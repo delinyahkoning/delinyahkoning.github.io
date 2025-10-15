@@ -29,7 +29,6 @@
   .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
   .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
 
-  /* your cursor */
   .cursor{
     position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
     pointer-events:none;background:rgba(155,212,255,.15);
@@ -61,20 +60,51 @@
         <filter id="liquify" x="-70%" y="-260%" width="240%" height="640%" filterUnits="objectBoundingBox">
           <!-- Normal map from offscreen canvas -->
           <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
-          <!-- A touch of blur to unify blobs -->
           <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
-          <!-- Liquify displacement (R->X, G->Y). Alpha unchanged. -->
+
+          <!-- Base displacement -->
           <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68"
-                             xChannelSelector="R" yChannelSelector="G" />
+                             xChannelSelector="R" yChannelSelector="G" result="disp"/>
+
+          <!-- ===== Prism mask: strength of displacement (|map - neutral|) ===== -->
+          <feFlood flood-color="rgb(128,128,0)" result="neutral"/>
+          <feBlend in="blur" in2="neutral" mode="difference" result="diff"/>          <!-- abs deviation -->
+          <feColorMatrix in="diff" type="saturate" values="0" result="strengthLum"/>  <!-- luminance -->
+          <feGaussianBlur in="strengthLum" stdDeviation="3" result="strength"/>       <!-- soften -->
+
+          <!-- Isolate channels of displaced text, mask by strength, then offset -->
+          <feColorMatrix in="disp" type="matrix" result="dispR"
+            values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+          <feColorMatrix in="disp" type="matrix" result="dispG"
+            values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+          <feColorMatrix in="disp" type="matrix" result="dispB"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+
+          <feComposite in="dispR" in2="strength" operator="in" result="maskR"/>
+          <feComposite in="dispG" in2="strength" operator="in" result="maskG"/>
+          <feComposite in="dispB" in2="strength" operator="in" result="maskB"/>
+
+          <!-- Tiny offsets; JS animates dx/dy via IDs below -->
+          <feOffset in="maskR" dx="0" dy="0" result="prismR" id="offR"/>
+          <feOffset in="maskG" dx="0" dy="0" result="prismG" id="offG"/>
+          <feOffset in="maskB" dx="0" dy="0" result="prismB" id="offB"/>
+
+          <!-- Composite back together: base displaced + RGB fringes -->
+          <feMerge>
+            <feMergeNode in="disp"/>
+            <feMergeNode in="prismR"/>
+            <feMergeNode in="prismG"/>
+            <feMergeNode in="prismB"/>
+          </feMerge>
         </filter>
       </defs>
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          This is...
+          Hi so this
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          test #2349587.
+          is a lil test.
         </text>
       </g>
     </svg>
@@ -116,27 +146,31 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // ================== Liquify-like local warp (no alpha change) ==================
+  // ================== Liquify-like local warp (no alpha change) + PRISM ==================
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
     const dm   = document.getElementById('dm');
+    const offR = document.getElementById('offR');
+    const offG = document.getElementById('offG');
+    const offB = document.getElementById('offB');
 
     const vb   = svg.viewBox.baseVal; // 1200x360
     const c = document.createElement('canvas');
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    // Trail of imprints (short-lived) — each is an oriented, twirled normal patch
-    const MAX_IMPRINTS = 22;    // length of trail
-    const LIFE = 520;           // ms each imprint lives
-    const BASE = 128;           // neutral R/G
-    const BASE_RADIUS = 110;    // px radius of influence
-    const STRETCH = 2.6;        // elongation along motion
-    const TWIRL = 0.9;          // 0..1 twirl strength around the center
-    const POWER = 1.0;          // global multiplier for effect (raise to 1.3 if you want more)
+    const MAX_IMPRINTS = 22;
+    const LIFE = 520;
+    const BASE = 128;
+    const BASE_RADIUS = 110;
+    const STRETCH = 2.6;
+    const TWIRL = 0.9;
+    const POWER = 1.0;
 
     const imprints = []; // {x,y,vx,vy,t}
+    let last = {x: vb.width/2, y: vb.height/2};
+    let vX = 0, vY = 0; // current mouse velocity (for prism direction)
 
     function toVB(e){
       const r = svg.getBoundingClientRect();
@@ -146,24 +180,21 @@
       };
     }
 
-    let last = {x: vb.width/2, y: vb.height/2};
-    let hovering = false;
-
     svg.addEventListener('mousemove', (e)=>{
       const p = toVB(e);
-      const vx = p.x - last.x;
-      const vy = p.y - last.y;
+      vX = p.x - last.x; vY = p.y - last.y;
       last = p;
-      hovering = true;
 
-      imprints.unshift({x:p.x, y:p.y, vx, vy, t: performance.now()});
+      imprints.unshift({x:p.x, y:p.y, vx:vX, vy:vY, t: performance.now()});
       if (imprints.length > MAX_IMPRINTS) imprints.pop();
     });
 
-    svg.addEventListener('mouseleave', ()=>{ hovering = false; });
+    svg.addEventListener('mouseleave', ()=>{ vX = vY = 0; });
+
+    function clamp(v){ return Math.max(0, Math.min(255, v)); }
+    function mix(a,b,t){ return a*(1-t)+b*t; }
 
     function drawNormalMap(){
-      // neutral normal everywhere
       ctx.clearRect(0,0,c.width,c.height);
       ctx.fillStyle = 'rgb(128,128,0)'; ctx.fillRect(0,0,c.width,c.height);
 
@@ -174,40 +205,29 @@
         const age = now - it.t;
         if (age > LIFE){ imprints.splice(i,1); continue; }
 
-        // normalized age & easing
-        const t = age / LIFE;                     // 0..1
-        const ease = 1 - (t*t*(3 - 2*t));         // smoothstep fade
-        const grow = 1 + 0.9*t;                   // slight expansion over life
+        const t = age / LIFE;
+        const ease = 1 - (t*t*(3 - 2*t));
+        const grow = 1 + 0.9*t;
 
-        // motion dir
         const vlen = Math.hypot(it.vx, it.vy) || 1;
         const ux = it.vx / vlen, uy = it.vy / vlen;
+        const disp = POWER * Math.min(1.2, vlen/14) * ease * 110;
 
-        // final displacement magnitude (stronger when moving faster)
-        const disp = POWER * Math.min(1.2, vlen/14) * ease * 110; // encodes into R/G range later
-
-        // We'll blend: directional push + a subtle swirl component
-        // swirl vector is perpendicular to (x,y) from patch center
         const cx = it.x, cy = it.y;
-
-        // draw oriented ellipse with gradient that encodes direction (R,G)
         const rx = BASE_RADIUS * STRETCH * grow;
         const ry = BASE_RADIUS * 0.85   * grow;
 
         ctx.save();
         ctx.translate(cx,cy);
-        ctx.rotate(Math.atan2(uy,ux)); // orient with motion
+        ctx.rotate(Math.atan2(uy,ux));
         ctx.scale(rx, ry);
 
-        // custom radial where center pixels carry push, edge falls to neutral
-        const g = ctx.createRadialGradient(0,0,0, 0,0,1);
-        // center push with swirl mix
-        // we approximate swirl by blending in a perpendicular push near mid-radius
         const pushX = BASE + (ux * disp * 0.6);
         const pushY = BASE + (uy * disp * 0.6);
         const spinX = BASE + ((-uy) * disp * TWIRL * 0.6);
         const spinY = BASE + (( ux) * disp * TWIRL * 0.6);
 
+        const g = ctx.createRadialGradient(0,0,0, 0,0,1);
         g.addColorStop(0.00, `rgb(${clamp(pushX)},${clamp(pushY)},0)`);
         g.addColorStop(0.45, `rgb(${clamp(mix(pushX,spinX,0.5))},${clamp(mix(pushY,spinY,0.5))},0)`);
         g.addColorStop(0.85, `rgb(128,128,0)`);
@@ -221,14 +241,28 @@
       nmEl.setAttribute('href', c.toDataURL('image/png'));
     }
 
-    function clamp(v){ return Math.max(0, Math.min(255, v)); }
-    function mix(a,b,t){ return a*(1-t)+b*t; }
-
+    // Animate + RGB prism offsets
     function animate(){
-      // keep the filter scale constant; the map encodes strength per-imprint
-      // (raise or lower the <feDisplacementMap scale> if you like:
-      //   document.getElementById('dm').setAttribute('scale', '80'); )
       drawNormalMap();
+
+      // prism magnitude based on current velocity and how many imprints are alive
+      const vMag = Math.min(1, Math.hypot(vX, vY) / 24);
+      const active = Math.min(1, imprints.length / MAX_IMPRINTS);
+      const amt = 3.2 * vMag * active; // max ~3.2px when fast; fades when trail fades
+
+      const dirX = vMag ? (vX / Math.hypot(vX, vY)) : 0;
+      const dirY = vMag ? (vY / Math.hypot(vX, vY)) : 0;
+
+      // R opposite motion, G slight with motion, B slight perpendicular
+      offR.setAttribute('dx', (-amt*1.0 * dirX).toFixed(2));
+      offR.setAttribute('dy', (-amt*1.0 * dirY).toFixed(2));
+
+      offG.setAttribute('dx', ( amt*0.6 * dirX).toFixed(2));
+      offG.setAttribute('dy', ( amt*0.6 * dirY).toFixed(2));
+
+      offB.setAttribute('dx', ( amt*0.9 * (-dirY)).toFixed(2)); // 90° turn
+      offB.setAttribute('dy', ( amt*0.9 * ( dirX)).toFixed(2));
+
       requestAnimationFrame(animate);
     }
     animate();
