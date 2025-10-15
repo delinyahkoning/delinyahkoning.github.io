@@ -24,15 +24,9 @@
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
   footer{padding:50px 0;color:var(--muted);text-align:center}
 
-  /* === Hero text (SVG) === */
   .hero-center{ text-align:center }
-  .hero-svg{ display:inline-block; width:min(92vw,1000px); height:auto }
+  .hero-svg{ display:inline-block; width:min(92vw,1100px); height:auto }
   .hero-sub{ color:var(--muted); max-width:760px; margin:12px auto 0 }
-
-  /* RGB split amount set in JS */
-  .split-r{ fill:#ff2a6d; mix-blend-mode:screen; opacity:.85 }
-  .split-g{ fill:#2aff79; mix-blend-mode:screen; opacity:.9 }
-  .split-b{ fill:#2ac8ff; mix-blend-mode:screen; opacity:.9 }
 
   /* === Custom Cursor (keeps native pointer) === */
   .cursor{
@@ -59,42 +53,38 @@
 
 <section class="hero">
   <div class="wrap hero-center">
-    <!-- The text lives entirely inside this SVG, so the filter can't clip against the page box -->
     <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <!-- Filter region expanded well beyond text bounds to prevent any cutoff -->
-        <filter id="rippleFilter" x="-40%" y="-120%" width="180%" height="300%" filterUnits="objectBoundingBox">
-          <!-- This <feImage> receives a dataURL from an offscreen canvas (normal map) every frame -->
+        <!-- Big filter region so nothing clips while warping -->
+        <filter id="rippleFilter" x="-60%" y="-260%" width="220%" height="560%" filterUnits="objectBoundingBox">
+          <!-- normal map from canvas -->
           <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
-          <feGaussianBlur in="map" stdDeviation="12" edgeMode="duplicate" result="blur"/>
-          <!-- Displace the glyphs using the normal map. R->X, G->Y -->
+          <feGaussianBlur in="map" stdDeviation="20" edgeMode="duplicate" result="blur"/>
+          <!-- main displacement -->
           <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="0"
-                             xChannelSelector="R" yChannelSelector="G" />
+                             xChannelSelector="R" yChannelSelector="G" result="disp"/>
+          <!-- RGB fringe (paint-only, no layout shift) -->
+          <feDropShadow in="disp" dx="0" dy="0" stdDeviation="0.6" flood-color="#ff2a6d" flood-opacity="0.9" result="r"/>
+          <feDropShadow in="disp" dx="0" dy="0" stdDeviation="0.6" flood-color="#2aff79" flood-opacity="0.9" result="g"/>
+          <feDropShadow in="disp" dx="0" dy="0" stdDeviation="0.6" flood-color="#2ac8ff" flood-opacity="0.9" result="b"/>
+          <feMerge>
+            <feMergeNode in="disp"/>
+            <feMergeNode in="r"/>
+            <feMergeNode in="g"/>
+            <feMergeNode in="b"/>
+          </feMerge>
         </filter>
       </defs>
 
-      <!-- Base (white) + three RGB splits, all filtered (warp happens per-glyph) -->
       <g filter="url(#rippleFilter)">
-        <text id="t-base" x="40" y="150" font-family="Arial, Helvetica, sans-serif"
+        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif"
               font-size="86" font-weight="700" fill="var(--ink)">
           Cinematic visuals,
         </text>
-        <text id="t-base-2" x="40" y="250" font-family="Arial, Helvetica, sans-serif"
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif"
               font-size="86" font-weight="700" fill="var(--ink)">
           science-minded design.
         </text>
-
-        <!-- RGB copies (subtle, follows velocity) -->
-        <g id="rgb">
-          <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-r">Cinematic visuals,</text>
-          <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-r">science-minded design.</text>
-
-          <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-g">Cinematic visuals,</text>
-          <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-g">science-minded design.</text>
-
-          <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-b">Cinematic visuals,</text>
-          <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-b">science-minded design.</text>
-        </g>
       </g>
     </svg>
 
@@ -137,137 +127,141 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // === Ripple text: per-pixel normal map driven by cursor velocity ===
+  // === Ripple with trailing flow + RGB prism (no layout shift) ===
   (function(){
     const svg  = document.getElementById('heroSVG');
-    const nmEl = document.getElementById('nm');    // <feImage>
-    const dmEl = document.getElementById('dm');    // <feDisplacementMap>
-    const rgb  = document.getElementById('rgb');
+    const nmEl = document.getElementById('nm');
+    const dmEl = document.getElementById('dm');
+    // the three feDropShadows are the 3 nodes after dm; grab them in order:
+    const filter = document.getElementById('rippleFilter');
+    const shadowR = filter.children[3];
+    const shadowG = filter.children[4];
+    const shadowB = filter.children[5];
 
-    // Offscreen canvas that encodes a normal map: R = X push, G = Y push (0..255 with 128 = no move)
+    // Offscreen normal-map canvas
     const cv = document.createElement('canvas');
     const ctx = cv.getContext('2d');
     const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
     function sizeCanvas(){
-      const {width, height} = svg.viewBox.baseVal;
-      cv.width  = Math.round(width * DPR);
-      cv.height = Math.round(height * DPR);
+      const vb = svg.viewBox.baseVal; // 1200x360
+      cv.width  = Math.round(vb.width * DPR);
+      cv.height = Math.round(vb.height * DPR);
     }
     sizeCanvas();
 
-    // Cursor state
+    // Cursor state + short trail for "flow out"
     let mouseX = 600, mouseY = 180;
-    let vx = 0, vy = 0;            // velocity
     let lastX = mouseX, lastY = mouseY;
-    let power = 0, target = 0;     // displacement strength
-    let split = 0;                 // rgb offset
-    const radius = 140;            // px influence radius in viewBox units
-    const strength = 48;           // max displacement px
-    const splitMax = 3.2;          // prism max px
+    let vx = 0, vy = 0;
+    let power = 0, target = 0;
+
+    const TRAIL = [];           // {x,y,age}
+    const TRAIL_MAX = 16;       // more = longer flow
+    const RADIUS = 210;         // influence radius (stronger + bigger)
+    const STRENGTH = 80;        // warp intensity (feDisplacementMap scale)
+    const PRISM = 3.5;          // max RGB prism px
+    const DAMP = 0.86;
+
+    function toVB(e){
+      const r = svg.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left) / r.width  * 1200,
+        y: (e.clientY - r.top)  / r.height * 360
+      };
+    }
 
     function onMove(e){
-      const bbox = svg.getBoundingClientRect();
-      const x = (e.clientX - bbox.left) / bbox.width  * 1200; // map to viewBox
-      const y = (e.clientY - bbox.top)  / bbox.height * 360;
-      vx = x - lastX; vy = y - lastY;
-      lastX = mouseX = x;
-      lastY = mouseY = y;
-      target = strength;
+      const p = toVB(e);
+      vx = p.x - lastX; vy = p.y - lastY;
+      lastX = mouseX = p.x; lastY = mouseY = p.y;
+      target = STRENGTH;
+
+      // push to trail
+      TRAIL.unshift({ x:mouseX, y:mouseY, age:0 });
+      if (TRAIL.length > TRAIL_MAX) TRAIL.pop();
     }
     svg.addEventListener('mousemove', onMove);
-    svg.addEventListener('mouseenter', ()=>{ target = strength; });
+    svg.addEventListener('mouseenter', ()=>{ target = STRENGTH; });
     svg.addEventListener('mouseleave', ()=>{ target = 0; });
 
     function drawNormalMap(){
       const w = cv.width, h = cv.height;
-      const s = 1200, t = 360; // viewBox
-      const scaleX = w / s, scaleY = h / t;
+      const sx = w / 1200, sy = h / 360;
 
-      // base neutral (128,128,0)
+      // neutral normal
       ctx.clearRect(0,0,w,h);
       ctx.fillStyle = 'rgb(128,128,0)';
       ctx.fillRect(0,0,w,h);
 
-      // directional falloff from cursor with velocity bias
-      const cx = mouseX * scaleX;
-      const cy = mouseY * scaleY;
-      const rad = radius * ((scaleX + scaleY)/2);
+      // decay trail ages, remove old
+      for (let i=TRAIL.length-1; i>=0; i--){
+        TRAIL[i].age += 1;
+        if (TRAIL[i].age > 40) { TRAIL.splice(i,1); }
+      }
 
-      // draw multiple rings to get that "balloon/ripple" feeling
-      const layers = 3;
-      for (let i=0;i<layers;i++){
-        const r = rad * (1 + i*0.22);
-        const amp = (power / strength) * (1 - i*0.28);
+      // draw blobs along the trail (newest strongest, older smoother & wider)
+      const len = Math.hypot(vx,vy) || 1;
+      const ux = vx/len, uy = vy/len;
 
-        // direction unit vector from velocity (fall back to last dir)
-        const len = Math.hypot(vx,vy) || 1;
-        const ux = vx/len, uy = vy/len;
+      TRAIL.forEach((p, idx) => {
+        const t = p.age / 40;                      // 0..1
+        const fall = Math.pow(1 - t, 1.4);         // ease-out
+        const amp = (power / STRENGTH) * (0.9 * fall + 0.1); // newer = stronger
+        const rad = (RADIUS * (0.8 + t * 0.9));    // older = wider ring
 
-        // encode displacement in R/G around the blob, signed via cos/sin around cursor
-        const grd = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
-        // center push
-        const pushX = 128 + (ux * 80 * amp); // 80 is channel intensity range
-        const pushY = 128 + (uy * 80 * amp);
+        const cx = p.x * sx, cy = p.y * sy;
+        const r  = rad * ((sx + sy)/2);
 
-        grd.addColorStop(0, `rgb(${pushX},${pushY},0)`);
-        grd.addColorStop(0.5, `rgb(128,128,0)`);
-        grd.addColorStop(1,   `rgb(128,128,0)`);
+        const pushX = 128 + (ux * 95 * amp);       // channel intensity
+        const pushY = 128 + (uy * 95 * amp);
 
-        ctx.fillStyle = grd;
+        const g = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+        // “balloon” center with soft ring
+        g.addColorStop(0.00, `rgb(${pushX},${pushY},0)`);
+        g.addColorStop(0.35, `rgb(${pushX},${pushY},0)`);
+        g.addColorStop(0.85, `rgb(128,128,0)`);
+        g.addColorStop(1.00, `rgb(128,128,0)`);
+
+        ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(cx,cy,r,0,Math.PI*2);
         ctx.fill();
-      }
+      });
 
-      // upload to filter as dataURL (fast enough at this size)
       nmEl.setAttribute('href', cv.toDataURL('image/png'));
     }
 
     function tick(){
-      // ease displacement & rgb split
-      power += (target - power) * 0.14;
+      // ease warp strength
+      power += (target - power) * 0.16;
       if (Math.abs(target - power) < 0.01) power = target;
       dmEl.setAttribute('scale', power.toFixed(2));
 
-      const targetSplit = (power/strength) * splitMax;
-      split += (targetSplit - split) * 0.2;
+      // RGB prism offsets follow direction, do not move the block
+      const mag = Math.min(1, Math.hypot(vx,vy)/30);
+      const off = (power/STRENGTH) * PRISM * mag;  // 0..PRISM
+      const ox = (vx ? vx/Math.abs(vx) : 0) * off;
+      const oy = (vy ? vy/Math.abs(vy) : 0) * off;
 
-      // nudge RGB copies opposite to velocity for prism effect (tiny, no layout shift)
-      const mag = Math.min(1, Math.hypot(vx,vy)/24);
-      const ox = (vx? vx/Math.abs(vx) : 0) * split * mag;
-      const oy = (vy? vy/Math.abs(vy) : 0) * split * mag;
-      const [r,g,b] = rgb.children;
-      // R
-      rgb.children[0].setAttribute('transform', `translate(${-ox},${-oy})`);
-      rgb.children[1].setAttribute('transform', `translate(${-ox},${-oy})`);
-      // G
-      rgb.children[2].setAttribute('transform', `translate(${ox*0.6},${oy*0.6})`);
-      rgb.children[3].setAttribute('transform', `translate(${ox*0.6},${oy*0.6})`);
-      // B
-      rgb.children[4].setAttribute('transform', `translate(${ox*1.1},${oy*1.1})`);
-      rgb.children[5].setAttribute('transform', `translate(${ox*1.1},${oy*1.1})`);
+      shadowR.setAttribute('dx', (-ox).toFixed(2));
+      shadowR.setAttribute('dy', (-oy).toFixed(2));
+      shadowG.setAttribute('dx', (ox*0.6).toFixed(2));
+      shadowG.setAttribute('dy', (oy*0.6).toFixed(2));
+      shadowB.setAttribute('dx', (ox*1.1).toFixed(2));
+      shadowB.setAttribute('dy', (oy*1.1).toFixed(2));
 
       drawNormalMap();
 
-      // slight velocity decay
-      vx *= 0.85; vy *= 0.85;
+      // velocity & trail damping
+      vx *= DAMP; vy *= DAMP;
 
       requestAnimationFrame(tick);
     }
     tick();
 
-    // keep canvas resolution in sync on resize / DPR changes
-    let dpr = DPR;
-    const resize = () => {
-      const newDpr = Math.max(1, Math.min(2, window.devicePixelRatio||1));
-      if (newDpr !== dpr){ dpr = newDpr; }
-      sizeCanvas();
-      // also update feImage size to match SVG viewBox
-      nmEl.setAttribute('width', '1200');
-      nmEl.setAttribute('height', '360');
-    };
-    window.addEventListener('resize', resize);
+    // DPR/resize sync
+    window.addEventListener('resize', ()=>{ sizeCanvas(); });
   })();
 </script>
 </body>
