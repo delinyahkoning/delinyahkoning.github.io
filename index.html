@@ -12,31 +12,21 @@
   .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
   header{position:sticky;top:0;z-index:50;background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
   .nav{display:flex;align-items:center;gap:16px;padding:14px 0}.brand{font-weight:700}.spacer{flex:1}
-  .tabs{display:flex;gap:10px;flex-wrap:wrap}
-  .tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
-  .tab:hover{background:#131623}
-  .tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
+  .tabs{display:flex;gap:10px;flex-wrap:wrap}.tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
+  .tab:hover{background:#131623}.tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
   .hero{min-height:58vh;display:grid;place-items:center;background:
     radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
     radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
     var(--bg)}
   section{padding:60px 0}
   .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
-  .grid{display:grid;gap:16px}
-  .cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .grid{display:grid;gap:16px}.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
   .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
   footer{padding:50px 0;color:var(--muted);text-align:center}
 
-  .hero-center{text-align:center; position:relative}
-  .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
+  .hero-center{text-align:center}
   .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
-
-  /* a transparent canvas sits over the text; pointer-events none */
-  #smokeMaskCanvas{
-    position:absolute; inset:auto 0 auto 0;
-    margin:0 auto; pointer-events:none; display:block; opacity:0.9;
-  }
 
   /* cursor */
   .cursor{
@@ -45,6 +35,9 @@
     border:1px solid rgba(155,212,255,.4);transform:translate(-50%,-50%);
     transition:width .15s,height .15s,background .2s;z-index:9999;
   }
+
+  /* make the SVG scale nicely */
+  .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
 </style>
 </head>
 <body>
@@ -63,41 +56,29 @@
 
 <section class="hero">
   <div class="wrap hero-center">
-    <!-- TEXT IN SVG (so we can filter without layout shift) -->
+    <!-- Text in SVG so we can apply a paint-only filter (no layout shift) -->
     <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <filter id="wispySmoke" x="-80%" y="-300%" width="260%" height="700%" filterUnits="objectBoundingBox">
-          <!-- low-frequency FBM: soft flow, not bubbly -->
-          <feTurbulence id="fbm" type="fractalNoise"
-                        baseFrequency="0.0045 0.0075" numOctaves="3" seed="19" result="noise"/>
-          <!-- smoke mask from canvas -->
-          <feImage id="maskImg" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="maskRaw"/>
-          <feGaussianBlur in="maskRaw" stdDeviation="16" edgeMode="duplicate" result="maskSoft"/>
-          <!-- localize displacement to wisps -->
-          <feComposite in="noise" in2="maskSoft" operator="in" result="localNoise"/>
-          <!-- gentle displacement -->
-          <feDisplacementMap id="dm" in="SourceGraphic" in2="localNoise" scale="24"
+        <!-- Oversized region so displaced pixels don't clip -->
+        <filter id="localTug" x="-60%" y="-200%" width="220%" height="500%" filterUnits="objectBoundingBox">
+          <!-- Normal map image (from offscreen canvas) -->
+          <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
+          <feGaussianBlur in="map" stdDeviation="14" result="blur"/>
+          <!-- Warp using R->X, G->Y -->
+          <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="0"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
-          <!-- tiny RGB shimmer (paint-only) -->
-          <feDropShadow in="disp" dx="-0.6" dy="-0.4" stdDeviation="0.25" flood-color="#ff2a6d" flood-opacity="0.85" result="r"/>
-          <feDropShadow in="disp" dx="0.45" dy="0.3" stdDeviation="0.25" flood-color="#2aff79" flood-opacity="0.85" result="g"/>
-          <feDropShadow in="disp" dx="0.9" dy="0.7" stdDeviation="0.25" flood-color="#2ac8ff" flood-opacity="0.85" result="b"/>
-          <feMerge><feMergeNode in="disp"/><feMergeNode in="r"/><feMergeNode in="g"/><feMergeNode in="b"/></feMerge>
         </filter>
       </defs>
 
-      <g filter="url(#wispySmoke)">
+      <g filter="url(#localTug)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          Cinematic visuals,
+          This is,
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          science-minded design.
+          a test.
         </text>
       </g>
     </svg>
-
-    <!-- smoke mask canvas (sent into filter) -->
-    <canvas id="smokeMaskCanvas" width="1200" height="360"></canvas>
 
     <p class="hero-sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
   </div>
@@ -128,150 +109,124 @@
 
 <script>
   // Year
-  document.getElementById('y').textContent=new Date().getFullYear();
+  document.getElementById('y').textContent = new Date().getFullYear();
 
-  // Cursor
-  const cursor=document.querySelector(".cursor");
+  // Cursor (keeping yours)
+  const cursor = document.querySelector(".cursor");
   document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
   document.querySelectorAll("a,button").forEach(el=>{
     el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(155,212,255,.25)";});
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // ===================== WISPY RIBBON SMOKE (quiet, cigarette-like) =====================
+  // ===== Localized tug/stretch filter (directional, with short trail) =====
   (function(){
-    const svg = document.getElementById('heroSVG');
-    const vb  = svg.viewBox.baseVal; // 1200x360
-    const cvs = document.getElementById('smokeMaskCanvas');
-    const ctx = cvs.getContext('2d');
-    const maskImg = document.getElementById('maskImg');
-    const dm = document.getElementById('dm');
-    const fbm = document.getElementById('fbm');
+    const svg   = document.getElementById('heroSVG');
+    const nmEl  = document.getElementById('nm');
+    const dmEl  = document.getElementById('dm');
 
-    // Position canvas to overlay the SVG region
-    function placeCanvas(){
-      const rect = svg.getBoundingClientRect();
-      const host = document.querySelector('.hero-center').getBoundingClientRect();
-      cvs.style.width  = rect.width + 'px';
-      cvs.style.height = rect.height + 'px';
-      cvs.style.left   = (rect.left - host.left) + 'px';
-      cvs.style.top    = (rect.top - host.top) + 'px';
+    // Offscreen canvas (NOT added to DOM) for the normal map
+    const vb = svg.viewBox.baseVal; // 1200x360
+    const DPR = 1; // keep 1:1 with filter coords for crisp mapping
+    const c = document.createElement('canvas');
+    const ctx = c.getContext('2d');
+    c.width = vb.width * DPR; c.height = vb.height * DPR;
+
+    // Trail of "imprints" (short-lived anisotropic blobs)
+    const imprints = []; // {x,y,vx,vy,age}
+    const MAX_IMPRINTS = 14;
+    const LIFE = 420;          // ms per imprint
+    const BASE = 128;          // neutral channel
+    const STRENGTH = 48;       // px displacement max
+    const RADIUS = 85;         // base radius
+    const STRETCH = 2.4;       // elongation along velocity
+    const EASING = t => t<.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2; // smooth in/out
+
+    // map cursor to viewBox units
+    function toVB(e){
+      const r = svg.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left) / r.width  * vb.width,
+        y: (e.clientY - r.top)  / r.height * vb.height
+      };
     }
-    placeCanvas();
-    window.addEventListener('resize', placeCanvas);
 
-    // Wisp ribbons (splines) — few, thin, drifting up
-    const RIBBONS = 4;           // number of concurrent wisps
-    const SPEED_Y = -22;         // upward drift (px/s, negative y)
-    const WOBBLE_X = 18;         // lateral meander amplitude
-    const WOBBLE_FREQ = 0.25;    // Hz of meander
-    const WIDTH_MIN = 8;         // minimum stroke width px
-    const WIDTH_MAX = 24;        // max stroke width px
-    const ALPHA = 0.16;          // stroke opacity
-    const BLUR_PX = 10;          // canvas blur to soften
-    const BUILD = 0.9;           // trail accumulation (closer to 1 = longer lingering)
-    const DM_SCALE_ON = 24;      // displacement while active
-    const DM_SCALE_OFF = 0;
+    let lastPos = {x: vb.width/2, y: vb.height/2};
+    let hover = false;
 
-    // Each ribbon has a spline of points; we animate control points over time
-    function makeRibbon(seed){
-      const pts = [];
-      const segments = 6;
-      for (let i=0;i<=segments;i++){
-        pts.push({ x: 200 + seed*150 + i*150, y: vb.height + i*18, n: i });
-      }
-      return { pts, seed, t: 0, w: WIDTH_MIN + (WIDTH_MAX-WIDTH_MIN)*(0.3+0.4*Math.random()) };
-    }
-    const ribbons = Array.from({length:RIBBONS}, (_,i)=>makeRibbon(i));
-
-    let hover=false, mx=vb.width/2, my=vb.height/2;
     svg.addEventListener('mousemove', (e)=>{
-      const r=svg.getBoundingClientRect();
-      mx=(e.clientX-r.left)/r.width*vb.width;
-      my=(e.clientY-r.top)/r.height*vb.height;
-      hover=true;
+      const p = toVB(e);
+      const vx = p.x - lastPos.x;
+      const vy = p.y - lastPos.y;
+      lastPos = p;
+      hover = true;
+
+      imprints.unshift({ x:p.x, y:p.y, vx, vy, t: performance.now() });
+      if (imprints.length > MAX_IMPRINTS) imprints.pop();
     });
-    svg.addEventListener('mouseleave', ()=>hover=false);
 
-    function perlinish(t){ return Math.sin(t) + 0.5*Math.sin(2.17*t+1.3) + 0.25*Math.sin(3.7*t+0.6); }
+    svg.addEventListener('mouseleave', ()=>{ hover = false; });
 
-    let last=performance.now()/1000;
-    function frame(){
-      const now=performance.now()/1000, dt=Math.min(0.033, now-last); last=now;
+    function drawNormalMap(){
+      // clear to neutral normal (128,128,0)
+      ctx.clearRect(0,0,c.width,c.height);
+      ctx.fillStyle = 'rgb(128,128,0)'; ctx.fillRect(0,0,c.width,c.height);
 
-      // Animate the base noise slightly (low frequency)
-      const bx = 0.0045 + Math.sin(now*0.22)*0.0012;
-      const by = 0.0075 + Math.cos(now*0.18)*0.0014;
-      fbm.setAttribute('baseFrequency', `${bx.toFixed(4)} ${by.toFixed(4)}`);
+      const now = performance.now();
 
-      // Displacement strength easing
-      const target = hover ? DM_SCALE_ON : DM_SCALE_OFF;
-      const cur = parseFloat(dm.getAttribute('scale')) || 0;
-      dm.setAttribute('scale', (cur + (target-cur)*0.08).toFixed(2));
+      // draw each imprint as an oriented soft ellipse that fades & expands
+      for (let i=imprints.length-1; i>=0; i--){
+        const it = imprints[i];
+        const age = now - it.t;
+        if (age > LIFE){ imprints.splice(i,1); continue; }
 
-      // fade old mask (soft accumulation)
-      ctx.globalCompositeOperation='source-over';
-      ctx.fillStyle = `rgba(0,0,0,${1-BUILD})`;
-      ctx.fillRect(0,0,cvs.width,cvs.height);
+        const t = age / LIFE;               // 0..1
+        const fade = 1 - EASING(t);         // ease-out
+        const grow = 1 + t * 0.8;           // expands a bit over time
 
-      // draw ribbons
-      ctx.save();
-      ctx.filter = `blur(${BLUR_PX}px)`;
-      ctx.globalCompositeOperation='lighter'; // additive for airy feel
-      ctx.lineCap='round'; ctx.lineJoin='round';
-      ctx.strokeStyle = `rgba(255,255,255,${ALPHA})`;
+        const len = Math.hypot(it.vx,it.vy) || 1;
+        const ux = it.vx/len, uy = it.vy/len;
 
-      const scaleX = cvs.width / vb.width;
-      const scaleY = cvs.height / vb.height;
-      ctx.setTransform(scaleX,0,0,scaleY,0,0);
+        const disp = STRENGTH * Math.min(1, len/18) * fade; // stronger when moving faster
+        const pushX = BASE + ux * disp;
+        const pushY = BASE + uy * disp;
 
-      ribbons.forEach((rb,i)=>{
-        rb.t += dt;
-        // move control pts upward and wobble x
-        rb.pts.forEach(p=>{
-          const base = (rb.seed*0.6 + p.n*0.33);
-          const wiggle = WOBBLE_X * perlinish((rb.t+base)*WOBBLE_FREQ*2*Math.PI) * (0.35 + 0.65*(p.n/rb.pts.length));
-          p.x += (i%2? -1:1) * wiggle * 0.02; // slow side-shift
-          p.y += SPEED_Y * dt;
-          // respawn above when out of view
-          if (p.y < -60) { p.y += vb.height + 120; }
-        });
+        const cx = it.x, cy = it.y;
+        const rx = RADIUS * STRETCH * grow;
+        const ry = RADIUS * 0.8   * grow;
 
-        // optional: bias ribbon toward mouse x when hovering (subtle)
-        if (hover){
-          const mid = rb.pts[Math.floor(rb.pts.length/2)];
-          const dx = (mx - mid.x) * 0.002;
-          rb.pts.forEach(p=> p.x += dx);
-        }
+        // draw oriented ellipse by transforming context
+        ctx.save();
+        ctx.translate(cx,cy);
+        ctx.rotate(Math.atan2(uy,ux));
+        ctx.scale(rx, ry);
 
-        // width breathing over time
-        const w = rb.w * (0.8 + 0.2*Math.sin(rb.t*1.3 + i));
+        // soft radial that encodes direction in R/G
+        const g = ctx.createRadialGradient(0,0,0, 0,0,1);
+        g.addColorStop(0.00, `rgb(${pushX},${pushY},0)`);
+        g.addColorStop(0.65, `rgb(${BASE+(pushX-BASE)*0.5},${BASE+(pushY-BASE)*0.5},0)`);
+        g.addColorStop(1.00, `rgb(${BASE},${BASE},0)`);
 
-        // draw spline
-        ctx.lineWidth = w;
-        ctx.beginPath();
-        for (let k=0;k<rb.pts.length;k++){
-          const p = rb.pts[k];
-          if (k===0) ctx.moveTo(p.x, p.y);
-          else {
-            const prev = rb.pts[k-1];
-            const cx = (prev.x + p.x)/2, cy=(prev.y+p.y)/2;
-            ctx.quadraticCurveTo(prev.x, prev.y, cx, cy);
-          }
-        }
-        ctx.stroke();
-      });
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
 
-      ctx.restore();
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.filter='none';
-
-      // upload mask to filter
-      maskImg.setAttribute('href', cvs.toDataURL('image/png'));
-
-      requestAnimationFrame(frame);
+      // upload to filter
+      nmEl.setAttribute('href', c.toDataURL('image/png'));
     }
-    frame();
+
+    // ease the overall scale so it “breathes” in/out when hovering
+    let scale = 0;
+    function tick(){
+      const target = hover ? 1 : 0;
+      scale += (target - scale) * 0.15;
+      dmEl.setAttribute('scale', (scale * 1).toFixed(2) * STRENGTH / 1.6); // global trim
+
+      drawNormalMap();
+      requestAnimationFrame(tick);
+    }
+    tick();
   })();
 </script>
 </body>
