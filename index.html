@@ -6,7 +6,7 @@
 <title>Delinyah Koning — Home</title>
 <meta name="description" content="Portfolio — 3D, 2D, Design, Photo." />
 <style>
-  :root{--bg:#0a0b0f;--ink:#e9ecf5;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px;--split:0px}
+  :root{--bg:#0a0b0f;--ink:#e9ecf5;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px}
   html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
   .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
   header{position:sticky;top:0;z-index:50;background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
@@ -24,20 +24,15 @@
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
   footer{padding:50px 0;color:var(--muted);text-align:center}
 
-  /* ====== RIPPLE TEXT ====== */
+  /* === Hero text (SVG) === */
   .hero-center{ text-align:center }
-  .ripple-wrap{ display:inline-block; position:relative }
-  /* stack 4 copies: white base + R, G, B with blend and micro offset */
-  .glitch{ position:relative; display:inline-block; line-height:1.1; margin:0 0 .6rem }
-  .glitch span{
-    position:absolute; inset:0; display:inline-block; filter:url(#ripple);
-    will-change:transform, filter;
-  }
-  .glitch .base{ position:relative; color:var(--ink); filter:url(#ripple) }
-  .glitch .r{ color:#ff2a6d; mix-blend-mode:screen; transform:translateX(calc(var(--split) * -1)); opacity:.85 }
-  .glitch .g{ color:#2aff79; mix-blend-mode:screen; transform:translateX(calc(var(--split) * .6)); opacity:.9 }
-  .glitch .b{ color:#2ac8ff; mix-blend-mode:screen; transform:translateX(calc(var(--split) * 1.1)); opacity:.9 }
+  .hero-svg{ display:inline-block; width:min(92vw,1000px); height:auto }
   .hero-sub{ color:var(--muted); max-width:760px; margin:12px auto 0 }
+
+  /* RGB split amount set in JS */
+  .split-r{ fill:#ff2a6d; mix-blend-mode:screen; opacity:.85 }
+  .split-g{ fill:#2aff79; mix-blend-mode:screen; opacity:.9 }
+  .split-b{ fill:#2ac8ff; mix-blend-mode:screen; opacity:.9 }
 
   /* === Custom Cursor (keeps native pointer) === */
   .cursor{
@@ -64,16 +59,46 @@
 
 <section class="hero">
   <div class="wrap hero-center">
-    <div class="ripple-wrap" id="rippleWrap">
-      <!-- stacked copies for prism split -->
-      <h1 class="glitch" id="heroText" data-text="Cinematic visuals, science-minded design." style="font-size:clamp(36px,6vw,64px)">
-        <span class="base">Cinematic visuals, <br>science-minded design.</span>
-        <span class="r">Cinematic visuals, <br>science-minded design.</span>
-        <span class="g">Cinematic visuals, <br>science-minded design.</span>
-        <span class="b">Cinematic visuals, <br>science-minded design.</span>
-      </h1>
-      <p class="hero-sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
-    </div>
+    <!-- The text lives entirely inside this SVG, so the filter can't clip against the page box -->
+    <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <!-- Filter region expanded well beyond text bounds to prevent any cutoff -->
+        <filter id="rippleFilter" x="-40%" y="-120%" width="180%" height="300%" filterUnits="objectBoundingBox">
+          <!-- This <feImage> receives a dataURL from an offscreen canvas (normal map) every frame -->
+          <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
+          <feGaussianBlur in="map" stdDeviation="12" edgeMode="duplicate" result="blur"/>
+          <!-- Displace the glyphs using the normal map. R->X, G->Y -->
+          <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="0"
+                             xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+
+      <!-- Base (white) + three RGB splits, all filtered (warp happens per-glyph) -->
+      <g filter="url(#rippleFilter)">
+        <text id="t-base" x="40" y="150" font-family="Arial, Helvetica, sans-serif"
+              font-size="86" font-weight="700" fill="var(--ink)">
+          Cinematic visuals,
+        </text>
+        <text id="t-base-2" x="40" y="250" font-family="Arial, Helvetica, sans-serif"
+              font-size="86" font-weight="700" fill="var(--ink)">
+          science-minded design.
+        </text>
+
+        <!-- RGB copies (subtle, follows velocity) -->
+        <g id="rgb">
+          <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-r">Cinematic visuals,</text>
+          <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-r">science-minded design.</text>
+
+          <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-g">Cinematic visuals,</text>
+          <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-g">science-minded design.</text>
+
+          <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-b">Cinematic visuals,</text>
+          <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" class="split-b">science-minded design.</text>
+        </g>
+      </g>
+    </svg>
+
+    <p class="hero-sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
   </div>
 </section>
 
@@ -98,38 +123,13 @@
 
 <footer>© <span id="y"></span> Delinyah Koning</footer>
 
-<!-- Invisible defs: the ripple filter -->
-<svg width="0" height="0" style="position:absolute">
-  <defs>
-    <!-- userSpaceOnUse lets us move the ripple in px inside the text box -->
-    <filter id="ripple" x="0" y="0" width="0" height="0" filterUnits="userSpaceOnUse">
-      <!-- a soft circular heightmap we’ll slide under the text -->
-      <feImage id="rip-img" x="0" y="0" width="240" height="240" preserveAspectRatio="none"
-        href='data:image/svg+xml;utf8,
-        <svg xmlns="http://www.w3.org/2000/svg" width="240" height="240">
-          <defs>
-            <radialGradient id="g" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="rgb(255,255,255)"/>
-              <stop offset="100%" stop-color="rgb(0,0,0)"/>
-            </radialGradient>
-          </defs>
-          <rect width="100%%" height="100%%" fill="url(#g)"/>
-        </svg>' result="map"/>
-      <feGaussianBlur in="map" stdDeviation="14" result="blur"/>
-      <!-- the actual warp; scale animated in JS -->
-      <feDisplacementMap id="rip-dm" in="SourceGraphic" in2="blur" scale="0"
-                         xChannelSelector="R" yChannelSelector="G" />
-    </filter>
-  </defs>
-</svg>
-
 <div class="cursor"></div>
 
 <script>
   // Year
   document.getElementById('y').textContent=new Date().getFullYear();
 
-  // === Custom cursor (keeps native pointer) ===
+  // Custom cursor
   const cursor=document.querySelector(".cursor");
   document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
   document.querySelectorAll("a,button").forEach(el=>{
@@ -137,66 +137,137 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // === Ripple text logic ===
+  // === Ripple text: per-pixel normal map driven by cursor velocity ===
   (function(){
-    const wrap = document.getElementById('rippleWrap');
-    const text = document.getElementById('heroText');
-    const filter = document.getElementById('ripple');
-    const img = document.getElementById('rip-img');
-    const disp = document.getElementById('rip-dm');
+    const svg  = document.getElementById('heroSVG');
+    const nmEl = document.getElementById('nm');    // <feImage>
+    const dmEl = document.getElementById('dm');    // <feDisplacementMap>
+    const rgb  = document.getElementById('rgb');
 
-    // apply filter to all stacked copies
-    text.querySelectorAll('span').forEach(s => s.style.filter = 'url(#ripple)');
+    // Offscreen canvas that encodes a normal map: R = X push, G = Y push (0..255 with 128 = no move)
+    const cv = document.createElement('canvas');
+    const ctx = cv.getContext('2d');
+    const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
-    const MAP_SIZE = 240; // pixels of the radial map image
-    let hover = false, power = 0, target = 0;
-
-    function setRegion(){
-      const r = text.getBoundingClientRect();
-      // set the filter's region to the text box (in px)
-      filter.setAttribute('x', 0);
-      filter.setAttribute('y', 0);
-      filter.setAttribute('width', r.width);
-      filter.setAttribute('height', r.height);
-      // also position the SVG defs element so coords are relative
-      const style = getComputedStyle(text);
+    function sizeCanvas(){
+      const {width, height} = svg.viewBox.baseVal;
+      cv.width  = Math.round(width * DPR);
+      cv.height = Math.round(height * DPR);
     }
-    setRegion();
-    window.addEventListener('resize', setRegion);
+    sizeCanvas();
 
-    function move(e){
-      const r = text.getBoundingClientRect();
-      const x = e.clientX - r.left;
-      const y = e.clientY - r.top;
-      // center the radial map on the cursor
-      img.setAttribute('x', Math.round(x - MAP_SIZE/2));
-      img.setAttribute('y', Math.round(y - MAP_SIZE/2));
-      // small chromatic split while moving
-      document.documentElement.style.setProperty('--split', hover ? '3px' : '0px');
-      target = 42; // desired warp strength while hovering
+    // Cursor state
+    let mouseX = 600, mouseY = 180;
+    let vx = 0, vy = 0;            // velocity
+    let lastX = mouseX, lastY = mouseY;
+    let power = 0, target = 0;     // displacement strength
+    let split = 0;                 // rgb offset
+    const radius = 140;            // px influence radius in viewBox units
+    const strength = 48;           // max displacement px
+    const splitMax = 3.2;          // prism max px
+
+    function onMove(e){
+      const bbox = svg.getBoundingClientRect();
+      const x = (e.clientX - bbox.left) / bbox.width  * 1200; // map to viewBox
+      const y = (e.clientY - bbox.top)  / bbox.height * 360;
+      vx = x - lastX; vy = y - lastY;
+      lastX = mouseX = x;
+      lastY = mouseY = y;
+      target = strength;
+    }
+    svg.addEventListener('mousemove', onMove);
+    svg.addEventListener('mouseenter', ()=>{ target = strength; });
+    svg.addEventListener('mouseleave', ()=>{ target = 0; });
+
+    function drawNormalMap(){
+      const w = cv.width, h = cv.height;
+      const s = 1200, t = 360; // viewBox
+      const scaleX = w / s, scaleY = h / t;
+
+      // base neutral (128,128,0)
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = 'rgb(128,128,0)';
+      ctx.fillRect(0,0,w,h);
+
+      // directional falloff from cursor with velocity bias
+      const cx = mouseX * scaleX;
+      const cy = mouseY * scaleY;
+      const rad = radius * ((scaleX + scaleY)/2);
+
+      // draw multiple rings to get that "balloon/ripple" feeling
+      const layers = 3;
+      for (let i=0;i<layers;i++){
+        const r = rad * (1 + i*0.22);
+        const amp = (power / strength) * (1 - i*0.28);
+
+        // direction unit vector from velocity (fall back to last dir)
+        const len = Math.hypot(vx,vy) || 1;
+        const ux = vx/len, uy = vy/len;
+
+        // encode displacement in R/G around the blob, signed via cos/sin around cursor
+        const grd = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+        // center push
+        const pushX = 128 + (ux * 80 * amp); // 80 is channel intensity range
+        const pushY = 128 + (uy * 80 * amp);
+
+        grd.addColorStop(0, `rgb(${pushX},${pushY},0)`);
+        grd.addColorStop(0.5, `rgb(128,128,0)`);
+        grd.addColorStop(1,   `rgb(128,128,0)`);
+
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.fill();
+      }
+
+      // upload to filter as dataURL (fast enough at this size)
+      nmEl.setAttribute('href', cv.toDataURL('image/png'));
     }
 
-    function enter(){
-      hover = true;
-      target = 42; // peak warp
-    }
-    function leave(){
-      hover = false;
-      target = 0;
-      document.documentElement.style.setProperty('--split', '0px');
-    }
-
-    text.addEventListener('mousemove', move);
-    text.addEventListener('mouseenter', enter);
-    text.addEventListener('mouseleave', leave);
-
-    // ease the displacement strength for a smooth feel
     function tick(){
-      power += (target - power) * 0.12;               // ease
-      disp.setAttribute('scale', power.toFixed(2));   // update filter
+      // ease displacement & rgb split
+      power += (target - power) * 0.14;
+      if (Math.abs(target - power) < 0.01) power = target;
+      dmEl.setAttribute('scale', power.toFixed(2));
+
+      const targetSplit = (power/strength) * splitMax;
+      split += (targetSplit - split) * 0.2;
+
+      // nudge RGB copies opposite to velocity for prism effect (tiny, no layout shift)
+      const mag = Math.min(1, Math.hypot(vx,vy)/24);
+      const ox = (vx? vx/Math.abs(vx) : 0) * split * mag;
+      const oy = (vy? vy/Math.abs(vy) : 0) * split * mag;
+      const [r,g,b] = rgb.children;
+      // R
+      rgb.children[0].setAttribute('transform', `translate(${-ox},${-oy})`);
+      rgb.children[1].setAttribute('transform', `translate(${-ox},${-oy})`);
+      // G
+      rgb.children[2].setAttribute('transform', `translate(${ox*0.6},${oy*0.6})`);
+      rgb.children[3].setAttribute('transform', `translate(${ox*0.6},${oy*0.6})`);
+      // B
+      rgb.children[4].setAttribute('transform', `translate(${ox*1.1},${oy*1.1})`);
+      rgb.children[5].setAttribute('transform', `translate(${ox*1.1},${oy*1.1})`);
+
+      drawNormalMap();
+
+      // slight velocity decay
+      vx *= 0.85; vy *= 0.85;
+
       requestAnimationFrame(tick);
     }
     tick();
+
+    // keep canvas resolution in sync on resize / DPR changes
+    let dpr = DPR;
+    const resize = () => {
+      const newDpr = Math.max(1, Math.min(2, window.devicePixelRatio||1));
+      if (newDpr !== dpr){ dpr = newDpr; }
+      sizeCanvas();
+      // also update feImage size to match SVG viewBox
+      nmEl.setAttribute('width', '1200');
+      nmEl.setAttribute('height', '360');
+    };
+    window.addEventListener('resize', resize);
   })();
 </script>
 </body>
