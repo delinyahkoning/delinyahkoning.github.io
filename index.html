@@ -57,40 +57,56 @@
 
 <section class="hero">
   <div class="wrap hero-center">
-    <!-- TEXT IN SVG (so warps never clip layout) -->
+    <!-- Text in SVG so paint can warp without layout shift -->
     <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <!-- Oversized region prevents clipping while warping -->
+        <!-- Oversized region prevents any clipping while warping -->
         <filter id="smokeFilter" x="-80%" y="-300%" width="260%" height="700%" filterUnits="objectBoundingBox">
-          <!-- Fractal noise = smoke field -->
-          <feTurbulence id="noise" type="fractalNoise" baseFrequency="0.0062 0.0105" numOctaves="3" seed="2" result="turb"/>
-          <!-- Mouse trail mask (from canvas) -->
+          <!-- Two layers of animated noise (coarse + fine) -->
+          <feTurbulence id="noiseCoarse" type="fractalNoise"
+                        baseFrequency="0.0035 0.0060" numOctaves="2" seed="11" result="nc"/>
+          <feTurbulence id="noiseFine" type="fractalNoise"
+                        baseFrequency="0.0140 0.0200" numOctaves="4" seed="37" result="nf"/>
+          <feBlend in="nc" in2="nf" mode="multiply" result="noiseMix"/>
+
+          <!-- Mouse smoke mask from canvas -->
           <feImage id="trail" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="trailImg"/>
-          <feGaussianBlur in="trailImg" stdDeviation="26" edgeMode="duplicate" result="trailSoft"/>
-          <!-- Localize smoke to trail -->
-          <feComposite in="turb" in2="trailSoft" operator="in" result="localTurb"/>
-          <!-- Displace glyphs with localized smoke -->
-          <feDisplacementMap id="dm" in="SourceGraphic" in2="localTurb" scale="76"
+          <feGaussianBlur in="trailImg" stdDeviation="24" edgeMode="duplicate" result="trailSoft"/>
+
+          <!-- Restrict noise to the smoke mask -->
+          <feComposite in="noiseMix" in2="trailSoft" operator="in" result="localNoise"/>
+
+          <!-- Subtle contrast to emphasize wisps, not blobs -->
+          <feColorMatrix in="localNoise" type="matrix"
+            values="
+              1.2 0   0   0  0
+              0   1.2 0   0  0
+              0   0   1   0  0
+              0   0   0   1  0" result="noisey"/>
+
+          <!-- Displace glyphs with smoky field -->
+          <feDisplacementMap id="dm" in="SourceGraphic" in2="noisey" scale="34"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
-          <!-- Directional RGB fringe (paint only; no layout shift) -->
-          <feDropShadow in="disp" dx="-1.6" dy="-1.2" stdDeviation="0.4" flood-color="#ff2a6d" flood-opacity="0.95" result="r"/>
-          <feDropShadow in="disp" dx="1.0" dy="0.7" stdDeviation="0.4" flood-color="#2aff79" flood-opacity="0.95" result="g"/>
-          <feDropShadow in="disp" dx="1.8" dy="1.6" stdDeviation="0.4" flood-color="#2ac8ff" flood-opacity="0.95" result="b"/>
+
+          <!-- Tiny RGB fringe (paint only; no layout movement) -->
+          <feDropShadow in="disp" dx="-0.9" dy="-0.7" stdDeviation="0.35" flood-color="#ff2a6d" flood-opacity="0.9" result="r"/>
+          <feDropShadow in="disp" dx="0.6" dy="0.4" stdDeviation="0.35" flood-color="#2aff79" flood-opacity="0.9" result="g"/>
+          <feDropShadow in="disp" dx="1.1" dy="0.9" stdDeviation="0.35" flood-color="#2ac8ff" flood-opacity="0.9" result="b"/>
           <feMerge><feMergeNode in="disp"/><feMergeNode in="r"/><feMergeNode in="g"/><feMergeNode in="b"/></feMerge>
         </filter>
       </defs>
 
       <g filter="url(#smokeFilter)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          Hi,
+          Cinematic visuals,
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          this is a test.
+          science-minded design.
         </text>
       </g>
     </svg>
 
-    <p class="hero-sub">[Headliner]</p>
+    <p class="hero-sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
   </div>
 </section>
 
@@ -121,7 +137,7 @@
   // Year
   document.getElementById('y').textContent=new Date().getFullYear();
 
-  // Custom cursor (keeps native)
+  // Custom cursor
   const cursor=document.querySelector(".cursor");
   document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
   document.querySelectorAll("a,button").forEach(el=>{
@@ -129,15 +145,16 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // ===== Localized smoky warp with smooth fade =====
+  // ===== FADING-SMOKE TEXT WARP =====
   (function(){
-    const svg      = document.getElementById('heroSVG');
-    const vb       = svg.viewBox.baseVal; // 1200 x 360
-    const noise    = document.getElementById('noise'); // feTurbulence
-    const trailImg = document.getElementById('trail'); // feImage (mask)
-    const dm       = document.getElementById('dm');    // feDisplacementMap
+    const svg       = document.getElementById('heroSVG');
+    const vb        = svg.viewBox.baseVal; // 1200 x 360
+    const trailImg  = document.getElementById('trail');
+    const dm        = document.getElementById('dm');
+    const nCoarse   = document.getElementById('noiseCoarse');
+    const nFine     = document.getElementById('noiseFine');
 
-    // Offscreen canvas for soft trail mask
+    // Offscreen canvas for smoke mask
     const DPR = Math.max(1, Math.min(2, window.devicePixelRatio||1));
     const c = document.createElement('canvas');
     const ctx = c.getContext('2d');
@@ -147,17 +164,16 @@
     }
     resizeCanvas();
 
-    // Localized + smooth parameters
-    const TRAIL = [];  // {x,y,age}
-    const MAX_N = 6;  // fewer blobs = tighter area
-    const LIFE  = 60;  // shorter life = quicker fade
-    const BASE_R= 15; // smaller base radius = localized
-    const GROW  = 1.5; // less growth = less sprawl
-    const ALPHA = 0.3;// a bit stronger since radius is smaller
+    // Smoke trail: tight & fading (no balloon math)
+    const TRAIL = [];          // {x,y,age}
+    const MAX_N = 12;          // how many puffs remembered
+    const LIFE  = 44;          // frames each puff lives
+    const BASE_R= 120;         // initial radius (localized)
+    const GROW  = 1.18;        // mild expansion over life
+    const ALPHA = 0.25;        // opacity of the mask puff
 
-    let t = 0;
+    let t = 0, hover=false;
     let mx = vb.width/2, my = vb.height/2;
-    let hover = false;
 
     function toVB(e){
       const r = svg.getBoundingClientRect();
@@ -179,53 +195,50 @@
       const sx = c.width / vb.width, sy = c.height / vb.height;
       ctx.clearRect(0,0,c.width,c.height);
 
-      // oldest -> newest for build-up
+      // fade oldest to newest
       for(let i=TRAIL.length-1;i>=0;i--){
         const p = TRAIL[i];
         const life = p.age / LIFE; // 0..1
         if (life >= 1){ TRAIL.splice(i,1); continue; }
 
-        // eased opacity and radius for smooth fade
+        // smooth smoke fade (no hard edges)
         const easeOut = x => 1 - Math.pow(1 - x, 2);
-        const easeIn  = x => Math.pow(x, 2);
-        const fade    = 1 - easeIn(life); // start strong, end gently
+        const easeIn  = x => x*x;
+        const fade    = 1 - easeIn(life);
         const a       = ALPHA * fade;
 
         const rGrow   = 1 + easeOut(life) * (GROW - 1);
         const radius  = (BASE_R * rGrow) * ((sx+sy)/2);
 
         const cx = p.x * sx, cy = p.y * sy;
-
         const g = ctx.createRadialGradient(cx,cy,0,cx,cy,radius);
         g.addColorStop(0.00, `rgba(255,255,255,${a})`);
-        g.addColorStop(0.60, `rgba(255,255,255,${a*0.6})`);
+        g.addColorStop(0.55, `rgba(255,255,255,${a*0.55})`);
         g.addColorStop(1.00, `rgba(255,255,255,0)`);
         ctx.fillStyle = g;
         ctx.beginPath(); ctx.arc(cx,cy,radius,0,Math.PI*2); ctx.fill();
 
         p.age += 1;
       }
-
       trailImg.setAttribute('href', c.toDataURL('image/png'));
     }
 
     function tick(){
       t += 0.016;
 
-      // Gentle smoke drift
-      const bx = 0.0062 + Math.sin(t*0.35)*0.0016;
-      const by = 0.0105 + Math.cos(t*0.28)*0.0021;
-      noise.setAttribute('baseFrequency', `${bx.toFixed(4)} ${by.toFixed(4)}`);
-      if ((t|0) % 3 === 0) noise.setAttribute('seed', String(2 + ((t*10)|0)%50));
+      // Gentle, organic drift of both noise layers (feels smoky, not wavy)
+      const bx1 = 0.0035 + Math.sin(t*0.25)*0.0009;
+      const by1 = 0.0060 + Math.cos(t*0.20)*0.0012;
+      nCoarse.setAttribute('baseFrequency', `${bx1.toFixed(4)} ${by1.toFixed(4)}`);
 
-      // Velocity-aware, smooth scale without popping
-      const last = TRAIL[1] || TRAIL[0] || {x:mx,y:my};
-      const vMag = Math.min(1, Math.hypot(mx - last.x, my - last.y) / 35);
-      const base = hover ? 76 : 0;                    // base intensity on hover
-      const targetScale = base * (0.6 + 0.4 * vMag);  // slightly stronger while moving
+      const bx2 = 0.0140 + Math.sin(t*0.38)*0.0018;
+      const by2 = 0.0200 + Math.cos(t*0.32)*0.0021;
+      nFine.setAttribute('baseFrequency', `${bx2.toFixed(4)} ${by2.toFixed(4)}`);
+
+      // Smooth in/out of overall displacement (no popping)
+      const target = hover ? 34 : 0;  // subtle, smoky
       const current = parseFloat(dm.getAttribute('scale')) || 0;
-      const smoothstep = x => x*x*(3 - 2*x);
-      dm.setAttribute('scale', (current + (targetScale - current)*0.10*smoothstep(0.9)).toFixed(2));
+      dm.setAttribute('scale', (current + (target - current)*0.12).toFixed(2));
 
       drawTrail();
       requestAnimationFrame(tick);
