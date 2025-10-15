@@ -3,310 +3,66 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Delinyah Koning — Portfolio</title>
-<meta name="description" content="Cinematic 3D · 2D animation · Illustration · Design · Photo/Video · Audio" />
+<title>Delinyah Koning — Home</title>
+<meta name="description" content="Portfolio — 3D, 2D, Design, Photo/Video." />
 <style>
-  /* ---------- design tokens ---------- */
-  :root{
-    --bg:#0a0b0f;
-    --ink:#e9ecf5;
-    --muted:#9aa0b3;
-    --accent:#9bd4ff;
-    --panel:#10121a;
-    --radius:18px;
-    --max:1200px;
-  }
-  html,body{height:100%}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif;overflow-x:hidden}
-
-  /* ---------- global ---------- */
+  :root{--bg:#0a0b0f;--ink:#e9ecf5;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px}
+  html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
   .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
-  h1,h2,h3{line-height:1.1;margin:0 0 .6rem}
-  h1{font-size:clamp(36px,6vw,64px);letter-spacing:.4px}
-  h2{font-size:clamp(28px,4vw,40px)}
-  h3{font-size:20px}
-  p.sub{color:var(--muted)}
-  a{color:inherit;text-decoration:none}
-  .btn{display:inline-block;padding:.75rem 1.1rem;border:1px solid #2a2d3a;border-radius:999px;background:#121522}
-  .btn:hover{border-color:#3a3f52}
-
-  /* ---------- cursor ---------- */
-  .cursor{
-    position:fixed;inset:auto auto 0 0;pointer-events:none;z-index:9999;
-    width:18px;height:18px;border-radius:50%;
-    transform:translate(-50%,-50%);mix-blend-mode:difference;background:#fff;opacity:.9;
-  }
-
-  /* ---------- header / nav ---------- */
-  header{
-    position:sticky;top:0;z-index:50;
-    background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);
-    border-bottom:1px solid rgba(255,255,255,.06)
-  }
-  .nav{display:flex;align-items:center;gap:16px;padding:14px 0}
-  .brand{font-weight:700;letter-spacing:.3px}
-  .spacer{flex:1}
-  .tabs{display:flex;gap:10px;flex-wrap:wrap}
-  .tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px}
-  .tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
-
-  /* ---------- hero ---------- */
-  .hero{
-    position:relative;min-height:72vh;display:grid;place-items:center;
-    background:
-      radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
-      radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
-      var(--bg);
-    overflow:hidden;
-  }
-  .hero .backdrop{
-    position:absolute;inset:-10% -10% auto -10%;height:60vh;
-    background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0));
-    filter:blur(80px);transform:translateY(-10%) scale(1.2);
-    opacity:.35;pointer-events:none;
-  }
-  .hero .content{position:relative;z-index:2}
-  .kicker{letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-size:12px}
-  .actions{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
-
-  /* ---------- sections ---------- */
-  section{padding:70px 0}
-  .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);
-    border-radius:var(--radius);padding:24px;box-shadow:0 18px 40px rgba(0,0,0,.35)}
-
-  /* ---------- reveal ---------- */
-  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
-  .reveal.on{opacity:1;transform:none}
-
-  /* ---------- project grid with hover video ---------- */
-  .grid{display:grid;gap:16px}
-  .grid.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  .card{position:relative;overflow:hidden;border-radius:14px;background:#0d0f16;border:1px solid #232634}
-  .thumb{aspect-ratio:16/9;background:#151826;display:grid;place-items:center;color:#556}
-  .card video,.card img{width:100%;height:100%;object-fit:cover;display:block}
-  .card .meta{position:absolute;left:10px;bottom:10px;background:rgba(0,0,0,.45);
-    padding:8px 10px;border-radius:12px;color:#d7dcf0;font-size:13px;border:1px solid rgba(255,255,255,.12)}
-  .card:hover .meta{background:rgba(0,0,0,.65)}
-  .card:hover{box-shadow:0 12px 40px rgba(0,0,0,.45)}
-
-  /* ---------- two column for Home ---------- */
-  .cols{display:grid;gap:20px;grid-template-columns:1.2fr .8fr}
-
-  /* ---------- footer ---------- */
-  footer{padding:60px 0 40px;color:var(--muted);text-align:center}
-  @media (max-width:900px){.cols{grid-template-columns:1fr}}
+  header{position:sticky;top:0;z-index:50;background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
+  .nav{display:flex;align-items:center;gap:16px;padding:14px 0}.brand{font-weight:700}.spacer{flex:1}
+  .tabs{display:flex;gap:10px;flex-wrap:wrap}.tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
+  .tab:hover{background:#131623}.tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
+  .hero{min-height:58vh;display:grid;place-items:center;background:radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),var(--bg)}
+  h1{font-size:clamp(36px,6vw,64px);line-height:1.1;margin:0 0 .6rem} p.sub{color:var(--muted);max-width:760px;margin:0 auto}
+  section{padding:60px 0}.panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
+  .grid{display:grid;gap:16px}.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
+  .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
+  footer{padding:50px 0;color:var(--muted);text-align:center}
 </style>
 </head>
 <body>
+<header>
+  <div class="wrap nav">
+    <div class="brand">Delinyah Koning</div><div class="spacer"></div>
+    <nav class="tabs">
+      <a class="tab active" href="index.html">Home</a>
+      <a class="tab" href="3d.html">3D</a>
+      <a class="tab" href="2d.html">2D</a>
+      <a class="tab" href="design.html">Design</a>
+      <a class="tab" href="photo-video.html">Photo/Video</a>
+    </nav>
+  </div>
+</header>
 
-  <!-- custom cursor -->
-  <div class="cursor" aria-hidden="true"></div>
+<section class="hero">
+  <div class="wrap" style="text-align:center">
+    <h1>Cinematic visuals, science-minded design.</h1>
+    <p class="sub">3D scenes, 2D motion & illustration, identity systems, photography & video.</p>
+  </div>
+</section>
 
-  <!-- nav -->
-  <header>
-    <div class="wrap nav">
-      <div class="brand">Delinyah Koning</div>
-      <div class="spacer"></div>
-      <nav class="tabs">
-        <a class="tab active" href="#home">Home</a>
-        <a class="tab" href="#cinematic-3d">Cinematic 3D</a>
-        <a class="tab" href="#anim-2d">2D Animations</a>
-        <a class="tab" href="#ill-2d">2D Illustrations</a>
-        <a class="tab" href="#design-branding">Graphic Design & Branding</a>
-        <a class="tab" href="#photo-video">Photography & Videography</a>
-        <a class="tab" href="#audio">Audio Work</a>
-      </nav>
-    </div>
-  </header>
-
-  <!-- hero -->
-  <section class="hero" id="home">
-    <div class="backdrop" data-parallax="0.25"></div>
-    <div class="wrap content">
-      <span class="kicker">Portfolio</span>
-      <h1 class="reveal">Cinematic visuals, science-minded design.</h1>
-      <p class="sub reveal" style="max-width:760px">
-        I craft narrative 3D shots, clear 2D explainers, illustrations, and brand systems — with the rigor of a biomedical researcher.
-      </p>
-      <div class="actions reveal">
-        <a class="btn" href="#featured">See featured work</a>
-        <a class="btn" href="assets/Delinyah-Koning-Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+<section>
+  <div class="wrap" style="display:grid;gap:20px;grid-template-columns:1.2fr .8fr">
+    <div class="panel">
+      <h2 style="margin-top:0">Featured Work</h2>
+      <div class="grid cards" style="margin-top:12px">
+        <article class="card"><div class="thumb">assets/feat-1.mp4</div><strong>Lookdev Shot</strong><div class="sub" style="font-size:13px">Blender · 2025</div></article>
+        <article class="card"><div class="thumb">assets/feat-2.jpg</div><strong>Science Illustration</strong><div class="sub" style="font-size:13px">Vectors · 2025</div></article>
+        <article class="card"><div class="thumb">assets/feat-3.mp4</div><strong>Explainer Motion</strong><div class="sub" style="font-size:13px">AE · 30s</div></article>
       </div>
     </div>
-  </section>
+    <aside class="panel">
+      <h2 style="margin-top:0">About</h2>
+      <p class="sub">Biomedical research background × creative direction. I build clear, cinematic visuals for science, culture, and brands.</p>
+      <p><a class="tab" href="assets/Delinyah-Koning-Resume.pdf" target="_blank" style="display:inline-block">Resume (PDF)</a></p>
+      <p><a class="tab" href="mailto:you@example.com">you@example.com</a></p>
+    </aside>
+  </div>
+</section>
 
-  <!-- home: about + featured -->
-  <section id="featured" class="reveal">
-    <div class="wrap cols">
-      <div class="panel">
-        <h2>About</h2>
-        <p class="sub">Short bio here. Keep it crisp: your craft, tools, and what you love making.</p>
-        <ul>
-          <li><b>Tools:</b> Blender (Cycles), After Effects, Illustrator, InDesign, Reaper</li>
-          <li><b>Focus:</b> cinematic 3D, motion for explainers, science visuals</li>
-          <li><b>Available for:</b> commissions, collaborations, studio work</li>
-        </ul>
-      </div>
-      <aside class="panel">
-        <h2>Contact</h2>
-        <p class="sub">Email / socials / city</p>
-        <p><a class="btn" href="mailto:you@example.com">you@example.com</a></p>
-        <p><a class="btn" href="https://instagram.com/" target="_blank">Instagram</a> <a class="btn" href="https://github.com/delinyahkoning" target="_blank">GitHub</a></p>
-      </aside>
-    </div>
-  </section>
-
-  <section class="reveal">
-    <div class="wrap">
-      <h2>Featured Work</h2>
-      <div class="grid cards" style="margin-top:16px">
-        <!-- hover plays video if present, else shows image -->
-        <article class="card" data-video="assets/feat-1.mp4">
-          <div class="thumb">Video: assets/feat-1.mp4</div>
-          <div class="meta">Short Film Lookdev · Blender</div>
-        </article>
-        <article class="card" data-image="assets/feat-2.jpg">
-          <div class="thumb">Image: assets/feat-2.jpg</div>
-          <div class="meta">Science Illustration · Organelles</div>
-        </article>
-        <article class="card" data-video="assets/feat-3.mp4">
-          <div class="thumb">Video: assets/feat-3.mp4</div>
-          <div class="meta">Explainer Motion · AE</div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- cinematic 3D -->
-  <section id="cinematic-3d" class="reveal">
-    <div class="wrap">
-      <h2>Cinematic 3D</h2>
-      <p class="sub">Mood-driven, physically-plausible shots; lookdev, lighting, simulation.</p>
-      <div class="grid cards" style="margin-top:16px">
-        <article class="card" data-video="assets/3d-1.mp4"><div class="thumb">assets/3d-1.mp4</div><div class="meta">Frame study</div></article>
-        <article class="card" data-video="assets/3d-2.mp4"><div class="thumb">assets/3d-2.mp4</div><div class="meta">Procedural</div></article>
-        <article class="card" data-image="assets/3d-3.jpg"><div class="thumb">assets/3d-3.jpg</div><div class="meta">Sci-viz</div></article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2D animations -->
-  <section id="anim-2d" class="reveal">
-    <div class="wrap">
-      <h2>2D Animations</h2>
-      <div class="grid cards" style="margin-top:16px">
-        <article class="card" data-video="assets/anim-1.mp4"><div class="thumb">assets/anim-1.mp4</div><div class="meta">Explainer</div></article>
-        <article class="card" data-video="assets/anim-2.mp4"><div class="thumb">assets/anim-2.mp4</div><div class="meta">UI Motion</div></article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2D illustrations -->
-  <section id="ill-2d" class="reveal">
-    <div class="wrap">
-      <h2>2D Illustrations</h2>
-      <div class="grid cards" style="margin-top:16px">
-        <article class="card" data-image="assets/ill-1.jpg"><div class="thumb">assets/ill-1.jpg</div><div class="meta">Editorial</div></article>
-        <article class="card" data-image="assets/ill-2.jpg"><div class="thumb">assets/ill-2.jpg</div><div class="meta">Science</div></article>
-      </div>
-    </div>
-  </section>
-
-  <!-- design & branding -->
-  <section id="design-branding" class="reveal">
-    <div class="wrap">
-      <h2>Graphic Design & Branding</h2>
-      <div class="grid cards" style="margin-top:16px">
-        <article class="card" data-image="assets/brand-1.jpg"><div class="thumb">assets/brand-1.jpg</div><div class="meta">Identity</div></article>
-        <article class="card" data-image="assets/brand-2.jpg"><div class="thumb">assets/brand-2.jpg</div><div class="meta">Poster</div></article>
-      </div>
-    </div>
-  </section>
-
-  <!-- photo & video -->
-  <section id="photo-video" class="reveal">
-    <div class="wrap">
-      <h2>Photography & Videography</h2>
-      <div class="grid cards" style="margin-top:16px">
-        <article class="card" data-image="assets/photo-1.jpg"><div class="thumb">assets/photo-1.jpg</div><div class="meta">Series</div></article>
-        <article class="card" data-video="assets/video-1.mp4"><div class="thumb">assets/video-1.mp4</div><div class="meta">Music video</div></article>
-      </div>
-    </div>
-  </section>
-
-  <!-- audio -->
-  <section id="audio" class="reveal">
-    <div class="wrap">
-      <h2>Audio Work</h2>
-      <div class="grid cards" style="margin-top:16px">
-        <article class="card" data-audio="assets/track-1.mp3" data-image="assets/audio-1.jpg">
-          <div class="thumb">assets/track-1.mp3</div>
-          <div class="meta">Mix/Master</div>
-        </article>
-        <article class="card" data-audio="assets/track-2.mp3" data-image="assets/audio-2.jpg">
-          <div class="thumb">assets/track-2.mp3</div>
-          <div class="meta">Sound Design</div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <footer>© <span id="y"></span> Delinyah Koning</footer>
-
-<script>
-  // year
-  document.getElementById('y').textContent = new Date().getFullYear();
-
-  // active tab highlight on scroll
-  const tabs=[...document.querySelectorAll('.tab')];
-  const secs=tabs.map(t=>document.querySelector(t.getAttribute('href')));
-  const onScroll=()=>{const y=scrollY+100;let a=0;secs.forEach((s,i)=>{if(s.offsetTop<=y)a=i});tabs.forEach((t,i)=>t.classList.toggle('active',i===a))};
-  addEventListener('scroll',onScroll,{passive:true}); onScroll();
-
-  // reveal on view
-  const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('on')), {threshold:.12});
-  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-
-  // parallax elements: add data-parallax="0.3"
-  const parEls=[...document.querySelectorAll('[data-parallax]')];
-  addEventListener('scroll',()=>parEls.forEach(el=>{
-    const speed=parseFloat(el.dataset.parallax||0.2);
-    el.style.transform=`translateY(${scrollY*speed*-1}px) scale(1.2)`;
-  }),{passive:true});
-
-  // custom cursor
-  const cur=document.querySelector('.cursor');
-  addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'});
-
-  // project cards: lazy create video/img/audio on hover/in-view
-  const makeMedia=(card)=>{
-    if(card.dataset.made)return;
-    const v=card.dataset.video, img=card.dataset.image, aud=card.dataset.audio;
-    const slot=document.createElement(v?'video':'img');
-    if(v){
-      slot.src=v; slot.muted=true; slot.loop=true; slot.playsInline=true;
-      slot.addEventListener('canplay',()=>slot.play());
-    }else{
-      slot.src=img; slot.loading='lazy';
-    }
-    const thumb=card.querySelector('.thumb');
-    thumb.replaceWith(slot);
-    if(aud){
-      const p=new Audio(aud); p.preload='none';
-      card.addEventListener('mouseenter',()=>{p.currentTime=0; p.play().catch(()=>{})});
-      card.addEventListener('mouseleave',()=>p.pause());
-    }
-    card.dataset.made=1;
-  };
-  const cardObserver=new IntersectionObserver(es=>es.forEach(e=>{
-    if(e.isIntersecting) makeMedia(e.target)
-  }),{threshold:.3});
-  document.querySelectorAll('.card').forEach(c=>{
-    cardObserver.observe(c);
-    c.addEventListener('mouseenter',()=>{ if(c.querySelector('video')) c.querySelector('video').play()});
-    c.addEventListener('mouseleave',()=>{ const v=c.querySelector('video'); if(v) v.pause()});
-  });
-</script>
+<footer>© <span id="y"></span> Delinyah Koning</footer>
+<script>document.getElementById('y').textContent=new Date().getFullYear()</script>
 </body>
 </html>
