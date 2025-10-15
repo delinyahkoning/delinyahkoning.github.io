@@ -32,7 +32,7 @@
   .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
   .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
 
-  /* === Custom Cursor (keeps native pointer) === */
+  /* custom cursor (keeps native pointer) */
   .cursor{
     position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
     pointer-events:none;background:rgba(155,212,255,.15);
@@ -62,46 +62,44 @@
       <defs>
         <!-- Oversized region prevents any clipping while warping -->
         <filter id="smokeFilter" x="-80%" y="-300%" width="260%" height="700%" filterUnits="objectBoundingBox">
-          <!-- Two layers of animated noise (coarse + fine) -->
-          <feTurbulence id="noiseCoarse" type="fractalNoise"
-                        baseFrequency="0.0035 0.0060" numOctaves="2" seed="11" result="nc"/>
-          <feTurbulence id="noiseFine" type="fractalNoise"
-                        baseFrequency="0.0140 0.0200" numOctaves="4" seed="37" result="nf"/>
+          <!-- Two animated noise layers (wisps) -->
+          <feTurbulence id="noiseCoarse" type="fractalNoise" baseFrequency="0.0035 0.0060" numOctaves="2" seed="11" result="nc"/>
+          <feTurbulence id="noiseFine"   type="fractalNoise" baseFrequency="0.0120 0.0180" numOctaves="4" seed="37" result="nf"/>
           <feBlend in="nc" in2="nf" mode="multiply" result="noiseMix"/>
 
-          <!-- Mouse smoke mask from canvas -->
+          <!-- Mouse-emitted smoke mask from canvas -->
           <feImage id="trail" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="trailImg"/>
           <feGaussianBlur in="trailImg" stdDeviation="24" edgeMode="duplicate" result="trailSoft"/>
 
-          <!-- Restrict noise to the smoke mask -->
+          <!-- Restrict noise to the diffusing smoke -->
           <feComposite in="noiseMix" in2="trailSoft" operator="in" result="localNoise"/>
 
-          <!-- Subtle contrast to emphasize wisps, not blobs -->
+          <!-- Slightly increase contrast for readable wisps -->
           <feColorMatrix in="localNoise" type="matrix"
             values="
-              1.2 0   0   0  0
-              0   1.2 0   0  0
-              0   0   1   0  0
-              0   0   0   1  0" result="noisey"/>
+              1.15 0    0    0  0
+              0    1.15 0    0  0
+              0    0    1    0  0
+              0    0    0    1  0" result="noisey"/>
 
-          <!-- Displace glyphs with smoky field -->
-          <feDisplacementMap id="dm" in="SourceGraphic" in2="noisey" scale="34"
+          <!-- Displace glyphs with smoky field (subtle scale) -->
+          <feDisplacementMap id="dm" in="SourceGraphic" in2="noisey" scale="32"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
 
-          <!-- Tiny RGB fringe (paint only; no layout movement) -->
+          <!-- Tiny RGB fringe (paint-only; no layout movement) -->
           <feDropShadow in="disp" dx="-0.9" dy="-0.7" stdDeviation="0.35" flood-color="#ff2a6d" flood-opacity="0.9" result="r"/>
-          <feDropShadow in="disp" dx="0.6" dy="0.4" stdDeviation="0.35" flood-color="#2aff79" flood-opacity="0.9" result="g"/>
-          <feDropShadow in="disp" dx="1.1" dy="0.9" stdDeviation="0.35" flood-color="#2ac8ff" flood-opacity="0.9" result="b"/>
+          <feDropShadow in="disp" dx="0.6"  dy="0.4"  stdDeviation="0.35" flood-color="#2aff79" flood-opacity="0.9" result="g"/>
+          <feDropShadow in="disp" dx="1.1"  dy="0.9"  stdDeviation="0.35" flood-color="#2ac8ff" flood-opacity="0.9" result="b"/>
           <feMerge><feMergeNode in="disp"/><feMergeNode in="r"/><feMergeNode in="g"/><feMergeNode in="b"/></feMerge>
         </filter>
       </defs>
 
       <g filter="url(#smokeFilter)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          Cinematic visuals,
+          This...,
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          science-minded design.
+          is a test.
         </text>
       </g>
     </svg>
@@ -145,7 +143,7 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // ===== FADING-SMOKE TEXT WARP =====
+  // ===== Diffusing SMOKE: particle mask advected by curl noise =====
   (function(){
     const svg       = document.getElementById('heroSVG');
     const vb        = svg.viewBox.baseVal; // 1200 x 360
@@ -164,15 +162,40 @@
     }
     resizeCanvas();
 
-    // Smoke trail: tight & fading (no balloon math)
-    const TRAIL = [];          // {x,y,age}
-    const MAX_N = 12;          // how many puffs remembered
-    const LIFE  = 44;          // frames each puff lives
-    const BASE_R= 120;         // initial radius (localized)
-    const GROW  = 1.18;        // mild expansion over life
-    const ALPHA = 0.25;        // opacity of the mask puff
+    // --- Tiny 2D value noise (for flow field) ---
+    function hash(n){ return Math.sin(n)*43758.5453 % 1; }
+    function noise2(x,y){
+      const xi=Math.floor(x), yi=Math.floor(y);
+      const xf=x-xi, yf=y-yi;
+      const s=hash(xi*57+yi*131);
+      const t=hash((xi+1)*57+yi*131);
+      const u=hash(xi*57+(yi+1)*131);
+      const v=hash((xi+1)*57+(yi+1)*131);
+      const sx=xf*xf*(3-2*xf), sy=yf*yf*(3-2*yf);
+      const a=s*(1-sx)+t*sx, b=u*(1-sx)+v*sx;
+      return a*(1-sy)+b*sy;
+    }
+    // Divergence-free "curl" from the scalar field
+    function curl(x,y,t){
+      const e=0.001;
+      const n1=noise2(x+e,y+t)-noise2(x-e,y+t);
+      const n2=noise2(x+t,y+e)-noise2(x+t,y-e);
+      // perpendicular (dy,-dx)
+      return {x: n2, y: -n1};
+    }
 
-    let t = 0, hover=false;
+    // Particles = smoke puffs that drift & expand
+    const particles=[];
+    const MAX_PART=90;      // overall count
+    const EMIT=6;           // spawned per mousemove
+    const LIFE=2.2;         // seconds
+    const BASE_R=36;        // start radius (in px on canvas)
+    const GROW=1.9;         // multiplicative growth over life
+    const ALPHA=0.22;       // base opacity per particle
+    const FLOW=0.55;        // flow speed multiplier
+    const DIFFUSE=0.35;     // per-frame extra blur in paint
+
+    let lastEmit=0, hover=false;
     let mx = vb.width/2, my = vb.height/2;
 
     function toVB(e){
@@ -186,64 +209,99 @@
     svg.addEventListener('mousemove', e=>{
       const p = toVB(e);
       mx = p.x; my = p.y; hover = true;
-      TRAIL.unshift({x:mx, y:my, age:0});
-      if (TRAIL.length > MAX_N) TRAIL.pop();
-    });
-    svg.addEventListener('mouseleave', ()=>{ hover = false; });
-
-    function drawTrail(){
-      const sx = c.width / vb.width, sy = c.height / vb.height;
-      ctx.clearRect(0,0,c.width,c.height);
-
-      // fade oldest to newest
-      for(let i=TRAIL.length-1;i>=0;i--){
-        const p = TRAIL[i];
-        const life = p.age / LIFE; // 0..1
-        if (life >= 1){ TRAIL.splice(i,1); continue; }
-
-        // smooth smoke fade (no hard edges)
-        const easeOut = x => 1 - Math.pow(1 - x, 2);
-        const easeIn  = x => x*x;
-        const fade    = 1 - easeIn(life);
-        const a       = ALPHA * fade;
-
-        const rGrow   = 1 + easeOut(life) * (GROW - 1);
-        const radius  = (BASE_R * rGrow) * ((sx+sy)/2);
-
-        const cx = p.x * sx, cy = p.y * sy;
-        const g = ctx.createRadialGradient(cx,cy,0,cx,cy,radius);
-        g.addColorStop(0.00, `rgba(255,255,255,${a})`);
-        g.addColorStop(0.55, `rgba(255,255,255,${a*0.55})`);
-        g.addColorStop(1.00, `rgba(255,255,255,0)`);
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(cx,cy,radius,0,Math.PI*2); ctx.fill();
-
-        p.age += 1;
+      // Emit a few new particles under cursor
+      for(let i=0;i<EMIT;i++){
+        if (particles.length>=MAX_PART) particles.shift();
+        const jitterx=(Math.random()-0.5)*8;
+        const jittery=(Math.random()-0.5)*8;
+        particles.push({
+          x: (mx + jitterx), y: (my + jittery),
+          age: 0, life: LIFE * (0.85 + Math.random()*0.3),
+          r: BASE_R * DPR * (0.85 + Math.random()*0.3),
+          seed: Math.random()*1000
+        });
       }
-      trailImg.setAttribute('href', c.toDataURL('image/png'));
-    }
+    });
+    svg.addEventListener('mouseleave', ()=>{ hover=false; });
 
-    function tick(){
-      t += 0.016;
+    let last=performance.now()/1000;
+    function step(){
+      const now=performance.now()/1000, dt=Math.min(0.033, now-last); last=now;
 
-      // Gentle, organic drift of both noise layers (feels smoky, not wavy)
-      const bx1 = 0.0035 + Math.sin(t*0.25)*0.0009;
-      const by1 = 0.0060 + Math.cos(t*0.20)*0.0012;
+      // Animate SVG noise layers (gentle drift)
+      const t=now*0.35;
+      const bx1=0.0035 + Math.sin(t*0.5)*0.0010;
+      const by1=0.0060 + Math.cos(t*0.4)*0.0012;
       nCoarse.setAttribute('baseFrequency', `${bx1.toFixed(4)} ${by1.toFixed(4)}`);
-
-      const bx2 = 0.0140 + Math.sin(t*0.38)*0.0018;
-      const by2 = 0.0200 + Math.cos(t*0.32)*0.0021;
+      const bx2=0.0120 + Math.sin(t*0.8)*0.0020;
+      const by2=0.0180 + Math.cos(t*0.6)*0.0022;
       nFine.setAttribute('baseFrequency', `${bx2.toFixed(4)} ${by2.toFixed(4)}`);
 
-      // Smooth in/out of overall displacement (no popping)
-      const target = hover ? 34 : 0;  // subtle, smoky
+      // Ease displacement in/out
+      const target = hover ? 32 : 0;
       const current = parseFloat(dm.getAttribute('scale')) || 0;
-      dm.setAttribute('scale', (current + (target - current)*0.12).toFixed(2));
+      dm.setAttribute('scale', (current + (target-current)*0.12).toFixed(2));
 
-      drawTrail();
-      requestAnimationFrame(tick);
+      // Clear mask with slight residual to create diffusion build-up
+      ctx.globalCompositeOperation='source-over';
+      ctx.fillStyle='rgba(0,0,0,0)';
+      ctx.clearRect(0,0,c.width,c.height);
+
+      // Advect & draw particles
+      const sx = c.width / vb.width, sy = c.height / vb.height;
+
+      for (let i=particles.length-1;i>=0;i--){
+        const p=particles[i];
+        p.age += dt;
+        const lifeT = p.age / p.life; // 0..1
+
+        if (lifeT>=1){ particles.splice(i,1); continue; }
+
+        // Curl-noise velocity (stable drift, looks smoky)
+        const kx=(p.x + p.seed)*0.01, ky=(p.y - p.seed)*0.01;
+        const v=curl(kx,ky, now*0.1);
+        p.x += v.x * FLOW * 120 * dt;
+        p.y += v.y * FLOW * 120 * dt;
+
+        // Grow + fade
+        const easeOut = x=>1 - Math.pow(1-x,2);
+        const radius  = p.r * (1 + easeOut(lifeT) * (GROW-1));
+        const alpha   = ALPHA * (1 - lifeT);
+
+        // Paint soft puff (slightly elongated along flow)
+        const cx=p.x*sx, cy=p.y*sy;
+        const elong = 1 + 0.8*easeOut(lifeT);
+        const rx = radius * elong, ry = radius;
+
+        // draw by scaling context (cheaper than rotated gradients)
+        ctx.save();
+        ctx.translate(cx,cy);
+        ctx.scale(rx, ry);
+        const g = ctx.createRadialGradient(0,0,0, 0,0,1);
+        g.addColorStop(0,   `rgba(255,255,255,${alpha})`);
+        g.addColorStop(0.6, `rgba(255,255,255,${alpha*0.5})`);
+        g.addColorStop(1,   `rgba(255,255,255,0)`);
+        ctx.fillStyle=g;
+        ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+
+      // A touch of diffusion blur each frame for continuity
+      // (we simulate by drawing the current mask again with slight blur via canvas filter)
+      if ('filter' in ctx){
+        ctx.filter=`blur(${(DIFFUSE*DPR).toFixed(2)}px)`;
+        const copy = ctx.getImageData(0,0,c.width,c.height);
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.putImageData(copy,0,0);
+        ctx.filter='none';
+      }
+
+      // Upload as data URL for feImage (mask)
+      trailImg.setAttribute('href', c.toDataURL('image/png'));
+
+      requestAnimationFrame(step);
     }
-    tick();
+    step();
 
     window.addEventListener('resize', resizeCanvas);
   })();
