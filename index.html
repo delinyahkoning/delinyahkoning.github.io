@@ -62,35 +62,37 @@
           <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
           <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
 
-          <!-- Base displacement -->
+          <!-- Base displacement (unchanged) -->
           <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
 
-          <!-- ===== Prism “shadow” (no base tint): show only where displacement changed pixels ===== -->
-          <!-- Build an edge/strength mask from difference between displaced and original -->
-          <feBlend in="disp" in2="SourceGraphic" mode="difference" result="diffRGB"/>
-          <feColorMatrix in="diffRGB" type="saturate" values="0" result="diffL"/>
-          <feComponentTransfer in="diffL" result="edgeMask">
-            <feFuncR type="gamma" amplitude="1" exponent="0.7" offset="0"/>
-            <feFuncG type="gamma" amplitude="1" exponent="0.7" offset="0"/>
-            <feFuncB type="gamma" amplitude="1" exponent="0.7" offset="0"/>
+          <!-- ===== Prism SHADOW: 100% constrained to glyphs; strength from normal-map only ===== -->
+          <!-- build strength = |blur - neutral|, NOT using disp; then intersect with SourceAlpha -->
+          <feFlood flood-color="rgb(128,128,0)" result="neutral"/>
+          <feBlend in="blur" in2="neutral" mode="difference" result="dev"/>
+          <feColorMatrix in="dev" type="saturate" values="0" result="devL"/>
+          <feComponentTransfer in="devL" result="strengthGamma">
+            <feFuncR type="gamma" amplitude="1" exponent="1.6" offset="0"/>
+            <feFuncG type="gamma" amplitude="1" exponent="1.6" offset="0"/>
+            <feFuncB type="gamma" amplitude="1" exponent="1.6" offset="0"/>
           </feComponentTransfer>
-          <feGaussianBlur in="edgeMask" stdDeviation="1.2" result="edgeSoft"/>
+          <feGaussianBlur in="strengthGamma" stdDeviation="1.2" result="strengthSoft"/>
+          <feComposite in="strengthSoft" in2="SourceAlpha" operator="in" result="strength"/>
 
-          <!-- Color the edge mask (separate layers), then offset them (JS animates dx/dy) -->
-          <feFlood flood-color="#ff2a6d" flood-opacity="0.85" result="floodR"/>
-          <feFlood flood-color="#2aff79" flood-opacity="0.85" result="floodG"/>
-          <feFlood flood-color="#2ac8ff" flood-opacity="0.85" result="floodB"/>
+          <!-- color the strength (no tint of base), then offset (JS moves dx/dy via ids) -->
+          <feFlood flood-color="#ff2a6d" flood-opacity="0.75" result="fR"/>
+          <feFlood flood-color="#2aff79" flood-opacity="0.75" result="fG"/>
+          <feFlood flood-color="#2ac8ff" flood-opacity="0.75" result="fB"/>
 
-          <feComposite in="floodR" in2="edgeSoft" operator="in" result="rimR"/>
-          <feComposite in="floodG" in2="edgeSoft" operator="in" result="rimG"/>
-          <feComposite in="floodB" in2="edgeSoft" operator="in" result="rimB"/>
+          <feComposite in="fR" in2="strength" operator="in" result="rimR"/>
+          <feComposite in="fG" in2="strength" operator="in" result="rimG"/>
+          <feComposite in="fB" in2="strength" operator="in" result="rimB"/>
 
           <feOffset in="rimR" dx="0" dy="0" result="prismR" id="offR"/>
           <feOffset in="rimG" dx="0" dy="0" result="prismG" id="offG"/>
           <feOffset in="rimB" dx="0" dy="0" result="prismB" id="offB"/>
 
-          <!-- Composite back: base displaced text + RGB fringes -->
+          <!-- Composite back: displaced base + subtle RGB rims -->
           <feMerge>
             <feMergeNode in="disp"/>
             <feMergeNode in="prismR"/>
@@ -102,10 +104,10 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          this is
+          Cinematic visuals,
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          a test
+          science-minded design.
         </text>
       </g>
     </svg>
@@ -121,7 +123,7 @@
       <div class="grid cards" style="margin-top:12px">
         <article class="card"><div class="thumb">assets/feat-1.mp4</div><strong>Lookdev Shot</strong><div class="sub" style="font-size:13px">Blender · 2025</div></article>
         <article class="card"><div class="thumb">assets/feat-2.jpg</div><strong>Science Illustration</strong><div class="sub" style="font-size:13px">Vectors · 2025</div></article>
-        <article class="card"><div class="thumb">assets/feat-3.mp4</div><strong>Explainer Motion</strong><div class="sub" style="font-size:13px">AE · 30s</div></article>
+        <article class="card"><div class="thumb">assets/feat-3.mp4</div><strong>Explainer Motion</strong><div class="sub" style="font-size:13px)">AE · 30s</div></article>
       </div>
     </div>
     <aside class="panel">
@@ -242,7 +244,7 @@
       nmEl.setAttribute('href', c.toDataURL('image/png'));
     }
 
-    // Animate + RGB prism offsets (masked and fades with displacement)
+    // Animate + RGB prism offsets (masked to glyphs, fades with strength)
     function animate(){
       drawNormalMap();
 
@@ -256,10 +258,8 @@
 
       offR.setAttribute('dx', (-amt*1.0 * dirX).toFixed(2));
       offR.setAttribute('dy', (-amt*1.0 * dirY).toFixed(2));
-
       offG.setAttribute('dx', ( amt*0.6 * dirX).toFixed(2));
       offG.setAttribute('dy', ( amt*0.6 * dirY).toFixed(2));
-
       offB.setAttribute('dx', ( amt*0.9 * (-dirY)).toFixed(2));
       offB.setAttribute('dy', ( amt*0.9 * ( dirX)).toFixed(2));
 
