@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Delinyah Koning — Portfolio</title>
+  <meta name="description" content="Creative portfolio — cinematic 3D, 2D animation, illustration, design, photo/video, audio." />
+  <style>
+    :root{
+      --bg:#0b0c10;       /* deep charcoal */
+      --panel:#121319;    /* slightly lighter panel */
+      --muted:#8b90a0;
+      --text:#e8eaf0;
+      --accent:#8ab4ff;   /* cool cinematic accent */
+      --ring: rgba(138,180,255,.35);
+      --radius:16px;
+      --max:1100px;
+      --card-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    html{scroll-behavior:smooth}
+    body{margin:0; background:var(--bg); color:var(--text); font:16px/1.6 Arial, Helvetica, sans-serif}
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:var(--max); margin:0 auto; padding:0 20px}
+    /* Header / Nav */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(140%) blur(8px);
+      background:rgba(10,11,16,.65);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .nav{
+      display:flex; align-items:center; gap:14px; padding:14px 0;
+    }
+    .brand{font-weight:bold; letter-spacing:.3px}
+    .spacer{flex:1}
+    .tabs{display:flex; flex-wrap:wrap; gap:10px}
+    .tab{
+      padding:8px 12px; border:1px solid rgba(255,255,255,.08);
+      border-radius:999px; color:var(--text); text-decoration:none;
+      transition:background .15s, border-color .15s, color .15s;
+    }
+    .tab:hover{background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.18)}
+    .tab.active{background:var(--panel); border-color:var(--ring); box-shadow:0 0 0 3px var(--ring)}
+    /* Hero */
+    .hero{padding:56px 0 18px}
+    h1{margin:0 0 8px; font-size:clamp(26px,4vw,38px); letter-spacing:.4px}
+    .sub{color:var(--muted)}
+    /* Sections */
+    section{padding:48px 0}
+    section .title{font-size:22px; margin:0 0 18px}
+    .panel{
+      background:var(--panel); border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius); box-shadow:var(--card-shadow);
+      padding:22px;
+    }
+    /* Grids */
+    .grid{display:grid; gap:16px}
+    .grid.cards{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius); padding:14px; box-shadow:var(--card-shadow);
+    }
+    .thumb{
+      width:100%; height:160px; border-radius:12px; background:#1a1c24;
+      display:grid; place-items:center; color:#657; border:1px dashed rgba(255,255,255,.1);
+      margin-bottom:10px;
+    }
+    .meta{color:var(--muted); font-size:13px}
+    /* Resume block */
+    .resume-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    .btn{
+      display:inline-block; padding:10px 14px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.1); color:var(--text); text-decoration:none;
+      background:rgba(255,255,255,.04);
+    }
+    .btn:hover{background:rgba(255,255,255,.08)}
+    /* Footer */
+    footer{padding:40px 0; color:var(--muted); text-align:center}
+    /* Responsive tweaks */
+    @media (max-width:760px){
+      .tabs{gap:8px}
+      .tab{padding:7px 10px; font-size:14px}
+    }
+  </style>
+</head>
+<body>
+  <!-- Sticky Top Nav -->
+  <header>
+    <div class="wrap nav">
+      <div class="brand">Delinyah Koning</div>
+      <div class="spacer"></div>
+      <nav class="tabs">
+        <a class="tab active" href="#home">Home</a>
+        <a class="tab" href="#cinematic-3d">Cinematic 3D</a>
+        <a class="tab" href="#anim-2d">2D Animations</a>
+        <a class="tab" href="#ill-2d">2D Illustrations</a>
+        <a class="tab" href="#design-branding">Graphic Design & Branding</a>
+        <a class="tab" href="#photo-video">Photography & Videography</a>
+        <a class="tab" href="#audio">Audio Work</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero / Intro -->
+  <div class="wrap hero" id="home">
+    <h1>Creative Portfolio</h1>
+    <p class="sub">Cinematic 3D · 2D animation & illustration · Design · Photo/Video · Audio</p>
+  </div>
+
+  <!-- Home: About + Resume + Featured -->
+  <section>
+    <div class="wrap grid" style="grid-template-columns: 1.2fr .8fr; gap:20px">
+      <!-- About & Featured -->
+      <div class="panel">
+        <h2 class="title">About</h2>
+        <p>
+          I’m Delinyah — I blend a biomedical research mindset with visual storytelling.
+          I make cinematic 3D, concise 2D animations, science illustrations, and brand systems.
+        </p>
+
+        <h3 class="title" style="margin-top:26px">Featured Work</h3>
+        <div class="grid cards">
+          <article class="card">
+            <div class="thumb">Add image: assets/feat-1.jpg</div>
+            <h4>Project Title One</h4>
+            <p class="meta">Role · Tools · Year</p>
+          </article>
+          <article class="card">
+            <div class="thumb">Add image: assets/feat-2.jpg</div>
+            <h4>Project Title Two</h4>
+            <p class="meta">Role · Tools · Year</p>
+          </article>
+          <article class="card">
+            <div class="thumb">Add image: assets/feat-3.jpg</div>
+            <h4>Project Title Three</h4>
+            <p class="meta">Role · Tools · Year</p>
+          </article>
+        </div>
+      </div>
+
+      <!-- Resume -->
+      <aside class="panel">
+        <h2 class="title">Resume</h2>
+        <p class="meta">Add a short summary, or link to a downloadable PDF.</p>
+        <div class="resume-actions">
+          <a class="btn" href="assets/Delinyah-Koning-Resume.pdf" target="_blank" rel="noopener">View PDF</a>
+          <a class="btn" href="#contact">Contact</a>
+          <a class="btn" href="https://github.com/delinyahkoning" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <ul style="margin-top:16px">
+          <li><strong>Focus:</strong> 3D/2D visuals, design, science communication</li>
+          <li><strong>Tools:</strong> Blender, Adobe Suite, Reaper, etc.</li>
+          <li><strong>Also:</strong> Scientific illustration & data visuals</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Cinematic 3D -->
+  <section id="cinematic-3d">
+    <div class="wrap">
+      <h2 class="title">Cinematic 3D</h2>
+      <div class="grid cards">
+        <article class="card">
+          <div class="thumb">assets/3d-1.jpg</div>
+          <h4>Short film frame / lookdev</h4>
+          <p class="meta">Blender · Cycles · 2025</p>
+        </article>
+        <article class="card">
+          <div class="thumb">assets/3d-2.jpg</div>
+          <h4>Procedural material study</h4>
+          <p class="meta">Nodes · Shading · 2025</p>
+        </article>
+        <article class="card">
+          <div class="thumb">assets/3d-3.jpg</div>
+          <h4>Scientific 3D visualization</h4>
+          <p class="meta">Protein/Organelle visual</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2D Animations -->
+  <section id="anim-2d">
+    <div class="wrap">
+      <h2 class="title">2D Animations</h2>
+      <div class="grid cards">
+        <article class="card">
+          <div class="thumb">assets/anim-1.jpg</div>
+          <h4>Explainer snippet</h4>
+          <p class="meta">After Effects · 30s</p>
+        </article>
+        <article class="card">
+          <div class="thumb">assets/anim-2.jpg</div>
+          <h4>UI motion</h4>
+          <p class="meta">Timing · Easing</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2D Illustrations -->
+  <section id="ill-2d">
+    <div class="wrap">
+      <h2 class="title">2D Illustrations</h2>
+      <div class="grid cards">
+        <article class="card">
+          <div class="thumb">assets/ill-1.jpg</div>
+          <h4>Science illustration</h4>
+          <p class="meta">Cell/Organelles</p>
+        </article>
+        <article class="card">
+          <div class="thumb">assets/ill-2.jpg</div>
+          <h4>Editorial spot</h4>
+          <p class="meta">Vector, print</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design & Branding -->
+  <section id="design-branding">
+    <div class="wrap">
+      <h2 class="title">Graphic Design & Branding</h2>
+      <div class="grid cards">
+        <article class="card">
+          <div class="thumb">assets/brand-1.jpg</div>
+          <h4>Identity concept</h4>
+          <p class="meta">Logo · Palette · Type</p>
+        </article>
+        <article class="card">
+          <div class="thumb">assets/brand-2.jpg</div>
+          <h4>Poster / layout</h4>
+          <p class="meta">InDesign</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Photo & Video -->
+  <section id="photo-video">
+    <div class="wrap">
+      <h2 class="title">Photography & Videography</h2>
+      <div class="grid cards">
+        <article class="card">
+          <div class="thumb">assets/photo-1.jpg</div>
+          <h4>Series title</h4>
+          <p class="meta">Lens · Location</p>
+        </article>
+        <article class="card">
+          <div class="thumb">assets/photo-2.jpg</div>
+          <h4>Music video still</h4>
+          <p class="meta">Edit · Grade</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Audio -->
+  <section id="audio">
+    <div class="wrap">
+      <h2 class="title">Audio Work</h2>
+      <div class="grid cards">
+        <article class="card">
+          <div class="thumb">assets/audio-1.jpg</div>
+          <h4>Mix/master example</h4>
+          <p class="meta">Reaper · FabFilter</p>
+        </article>
+        <article class="card">
+          <div class="thumb">assets/audio-2.jpg</div>
+          <h4>Sound design</h4>
+          <p class="meta">Film/Short</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © <span id="y"></span> Delinyah Koning · <a href="mailto:you@example.com">you@example.com</a>
+  </footer>
+
+  <script>
+    // Year
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Active tab highlight on scroll
+    const tabs = [...document.querySelectorAll('.tab')];
+    const ids = tabs.map(a => a.getAttribute('href'));
+    const sections = ids.map(id => document.querySelector(id));
+
+    const onScroll = () => {
+      const pos = window.scrollY + 90;
+      let active = 0;
+      sections.forEach((sec, i) => {
+        if (sec && sec.offsetTop <= pos) active = i;
+      });
+      tabs.forEach((t,i)=> t.classList.toggle('active', i===active));
+    };
+    document.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+  </script>
+</body>
+</html>
