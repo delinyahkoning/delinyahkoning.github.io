@@ -32,15 +32,13 @@
   .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
   .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
 
-  /* Smoke canvas sits on top of the text but pointer-events none */
-  #smokeCanvas{
-    position:absolute; inset:auto 0 auto 0; /* horizontal center via width of wrap */
-    margin:0 auto;
-    pointer-events:none; display:block; opacity:0.9;
-    filter:contrast(105%) saturate(105%);
+  /* a transparent canvas sits over the text; pointer-events none */
+  #smokeMaskCanvas{
+    position:absolute; inset:auto 0 auto 0;
+    margin:0 auto; pointer-events:none; display:block; opacity:0.9;
   }
 
-  /* === Custom Cursor (keeps native pointer) === */
+  /* cursor */
   .cursor{
     position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
     pointer-events:none;background:rgba(155,212,255,.15);
@@ -65,42 +63,41 @@
 
 <section class="hero">
   <div class="wrap hero-center">
-    <!-- TEXT IN SVG -->
+    <!-- TEXT IN SVG (so we can filter without layout shift) -->
     <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <!-- Oversized region so nothing clips while warping -->
-        <filter id="smokeFilter" x="-80%" y="-300%" width="260%" height="700%" filterUnits="objectBoundingBox">
-          <!-- Displacement field baseline: fine FBM for filament detail -->
-          <feTurbulence id="flowFine" type="fractalNoise"
-                        baseFrequency="0.012 0.018" numOctaves="4" seed="7" result="fine"/>
-          <!-- Smoke mask (from canvas) -->
-          <feImage id="smokeMask" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="maskRaw"/>
-          <feGaussianBlur in="maskRaw" stdDeviation="18" edgeMode="duplicate" result="maskSoft"/>
-          <!-- Localize displacement to the wisps -->
-          <feComposite in="fine" in2="maskSoft" operator="in" result="localFlow"/>
-          <!-- Gentle displacement with the localized flow -->
-          <feDisplacementMap id="dm" in="SourceGraphic" in2="localFlow" scale="26"
+        <filter id="wispySmoke" x="-80%" y="-300%" width="260%" height="700%" filterUnits="objectBoundingBox">
+          <!-- low-frequency FBM: soft flow, not bubbly -->
+          <feTurbulence id="fbm" type="fractalNoise"
+                        baseFrequency="0.0045 0.0075" numOctaves="3" seed="19" result="noise"/>
+          <!-- smoke mask from canvas -->
+          <feImage id="maskImg" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="maskRaw"/>
+          <feGaussianBlur in="maskRaw" stdDeviation="16" edgeMode="duplicate" result="maskSoft"/>
+          <!-- localize displacement to wisps -->
+          <feComposite in="noise" in2="maskSoft" operator="in" result="localNoise"/>
+          <!-- gentle displacement -->
+          <feDisplacementMap id="dm" in="SourceGraphic" in2="localNoise" scale="24"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
-          <!-- Tiny RGB shimmer (paint-only; no layout shift) -->
-          <feDropShadow in="disp" dx="-0.7" dy="-0.5" stdDeviation="0.25" flood-color="#ff2a6d" flood-opacity="0.9" result="r"/>
-          <feDropShadow in="disp" dx="0.5" dy="0.3" stdDeviation="0.25" flood-color="#2aff79" flood-opacity="0.9" result="g"/>
-          <feDropShadow in="disp" dx="0.9" dy="0.7" stdDeviation="0.25" flood-color="#2ac8ff" flood-opacity="0.9" result="b"/>
+          <!-- tiny RGB shimmer (paint-only) -->
+          <feDropShadow in="disp" dx="-0.6" dy="-0.4" stdDeviation="0.25" flood-color="#ff2a6d" flood-opacity="0.85" result="r"/>
+          <feDropShadow in="disp" dx="0.45" dy="0.3" stdDeviation="0.25" flood-color="#2aff79" flood-opacity="0.85" result="g"/>
+          <feDropShadow in="disp" dx="0.9" dy="0.7" stdDeviation="0.25" flood-color="#2ac8ff" flood-opacity="0.85" result="b"/>
           <feMerge><feMergeNode in="disp"/><feMergeNode in="r"/><feMergeNode in="g"/><feMergeNode in="b"/></feMerge>
         </filter>
       </defs>
 
-      <g filter="url(#smokeFilter)">
+      <g filter="url(#wispySmoke)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          This is...
+          Cinematic visuals,
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          a test.
+          science-minded design.
         </text>
       </g>
     </svg>
 
-    <!-- The smoke canvas is sized to the SVG viewBox and centered -->
-    <canvas id="smokeCanvas" width="1200" height="360"></canvas>
+    <!-- smoke mask canvas (sent into filter) -->
+    <canvas id="smokeMaskCanvas" width="1200" height="360"></canvas>
 
     <p class="hero-sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
   </div>
@@ -133,7 +130,7 @@
   // Year
   document.getElementById('y').textContent=new Date().getFullYear();
 
-  // Custom cursor (keeps native)
+  // Cursor
   const cursor=document.querySelector(".cursor");
   document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
   document.querySelectorAll("a,button").forEach(el=>{
@@ -141,457 +138,140 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // ===================== WISPY CIGARETTE SMOKE =====================
+  // ===================== WISPY RIBBON SMOKE (quiet, cigarette-like) =====================
   (function(){
-    // --- Tweakables ---
-    const EMIT_PER_MOVE = 5;     // particles per mouse move
-    const MAX_PART      = 140;   // max particles
-    const LIFESPAN      = 3.5;   // seconds
-    const BASE_RADIUS   = 10;    // base visual radius (px) before elongation
-    const ELONG_MAX     = 3.2;   // max elongation along direction
-    const UPDRIFT       = 22;    // constant upward drift (px/s)
-    const FLOW_SPEED    = 38;    // curl field strength (px/s)
-    const FADE          = 0.8;   // accumulation fade (0.80..0.94) lower = longer trails
-    const OPACITY       = 0.18;  // per-particle paint opacity
-    const DM_SCALE_HOVER= 40;    // displacement strength while hovering
-    const DM_SCALE_IDLE = 0;
+    const svg = document.getElementById('heroSVG');
+    const vb  = svg.viewBox.baseVal; // 1200x360
+    const cvs = document.getElementById('smokeMaskCanvas');
+    const ctx = cvs.getContext('2d');
+    const maskImg = document.getElementById('maskImg');
+    const dm = document.getElementById('dm');
+    const fbm = document.getElementById('fbm');
 
-    const svg   = document.getElementById('heroSVG');
-    const smoke = document.getElementById('smokeCanvas');
-    const ctx   = smoke.getContext('2d');
-    const mask  = document.getElementById('smokeMask');
-    const dm    = document.getElementById('dm');
-    const fine  = document.getElementById('flowFine');
-
-    // Center canvas to the SVG width
-    function sizeCanvas(){
+    // Position canvas to overlay the SVG region
+    function placeCanvas(){
       const rect = svg.getBoundingClientRect();
-      // keep canvas' internal pixels equal to viewBox (1200x360) for sharp mapping
-      smoke.style.width  = rect.width  + 'px';
-      smoke.style.height = rect.height + 'px';
-      smoke.style.left   = rect.left + 'px';
-      // vertically center inside the wrap
-      const wrap = document.querySelector('.hero-center').getBoundingClientRect();
-      smoke.style.top = (rect.top - wrap.top) + 'px';
+      const host = document.querySelector('.hero-center').getBoundingClientRect();
+      cvs.style.width  = rect.width + 'px';
+      cvs.style.height = rect.height + 'px';
+      cvs.style.left   = (rect.left - host.left) + 'px';
+      cvs.style.top    = (rect.top - host.top) + 'px';
     }
-    sizeCanvas(); window.addEventListener('resize', sizeCanvas);
+    placeCanvas();
+    window.addEventListener('resize', placeCanvas);
 
-    // Vector field: curl noise (stable swirls)
-    function hash(n){ return Math.sin(n)*43758.5453 % 1; }
-    function noise2(x,y){
-      const xi=Math.floor(x), yi=Math.floor(y);
-      const xf=x-xi, yf=y-yi;
-      const s=hash(xi*57+yi*131), t=hash((xi+1)*57+yi*131);
-      const u=hash(xi*57+(yi+1)*131), v=hash((xi+1)*57+(yi+1)*131);
-      const sx=xf*xf*(3-2*xf), sy=yf*yf*(3-2*yf);
-      return (s*(1-sx)+t*sx)*(1-sy)+(u*(1-sx)+v*sx)*sy;
-    }
-    function curl(x,y,t){
-      // slowly evolving field
-      const s=0.005, tt=t*0.05;
-      const e=0.001;
-      const dx = noise2((x+e)*s, (y+tt)*s) - noise2((x-e)*s, (y+tt)*s);
-      const dy = noise2((x+tt)*s, (y+e)*s) - noise2((x+tt)*s, (y-e)*s);
-      return {x: dy, y: -dx}; // rotated gradient => divergence-free
-    }
+    // Wisp ribbons (splines) — few, thin, drifting up
+    const RIBBONS = 4;           // number of concurrent wisps
+    const SPEED_Y = -22;         // upward drift (px/s, negative y)
+    const WOBBLE_X = 18;         // lateral meander amplitude
+    const WOBBLE_FREQ = 0.25;    // Hz of meander
+    const WIDTH_MIN = 8;         // minimum stroke width px
+    const WIDTH_MAX = 24;        // max stroke width px
+    const ALPHA = 0.16;          // stroke opacity
+    const BLUR_PX = 10;          // canvas blur to soften
+    const BUILD = 0.9;           // trail accumulation (closer to 1 = longer lingering)
+    const DM_SCALE_ON = 24;      // displacement while active
+    const DM_SCALE_OFF = 0;
 
-    const parts=[];
-    let hover=false, mx=600, my=180;
+    // Each ribbon has a spline of points; we animate control points over time
+    function makeRibbon(seed){
+      const pts = [];
+      const segments = 6;
+      for (let i=0;i<=segments;i++){
+        pts.push({ x: 200 + seed*150 + i*150, y: vb.height + i*18, n: i });
+      }
+      return { pts, seed, t: 0, w: WIDTH_MIN + (WIDTH_MAX-WIDTH_MIN)*(0.3+0.4*Math.random()) };
+    }
+    const ribbons = Array.from({length:RIBBONS}, (_,i)=>makeRibbon(i));
+
+    let hover=false, mx=vb.width/2, my=vb.height/2;
     svg.addEventListener('mousemove', (e)=>{
       const r=svg.getBoundingClientRect();
-      mx = (e.clientX - r.left)/r.width*1200;
-      my = (e.clientY - r.top )/r.height*360;
+      mx=(e.clientX-r.left)/r.width*vb.width;
+      my=(e.clientY-r.top)/r.height*vb.height;
       hover=true;
-      for(let i=0;i<EMIT_PER_MOVE;i++){
-        if (parts.length>=MAX_PART) parts.shift();
-        const ang=Math.random()*Math.PI*2;
-        const spd= 14 + Math.random()*12;
-        parts.push({
-          x:mx + (Math.random()-0.5)*6,
-          y:my + (Math.random()-0.5)*6,
-          vx:Math.cos(ang)*spd,
-          vy:Math.sin(ang)*spd - 8,
-          age:0,
-          life:LIFESPAN*(0.9+Math.random()*0.2),
-          r:BASE_RADIUS*(0.8+Math.random()*0.4),
-        });
-      }
     });
     svg.addEventListener('mouseleave', ()=>hover=false);
+
+    function perlinish(t){ return Math.sin(t) + 0.5*Math.sin(2.17*t+1.3) + 0.25*Math.sin(3.7*t+0.6); }
 
     let last=performance.now()/1000;
     function frame(){
       const now=performance.now()/1000, dt=Math.min(0.033, now-last); last=now;
 
-      // animate fine noise slightly (adds filament detail in displacement)
-      const bx = 0.012 + Math.sin(now*0.4)*0.0016;
-      const by = 0.018 + Math.cos(now*0.3)*0.0019;
-      fine.setAttribute('baseFrequency', `${bx.toFixed(4)} ${by.toFixed(4)}`);
+      // Animate the base noise slightly (low frequency)
+      const bx = 0.0045 + Math.sin(now*0.22)*0.0012;
+      const by = 0.0075 + Math.cos(now*0.18)*0.0014;
+      fbm.setAttribute('baseFrequency', `${bx.toFixed(4)} ${by.toFixed(4)}`);
 
-      // ease displacement
-      const target = hover? DM_SCALE_HOVER : DM_SCALE_IDLE;
+      // Displacement strength easing
+      const target = hover ? DM_SCALE_ON : DM_SCALE_OFF;
       const cur = parseFloat(dm.getAttribute('scale')) || 0;
-      dm.setAttribute('scale', (cur + (target-cur)*0.12).toFixed(2));
+      dm.setAttribute('scale', (cur + (target-cur)*0.08).toFixed(2));
 
-      // fade accumulation toward transparent for smooth trails
+      // fade old mask (soft accumulation)
       ctx.globalCompositeOperation='source-over';
-      ctx.fillStyle = `rgba(0,0,0,${1-FADE})`;
-      ctx.fillRect(0,0,smoke.width,smoke.height);
+      ctx.fillStyle = `rgba(0,0,0,${1-BUILD})`;
+      ctx.fillRect(0,0,cvs.width,cvs.height);
 
-      // advect + draw
-      ctx.globalCompositeOperation='lighter'; // soft additive
-      for(let i=parts.length-1;i>=0;i--){
-        const p=parts[i];
-        p.age += dt;
-        if (p.age >= p.life){ parts.splice(i,1); continue; }
+      // draw ribbons
+      ctx.save();
+      ctx.filter = `blur(${BLUR_PX}px)`;
+      ctx.globalCompositeOperation='lighter'; // additive for airy feel
+      ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.strokeStyle = `rgba(255,255,255,${ALPHA})`;
 
-        // curl flow + upward drift
-        const f = curl(p.x, p.y, now);
-        p.vx += f.x * FLOW_SPEED * dt;
-        p.vy += (f.y * FLOW_SPEED - UPDRIFT) * dt;
+      const scaleX = cvs.width / vb.width;
+      const scaleY = cvs.height / vb.height;
+      ctx.setTransform(scaleX,0,0,scaleY,0,0);
 
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
+      ribbons.forEach((rb,i)=>{
+        rb.t += dt;
+        // move control pts upward and wobble x
+        rb.pts.forEach(p=>{
+          const base = (rb.seed*0.6 + p.n*0.33);
+          const wiggle = WOBBLE_X * perlinish((rb.t+base)*WOBBLE_FREQ*2*Math.PI) * (0.35 + 0.65*(p.n/rb.pts.length));
+          p.x += (i%2? -1:1) * wiggle * 0.02; // slow side-shift
+          p.y += SPEED_Y * dt;
+          // respawn above when out of view
+          if (p.y < -60) { p.y += vb.height + 120; }
+        });
 
-        // visual params
-        const tNorm = p.age/p.life;
-        const alpha = OPACITY * (1 - tNorm);
-        const elong = 1 + ELONG_MAX * Math.min(1, tNorm*1.2); // longer as it ages
-        const angle = Math.atan2(p.vy, p.vx);
+        // optional: bias ribbon toward mouse x when hovering (subtle)
+        if (hover){
+          const mid = rb.pts[Math.floor(rb.pts.length/2)];
+          const dx = (mx - mid.x) * 0.002;
+          rb.pts.forEach(p=> p.x += dx);
+        }
 
-        // draw elongated soft stroke (ellipse)
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(angle);
-        ctx.scale(p.r*elong, p.r*0.6);
-        const g = ctx.createRadialGradient(0,0,0, 0,0,1);
-        g.addColorStop(0,   `rgba(255,255,255,${alpha})`);
-        g.addColorStop(0.5, `rgba(255,255,255,${alpha*0.5})`);
-        g.addColorStop(1,   `rgba(255,255,255,0)`);
-        ctx.fillStyle=g;
-        ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
-        ctx.restore();
-      }
+        // width breathing over time
+        const w = rb.w * (0.8 + 0.2*Math.sin(rb.t*1.3 + i));
 
-      // send the smoke canvas to the SVG filter as a mask
-      mask.setAttribute('href', smoke.toDataURL('image/png'));
+        // draw spline
+        ctx.lineWidth = w;
+        ctx.beginPath();
+        for (let k=0;k<rb.pts.length;k++){
+          const p = rb.pts[k];
+          if (k===0) ctx.moveTo(p.x, p.y);
+          else {
+            const prev = rb.pts[k-1];
+            const cx = (prev.x + p.x)/2, cy=(prev.y+p.y)/2;
+            ctx.quadraticCurveTo(prev.x, prev.y, cx, cy);
+          }
+        }
+        ctx.stroke();
+      });
+
+      ctx.restore();
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.filter='none';
+
+      // upload mask to filter
+      maskImg.setAttribute('href', cvs.toDataURL('image/png'));
 
       requestAnimationFrame(frame);
     }
     frame();
-  })();
-
-  // keep canvas positioned on resize
-  window.addEventListener('resize', ()=>{ /* handled inside sizeCanvas() */ });
-</script>
-</body>
-</html>
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Delinyah Koning — Home</title>
-<meta name="description" content="Portfolio — 3D, 2D, Design, Photo." />
-<style>
-  :root{--bg:#0a0b0f;--ink:#e9ecf5;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
-  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
-  header{position:sticky;top:0;z-index:50;background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
-  .nav{display:flex;align-items:center;gap:16px;padding:14px 0}.brand{font-weight:700}.spacer{flex:1}
-  .tabs{display:flex;gap:10px;flex-wrap:wrap}
-  .tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
-  .tab:hover{background:#131623}
-  .tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
-  .hero{min-height:58vh;display:grid;place-items:center;background:
-    radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
-    radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
-    var(--bg)}
-  section{padding:60px 0}
-  .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
-  .grid{display:grid;gap:16px}
-  .cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
-  .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
-  footer{padding:50px 0;color:var(--muted);text-align:center}
-
-  .hero-center{text-align:center}
-  .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
-  .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
-
-  /* custom cursor (keeps native pointer) */
-  .cursor{
-    position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
-    pointer-events:none;background:rgba(155,212,255,.15);
-    border:1px solid rgba(155,212,255,.4);transform:translate(-50%,-50%);
-    transition:width .15s,height .15s,background .2s;z-index:9999;
-  }
-</style>
-</head>
-<body>
-<header>
-  <div class="wrap nav">
-    <div class="brand">Delinyah Koning</div><div class="spacer"></div>
-    <nav class="tabs">
-      <a class="tab active" href="/">Home</a>
-      <a class="tab" href="/3d/">3D</a>
-      <a class="tab" href="/2d/">2D</a>
-      <a class="tab" href="/design/">Design</a>
-      <a class="tab" href="/photo/">Photo</a>
-    </nav>
-  </div>
-</header>
-
-<section class="hero">
-  <div class="wrap hero-center">
-    <!-- Text in SVG so paint can warp without layout shift -->
-    <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <!-- Oversized region prevents any clipping while warping -->
-        <filter id="smokeFilter" x="-80%" y="-300%" width="260%" height="700%" filterUnits="objectBoundingBox">
-          <!-- Two animated noise layers (wisps) -->
-          <feTurbulence id="noiseCoarse" type="fractalNoise" baseFrequency="0.0035 0.0060" numOctaves="2" seed="11" result="nc"/>
-          <feTurbulence id="noiseFine"   type="fractalNoise" baseFrequency="0.0120 0.0180" numOctaves="4" seed="37" result="nf"/>
-          <feBlend in="nc" in2="nf" mode="multiply" result="noiseMix"/>
-
-          <!-- Mouse-emitted smoke mask from canvas -->
-          <feImage id="trail" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="trailImg"/>
-          <feGaussianBlur in="trailImg" stdDeviation="24" edgeMode="duplicate" result="trailSoft"/>
-
-          <!-- Restrict noise to the diffusing smoke -->
-          <feComposite in="noiseMix" in2="trailSoft" operator="in" result="localNoise"/>
-
-          <!-- Slightly increase contrast for readable wisps -->
-          <feColorMatrix in="localNoise" type="matrix"
-            values="
-              1.15 0    0    0  0
-              0    1.15 0    0  0
-              0    0    1    0  0
-              0    0    0    1  0" result="noisey"/>
-
-          <!-- Displace glyphs with smoky field (subtle scale) -->
-          <feDisplacementMap id="dm" in="SourceGraphic" in2="noisey" scale="32"
-                             xChannelSelector="R" yChannelSelector="G" result="disp"/>
-
-          <!-- Tiny RGB fringe (paint-only; no layout movement) -->
-          <feDropShadow in="disp" dx="-0.9" dy="-0.7" stdDeviation="0.35" flood-color="#ff2a6d" flood-opacity="0.9" result="r"/>
-          <feDropShadow in="disp" dx="0.6"  dy="0.4"  stdDeviation="0.35" flood-color="#2aff79" flood-opacity="0.9" result="g"/>
-          <feDropShadow in="disp" dx="1.1"  dy="0.9"  stdDeviation="0.35" flood-color="#2ac8ff" flood-opacity="0.9" result="b"/>
-          <feMerge><feMergeNode in="disp"/><feMergeNode in="r"/><feMergeNode in="g"/><feMergeNode in="b"/></feMerge>
-        </filter>
-      </defs>
-
-      <g filter="url(#smokeFilter)">
-        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          This...,
-        </text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          is test #7239.
-        </text>
-      </g>
-    </svg>
-
-    <p class="hero-sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
-  </div>
-</section>
-
-<section>
-  <div class="wrap" style="display:grid;gap:20px;grid-template-columns:1.2fr .8fr">
-    <div class="panel">
-      <h2 style="margin-top:0">Featured Work</h2>
-      <div class="grid cards" style="margin-top:12px">
-        <article class="card"><div class="thumb">assets/feat-1.mp4</div><strong>Lookdev Shot</strong><div class="sub" style="font-size:13px">Blender · 2025</div></article>
-        <article class="card"><div class="thumb">assets/feat-2.jpg</div><strong>Science Illustration</strong><div class="sub" style="font-size:13px">Vectors · 2025</div></article>
-        <article class="card"><div class="thumb">assets/feat-3.mp4</div><strong>Explainer Motion</strong><div class="sub" style="font-size:13px">AE · 30s</div></article>
-      </div>
-    </div>
-    <aside class="panel">
-      <h2 style="margin-top:0">About</h2>
-      <p class="sub">Biomedical research background × creative direction. I build clear, cinematic visuals for science, culture, and brands.</p>
-      <p><a class="tab" href="assets/Delinyah-Koning-Resume.pdf" target="_blank" style="display:inline-block">Resume (PDF)</a></p>
-      <p><a class="tab" href="mailto:you@example.com">you@example.com</a></p>
-    </aside>
-  </div>
-</section>
-
-<footer>© <span id="y"></span> Delinyah Koning</footer>
-
-<div class="cursor"></div>
-
-<script>
-  // Year
-  document.getElementById('y').textContent=new Date().getFullYear();
-
-  // Custom cursor
-  const cursor=document.querySelector(".cursor");
-  document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
-  document.querySelectorAll("a,button").forEach(el=>{
-    el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(155,212,255,.25)";});
-    el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
-  });
-
-  // ===== Diffusing SMOKE: particle mask advected by curl noise =====
-  (function(){
-    const svg       = document.getElementById('heroSVG');
-    const vb        = svg.viewBox.baseVal; // 1200 x 360
-    const trailImg  = document.getElementById('trail');
-    const dm        = document.getElementById('dm');
-    const nCoarse   = document.getElementById('noiseCoarse');
-    const nFine     = document.getElementById('noiseFine');
-
-    // Offscreen canvas for smoke mask
-    const DPR = Math.max(1, Math.min(2, window.devicePixelRatio||1));
-    const c = document.createElement('canvas');
-    const ctx = c.getContext('2d');
-    function resizeCanvas(){
-      c.width  = Math.round(vb.width * DPR);
-      c.height = Math.round(vb.height * DPR);
-    }
-    resizeCanvas();
-
-    // --- Tiny 2D value noise (for flow field) ---
-    function hash(n){ return Math.sin(n)*43758.5453 % 1; }
-    function noise2(x,y){
-      const xi=Math.floor(x), yi=Math.floor(y);
-      const xf=x-xi, yf=y-yi;
-      const s=hash(xi*57+yi*131);
-      const t=hash((xi+1)*57+yi*131);
-      const u=hash(xi*57+(yi+1)*131);
-      const v=hash((xi+1)*57+(yi+1)*131);
-      const sx=xf*xf*(3-2*xf), sy=yf*yf*(3-2*yf);
-      const a=s*(1-sx)+t*sx, b=u*(1-sx)+v*sx;
-      return a*(1-sy)+b*sy;
-    }
-    // Divergence-free "curl" from the scalar field
-    function curl(x,y,t){
-      const e=0.001;
-      const n1=noise2(x+e,y+t)-noise2(x-e,y+t);
-      const n2=noise2(x+t,y+e)-noise2(x+t,y-e);
-      // perpendicular (dy,-dx)
-      return {x: n2, y: -n1};
-    }
-
-    // Particles = smoke puffs that drift & expand
-    const particles=[];
-    const MAX_PART=90;      // overall count
-    const EMIT=6;           // spawned per mousemove
-    const LIFE=2.2;         // seconds
-    const BASE_R=36;        // start radius (in px on canvas)
-    const GROW=1.9;         // multiplicative growth over life
-    const ALPHA=0.22;       // base opacity per particle
-    const FLOW=0.55;        // flow speed multiplier
-    const DIFFUSE=0.35;     // per-frame extra blur in paint
-
-    let lastEmit=0, hover=false;
-    let mx = vb.width/2, my = vb.height/2;
-
-    function toVB(e){
-      const r = svg.getBoundingClientRect();
-      return {
-        x: (e.clientX - r.left) / r.width  * vb.width,
-        y: (e.clientY - r.top)  / r.height * vb.height
-      };
-    }
-
-    svg.addEventListener('mousemove', e=>{
-      const p = toVB(e);
-      mx = p.x; my = p.y; hover = true;
-      // Emit a few new particles under cursor
-      for(let i=0;i<EMIT;i++){
-        if (particles.length>=MAX_PART) particles.shift();
-        const jitterx=(Math.random()-0.5)*8;
-        const jittery=(Math.random()-0.5)*8;
-        particles.push({
-          x: (mx + jitterx), y: (my + jittery),
-          age: 0, life: LIFE * (0.85 + Math.random()*0.3),
-          r: BASE_R * DPR * (0.85 + Math.random()*0.3),
-          seed: Math.random()*1000
-        });
-      }
-    });
-    svg.addEventListener('mouseleave', ()=>{ hover=false; });
-
-    let last=performance.now()/1000;
-    function step(){
-      const now=performance.now()/1000, dt=Math.min(0.033, now-last); last=now;
-
-      // Animate SVG noise layers (gentle drift)
-      const t=now*0.35;
-      const bx1=0.0035 + Math.sin(t*0.5)*0.0010;
-      const by1=0.0060 + Math.cos(t*0.4)*0.0012;
-      nCoarse.setAttribute('baseFrequency', `${bx1.toFixed(4)} ${by1.toFixed(4)}`);
-      const bx2=0.0120 + Math.sin(t*0.8)*0.0020;
-      const by2=0.0180 + Math.cos(t*0.6)*0.0022;
-      nFine.setAttribute('baseFrequency', `${bx2.toFixed(4)} ${by2.toFixed(4)}`);
-
-      // Ease displacement in/out
-      const target = hover ? 32 : 0;
-      const current = parseFloat(dm.getAttribute('scale')) || 0;
-      dm.setAttribute('scale', (current + (target-current)*0.12).toFixed(2));
-
-      // Clear mask with slight residual to create diffusion build-up
-      ctx.globalCompositeOperation='source-over';
-      ctx.fillStyle='rgba(0,0,0,0)';
-      ctx.clearRect(0,0,c.width,c.height);
-
-      // Advect & draw particles
-      const sx = c.width / vb.width, sy = c.height / vb.height;
-
-      for (let i=particles.length-1;i>=0;i--){
-        const p=particles[i];
-        p.age += dt;
-        const lifeT = p.age / p.life; // 0..1
-
-        if (lifeT>=1){ particles.splice(i,1); continue; }
-
-        // Curl-noise velocity (stable drift, looks smoky)
-        const kx=(p.x + p.seed)*0.01, ky=(p.y - p.seed)*0.01;
-        const v=curl(kx,ky, now*0.1);
-        p.x += v.x * FLOW * 120 * dt;
-        p.y += v.y * FLOW * 120 * dt;
-
-        // Grow + fade
-        const easeOut = x=>1 - Math.pow(1-x,2);
-        const radius  = p.r * (1 + easeOut(lifeT) * (GROW-1));
-        const alpha   = ALPHA * (1 - lifeT);
-
-        // Paint soft puff (slightly elongated along flow)
-        const cx=p.x*sx, cy=p.y*sy;
-        const elong = 1 + 0.8*easeOut(lifeT);
-        const rx = radius * elong, ry = radius;
-
-        // draw by scaling context (cheaper than rotated gradients)
-        ctx.save();
-        ctx.translate(cx,cy);
-        ctx.scale(rx, ry);
-        const g = ctx.createRadialGradient(0,0,0, 0,0,1);
-        g.addColorStop(0,   `rgba(255,255,255,${alpha})`);
-        g.addColorStop(0.6, `rgba(255,255,255,${alpha*0.5})`);
-        g.addColorStop(1,   `rgba(255,255,255,0)`);
-        ctx.fillStyle=g;
-        ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
-        ctx.restore();
-      }
-
-      // A touch of diffusion blur each frame for continuity
-      // (we simulate by drawing the current mask again with slight blur via canvas filter)
-      if ('filter' in ctx){
-        ctx.filter=`blur(${(DIFFUSE*DPR).toFixed(2)}px)`;
-        const copy = ctx.getImageData(0,0,c.width,c.height);
-        ctx.clearRect(0,0,c.width,c.height);
-        ctx.putImageData(copy,0,0);
-        ctx.filter='none';
-      }
-
-      // Upload as data URL for feImage (mask)
-      trailImg.setAttribute('href', c.toDataURL('image/png'));
-
-      requestAnimationFrame(step);
-    }
-    step();
-
-    window.addEventListener('resize', resizeCanvas);
   })();
 </script>
 </body>
