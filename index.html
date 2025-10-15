@@ -29,7 +29,6 @@
   .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
   .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
 
-  /* your cursor */
   .cursor{
     position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
     pointer-events:none;background:rgba(155,212,255,.15);
@@ -63,11 +62,12 @@
           <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
           <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
 
-          <!-- Base displacement (kept from your good version) -->
+          <!-- Base displacement -->
           <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
 
-          <!-- ===== Edge/strength mask: where displacement differs from original ===== -->
+          <!-- ===== Prism “shadow” (no base tint): show only where displacement changed pixels ===== -->
+          <!-- Build an edge/strength mask from difference between displaced and original -->
           <feBlend in="disp" in2="SourceGraphic" mode="difference" result="diffRGB"/>
           <feColorMatrix in="diffRGB" type="saturate" values="0" result="diffL"/>
           <feComponentTransfer in="diffL" result="edgeMask">
@@ -77,7 +77,7 @@
           </feComponentTransfer>
           <feGaussianBlur in="edgeMask" stdDeviation="1.2" result="edgeSoft"/>
 
-          <!-- ===== Colored fringes masked to edge, offset by JS (no base tint) ===== -->
+          <!-- Color the edge mask (separate layers), then offset them (JS animates dx/dy) -->
           <feFlood flood-color="#ff2a6d" flood-opacity="0.85" result="floodR"/>
           <feFlood flood-color="#2aff79" flood-opacity="0.85" result="floodG"/>
           <feFlood flood-color="#2ac8ff" flood-opacity="0.85" result="floodB"/>
@@ -86,12 +86,11 @@
           <feComposite in="floodG" in2="edgeSoft" operator="in" result="rimG"/>
           <feComposite in="floodB" in2="edgeSoft" operator="in" result="rimB"/>
 
-          <!-- Offsets animated in JS (id=offR/G/B). These overlay on top. -->
           <feOffset in="rimR" dx="0" dy="0" result="prismR" id="offR"/>
           <feOffset in="rimG" dx="0" dy="0" result="prismG" id="offG"/>
           <feOffset in="rimB" dx="0" dy="0" result="prismB" id="offB"/>
 
-          <!-- Composite back: base displaced text + subtle fringes -->
+          <!-- Composite back: base displaced text + RGB fringes -->
           <feMerge>
             <feMergeNode in="disp"/>
             <feMergeNode in="prismR"/>
@@ -152,6 +151,7 @@
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
+    const dm   = document.getElementById('dm');
     const offR = document.getElementById('offR');
     const offG = document.getElementById('offG');
     const offB = document.getElementById('offB');
@@ -161,18 +161,17 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    // Liquify normal map (same as your good version)
-    const MAX_IMPRINTS = 22;    // trail length
-    const LIFE = 520;           // ms per imprint
-    const BASE = 128;           // neutral R/G
-    const BASE_RADIUS = 110;    // radius of influence
-    const STRETCH = 2.6;        // elongation along motion
-    const TWIRL = 0.9;          // 0..1 swirl component
-    const POWER = 1.0;          // global multiplier
+    const MAX_IMPRINTS = 22;
+    const LIFE = 520;
+    const BASE = 128;
+    const BASE_RADIUS = 110;
+    const STRETCH = 2.6;
+    const TWIRL = 0.9;
+    const POWER = 1.0;
 
     const imprints = []; // {x,y,vx,vy,t}
     let last = {x: vb.width/2, y: vb.height/2};
-    let vX = 0, vY = 0; // mouse velocity (for prism direction)
+    let vX = 0, vY = 0; // current mouse velocity (for prism direction)
 
     function toVB(e){
       const r = svg.getBoundingClientRect();
@@ -208,7 +207,7 @@
         if (age > LIFE){ imprints.splice(i,1); continue; }
 
         const t = age / LIFE;
-        const ease = 1 - (t*t*(3 - 2*t)); // smoothstep fade
+        const ease = 1 - (t*t*(3 - 2*t));
         const grow = 1 + 0.9*t;
 
         const vlen = Math.hypot(it.vx, it.vy) || 1;
@@ -243,11 +242,10 @@
       nmEl.setAttribute('href', c.toDataURL('image/png'));
     }
 
-    // Animate + RGB prism offsets (masked inside the filter)
+    // Animate + RGB prism offsets (masked and fades with displacement)
     function animate(){
       drawNormalMap();
 
-      // prism magnitude scales with velocity and live trail (so it mutes as it fades)
       const vMag = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
       const amt = 3.2 * vMag * active; // px
@@ -256,7 +254,6 @@
       const dirX = (vX / hyp);
       const dirY = (vY / hyp);
 
-      // R opposite motion, G with motion, B perpendicular
       offR.setAttribute('dx', (-amt*1.0 * dirX).toFixed(2));
       offR.setAttribute('dy', (-amt*1.0 * dirY).toFixed(2));
 
