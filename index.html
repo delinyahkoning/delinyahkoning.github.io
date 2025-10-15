@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Delinyah Koning — Home</title>
-<meta name="description" content="Portfolio — 3D, 2D, Design, Photo/Video." />
+<meta name="description" content="Portfolio — 3D, 2D, Design, Photo." />
 <style>
   :root{--bg:#0a0b0f;--ink:#e9ecf5;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px}
   html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
@@ -21,24 +21,12 @@
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
   footer{padding:50px 0;color:var(--muted);text-align:center}
 
-  /* === Custom Cursor === */
-  body, a, button {
-    cursor: none; /* hide default cursor */
-  }
-
-  .cursor {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    pointer-events: none;
-    background: rgba(155,212,255,0.15);
-    border: 1px solid rgba(155,212,255,0.4);
-    transform: translate(-50%, -50%);
-    transition: width 0.15s ease, height 0.15s ease, background 0.2s ease;
-    z-index: 9999;
+  /* === Custom Cursor (keeps native pointer) === */
+  .cursor{
+    position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
+    pointer-events:none;background:rgba(155,212,255,.15);
+    border:1px solid rgba(155,212,255,.4);transform:translate(-50%,-50%);
+    transition:width .15s,height .15s,background .2s;z-index:9999;
   }
 </style>
 </head>
@@ -47,11 +35,11 @@
   <div class="wrap nav">
     <div class="brand">Delinyah Koning</div><div class="spacer"></div>
     <nav class="tabs">
-      <a class="tab active" href="index.html">Home</a>
-      <a class="tab" href="3d.html">3D</a>
-      <a class="tab" href="2d.html">2D</a>
-      <a class="tab" href="design.html">Design</a>
-      <a class="tab" href="photo-video.html">Photo/Video</a>
+      <a class="tab active" href="/">Home</a>
+      <a class="tab" href="/3d/">3D</a>
+      <a class="tab" href="/2d/">2D</a>
+      <a class="tab" href="/design/">Design</a>
+      <a class="tab" href="/photo/">Photo</a>
     </nav>
   </div>
 </header>
@@ -59,7 +47,7 @@
 <section class="hero">
   <div class="wrap" style="text-align:center">
     <h1>Cinematic visuals, science-minded design.</h1>
-    <p class="sub">3D scenes, 2D motion & illustration, identity systems, photography & video.</p>
+    <p class="sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
   </div>
 </section>
 
@@ -87,24 +75,12 @@
 <div class="cursor"></div>
 <script>
   document.getElementById('y').textContent=new Date().getFullYear();
-  const cursor = document.querySelector(".cursor");
-  document.addEventListener("mousemove", e => {
-    cursor.style.top = e.clientY + "px";
-    cursor.style.left = e.clientX + "px";
-  });
-  document.querySelectorAll("a, button").forEach(el => {
-    el.addEventListener("mouseenter", () => {
-      cursor.style.width = "36px";
-      cursor.style.height = "36px";
-      cursor.style.background = "rgba(155,212,255,0.25)";
-    });
-    el.addEventListener("mouseleave", () => {
-      cursor.style.width = "22px";
-      cursor.style.height = "22px";
-      cursor.style.background = "rgba(155,212,255,0.15)";
-    });
+  const cursor=document.querySelector(".cursor");
+  document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
+  document.querySelectorAll("a,button").forEach(el=>{
+    el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(155,212,255,.25)";});
+    el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 </script>
-
 </body>
 </html>
