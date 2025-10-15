@@ -1,92 +1,109 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Delinyah Koning — Portfolio</title>
-  <meta name="description" content="Creative portfolio — cinematic 3D, 2D animation, illustration, design, photo/video, audio." />
-  <style>
-    :root{
-      --bg:#0b0c10;       /* deep charcoal */
-      --panel:#121319;    /* slightly lighter panel */
-      --muted:#8b90a0;
-      --text:#e8eaf0;
-      --accent:#8ab4ff;   /* cool cinematic accent */
-      --ring: rgba(138,180,255,.35);
-      --radius:16px;
-      --max:1100px;
-      --card-shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
-    html{scroll-behavior:smooth}
-    body{margin:0; background:var(--bg); color:var(--text); font:16px/1.6 Arial, Helvetica, sans-serif}
-    a{color:var(--accent); text-decoration:none}
-    a:hover{text-decoration:underline}
-    .wrap{max-width:var(--max); margin:0 auto; padding:0 20px}
-    /* Header / Nav */
-    header{
-      position:sticky; top:0; z-index:50;
-      backdrop-filter:saturate(140%) blur(8px);
-      background:rgba(10,11,16,.65);
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .nav{
-      display:flex; align-items:center; gap:14px; padding:14px 0;
-    }
-    .brand{font-weight:bold; letter-spacing:.3px}
-    .spacer{flex:1}
-    .tabs{display:flex; flex-wrap:wrap; gap:10px}
-    .tab{
-      padding:8px 12px; border:1px solid rgba(255,255,255,.08);
-      border-radius:999px; color:var(--text); text-decoration:none;
-      transition:background .15s, border-color .15s, color .15s;
-    }
-    .tab:hover{background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.18)}
-    .tab.active{background:var(--panel); border-color:var(--ring); box-shadow:0 0 0 3px var(--ring)}
-    /* Hero */
-    .hero{padding:56px 0 18px}
-    h1{margin:0 0 8px; font-size:clamp(26px,4vw,38px); letter-spacing:.4px}
-    .sub{color:var(--muted)}
-    /* Sections */
-    section{padding:48px 0}
-    section .title{font-size:22px; margin:0 0 18px}
-    .panel{
-      background:var(--panel); border:1px solid rgba(255,255,255,.08);
-      border-radius:var(--radius); box-shadow:var(--card-shadow);
-      padding:22px;
-    }
-    /* Grids */
-    .grid{display:grid; gap:16px}
-    .grid.cards{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-    .card{
-      background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:var(--radius); padding:14px; box-shadow:var(--card-shadow);
-    }
-    .thumb{
-      width:100%; height:160px; border-radius:12px; background:#1a1c24;
-      display:grid; place-items:center; color:#657; border:1px dashed rgba(255,255,255,.1);
-      margin-bottom:10px;
-    }
-    .meta{color:var(--muted); font-size:13px}
-    /* Resume block */
-    .resume-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
-    .btn{
-      display:inline-block; padding:10px 14px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.1); color:var(--text); text-decoration:none;
-      background:rgba(255,255,255,.04);
-    }
-    .btn:hover{background:rgba(255,255,255,.08)}
-    /* Footer */
-    footer{padding:40px 0; color:var(--muted); text-align:center}
-    /* Responsive tweaks */
-    @media (max-width:760px){
-      .tabs{gap:8px}
-      .tab{padding:7px 10px; font-size:14px}
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Delinyah Koning — Portfolio</title>
+<meta name="description" content="Cinematic 3D · 2D animation · Illustration · Design · Photo/Video · Audio" />
+<style>
+  /* ---------- design tokens ---------- */
+  :root{
+    --bg:#0a0b0f;
+    --ink:#e9ecf5;
+    --muted:#9aa0b3;
+    --accent:#9bd4ff;
+    --panel:#10121a;
+    --radius:18px;
+    --max:1200px;
+  }
+  html,body{height:100%}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif;overflow-x:hidden}
+
+  /* ---------- global ---------- */
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  h1,h2,h3{line-height:1.1;margin:0 0 .6rem}
+  h1{font-size:clamp(36px,6vw,64px);letter-spacing:.4px}
+  h2{font-size:clamp(28px,4vw,40px)}
+  h3{font-size:20px}
+  p.sub{color:var(--muted)}
+  a{color:inherit;text-decoration:none}
+  .btn{display:inline-block;padding:.75rem 1.1rem;border:1px solid #2a2d3a;border-radius:999px;background:#121522}
+  .btn:hover{border-color:#3a3f52}
+
+  /* ---------- cursor ---------- */
+  .cursor{
+    position:fixed;inset:auto auto 0 0;pointer-events:none;z-index:9999;
+    width:18px;height:18px;border-radius:50%;
+    transform:translate(-50%,-50%);mix-blend-mode:difference;background:#fff;opacity:.9;
+  }
+
+  /* ---------- header / nav ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);
+    border-bottom:1px solid rgba(255,255,255,.06)
+  }
+  .nav{display:flex;align-items:center;gap:16px;padding:14px 0}
+  .brand{font-weight:700;letter-spacing:.3px}
+  .spacer{flex:1}
+  .tabs{display:flex;gap:10px;flex-wrap:wrap}
+  .tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px}
+  .tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;min-height:72vh;display:grid;place-items:center;
+    background:
+      radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
+      radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
+      var(--bg);
+    overflow:hidden;
+  }
+  .hero .backdrop{
+    position:absolute;inset:-10% -10% auto -10%;height:60vh;
+    background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0));
+    filter:blur(80px);transform:translateY(-10%) scale(1.2);
+    opacity:.35;pointer-events:none;
+  }
+  .hero .content{position:relative;z-index:2}
+  .kicker{letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-size:12px}
+  .actions{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+
+  /* ---------- sections ---------- */
+  section{padding:70px 0}
+  .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);padding:24px;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+
+  /* ---------- reveal ---------- */
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.on{opacity:1;transform:none}
+
+  /* ---------- project grid with hover video ---------- */
+  .grid{display:grid;gap:16px}
+  .grid.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .card{position:relative;overflow:hidden;border-radius:14px;background:#0d0f16;border:1px solid #232634}
+  .thumb{aspect-ratio:16/9;background:#151826;display:grid;place-items:center;color:#556}
+  .card video,.card img{width:100%;height:100%;object-fit:cover;display:block}
+  .card .meta{position:absolute;left:10px;bottom:10px;background:rgba(0,0,0,.45);
+    padding:8px 10px;border-radius:12px;color:#d7dcf0;font-size:13px;border:1px solid rgba(255,255,255,.12)}
+  .card:hover .meta{background:rgba(0,0,0,.65)}
+  .card:hover{box-shadow:0 12px 40px rgba(0,0,0,.45)}
+
+  /* ---------- two column for Home ---------- */
+  .cols{display:grid;gap:20px;grid-template-columns:1.2fr .8fr}
+
+  /* ---------- footer ---------- */
+  footer{padding:60px 0 40px;color:var(--muted);text-align:center}
+  @media (max-width:900px){.cols{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-  <!-- Sticky Top Nav -->
+
+  <!-- custom cursor -->
+  <div class="cursor" aria-hidden="true"></div>
+
+  <!-- nav -->
   <header>
     <div class="wrap nav">
       <div class="brand">Delinyah Koning</div>
@@ -103,203 +120,193 @@
     </div>
   </header>
 
-  <!-- Hero / Intro -->
-  <div class="wrap hero" id="home">
-    <h1>Creative Portfolio</h1>
-    <p class="sub">Cinematic 3D · 2D animation & illustration · Design · Photo/Video · Audio</p>
-  </div>
-
-  <!-- Home: About + Resume + Featured -->
-  <section>
-    <div class="wrap grid" style="grid-template-columns: 1.2fr .8fr; gap:20px">
-      <!-- About & Featured -->
-      <div class="panel">
-        <h2 class="title">About</h2>
-        <p>
-          I’m Delinyah — I blend a biomedical research mindset with visual storytelling.
-          I make cinematic 3D, concise 2D animations, science illustrations, and brand systems.
-        </p>
-
-        <h3 class="title" style="margin-top:26px">Featured Work</h3>
-        <div class="grid cards">
-          <article class="card">
-            <div class="thumb">Add image: assets/feat-1.jpg</div>
-            <h4>Project Title One</h4>
-            <p class="meta">Role · Tools · Year</p>
-          </article>
-          <article class="card">
-            <div class="thumb">Add image: assets/feat-2.jpg</div>
-            <h4>Project Title Two</h4>
-            <p class="meta">Role · Tools · Year</p>
-          </article>
-          <article class="card">
-            <div class="thumb">Add image: assets/feat-3.jpg</div>
-            <h4>Project Title Three</h4>
-            <p class="meta">Role · Tools · Year</p>
-          </article>
-        </div>
+  <!-- hero -->
+  <section class="hero" id="home">
+    <div class="backdrop" data-parallax="0.25"></div>
+    <div class="wrap content">
+      <span class="kicker">Portfolio</span>
+      <h1 class="reveal">Cinematic visuals, science-minded design.</h1>
+      <p class="sub reveal" style="max-width:760px">
+        I craft narrative 3D shots, clear 2D explainers, illustrations, and brand systems — with the rigor of a biomedical researcher.
+      </p>
+      <div class="actions reveal">
+        <a class="btn" href="#featured">See featured work</a>
+        <a class="btn" href="assets/Delinyah-Koning-Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
       </div>
+    </div>
+  </section>
 
-      <!-- Resume -->
-      <aside class="panel">
-        <h2 class="title">Resume</h2>
-        <p class="meta">Add a short summary, or link to a downloadable PDF.</p>
-        <div class="resume-actions">
-          <a class="btn" href="assets/Delinyah-Koning-Resume.pdf" target="_blank" rel="noopener">View PDF</a>
-          <a class="btn" href="#contact">Contact</a>
-          <a class="btn" href="https://github.com/delinyahkoning" target="_blank" rel="noopener">GitHub</a>
-        </div>
-        <ul style="margin-top:16px">
-          <li><strong>Focus:</strong> 3D/2D visuals, design, science communication</li>
-          <li><strong>Tools:</strong> Blender, Adobe Suite, Reaper, etc.</li>
-          <li><strong>Also:</strong> Scientific illustration & data visuals</li>
+  <!-- home: about + featured -->
+  <section id="featured" class="reveal">
+    <div class="wrap cols">
+      <div class="panel">
+        <h2>About</h2>
+        <p class="sub">Short bio here. Keep it crisp: your craft, tools, and what you love making.</p>
+        <ul>
+          <li><b>Tools:</b> Blender (Cycles), After Effects, Illustrator, InDesign, Reaper</li>
+          <li><b>Focus:</b> cinematic 3D, motion for explainers, science visuals</li>
+          <li><b>Available for:</b> commissions, collaborations, studio work</li>
         </ul>
+      </div>
+      <aside class="panel">
+        <h2>Contact</h2>
+        <p class="sub">Email / socials / city</p>
+        <p><a class="btn" href="mailto:you@example.com">you@example.com</a></p>
+        <p><a class="btn" href="https://instagram.com/" target="_blank">Instagram</a> <a class="btn" href="https://github.com/delinyahkoning" target="_blank">GitHub</a></p>
       </aside>
     </div>
   </section>
 
-  <!-- Cinematic 3D -->
-  <section id="cinematic-3d">
+  <section class="reveal">
     <div class="wrap">
-      <h2 class="title">Cinematic 3D</h2>
-      <div class="grid cards">
-        <article class="card">
-          <div class="thumb">assets/3d-1.jpg</div>
-          <h4>Short film frame / lookdev</h4>
-          <p class="meta">Blender · Cycles · 2025</p>
+      <h2>Featured Work</h2>
+      <div class="grid cards" style="margin-top:16px">
+        <!-- hover plays video if present, else shows image -->
+        <article class="card" data-video="assets/feat-1.mp4">
+          <div class="thumb">Video: assets/feat-1.mp4</div>
+          <div class="meta">Short Film Lookdev · Blender</div>
         </article>
-        <article class="card">
-          <div class="thumb">assets/3d-2.jpg</div>
-          <h4>Procedural material study</h4>
-          <p class="meta">Nodes · Shading · 2025</p>
+        <article class="card" data-image="assets/feat-2.jpg">
+          <div class="thumb">Image: assets/feat-2.jpg</div>
+          <div class="meta">Science Illustration · Organelles</div>
         </article>
-        <article class="card">
-          <div class="thumb">assets/3d-3.jpg</div>
-          <h4>Scientific 3D visualization</h4>
-          <p class="meta">Protein/Organelle visual</p>
+        <article class="card" data-video="assets/feat-3.mp4">
+          <div class="thumb">Video: assets/feat-3.mp4</div>
+          <div class="meta">Explainer Motion · AE</div>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- 2D Animations -->
-  <section id="anim-2d">
+  <!-- cinematic 3D -->
+  <section id="cinematic-3d" class="reveal">
     <div class="wrap">
-      <h2 class="title">2D Animations</h2>
-      <div class="grid cards">
-        <article class="card">
-          <div class="thumb">assets/anim-1.jpg</div>
-          <h4>Explainer snippet</h4>
-          <p class="meta">After Effects · 30s</p>
+      <h2>Cinematic 3D</h2>
+      <p class="sub">Mood-driven, physically-plausible shots; lookdev, lighting, simulation.</p>
+      <div class="grid cards" style="margin-top:16px">
+        <article class="card" data-video="assets/3d-1.mp4"><div class="thumb">assets/3d-1.mp4</div><div class="meta">Frame study</div></article>
+        <article class="card" data-video="assets/3d-2.mp4"><div class="thumb">assets/3d-2.mp4</div><div class="meta">Procedural</div></article>
+        <article class="card" data-image="assets/3d-3.jpg"><div class="thumb">assets/3d-3.jpg</div><div class="meta">Sci-viz</div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2D animations -->
+  <section id="anim-2d" class="reveal">
+    <div class="wrap">
+      <h2>2D Animations</h2>
+      <div class="grid cards" style="margin-top:16px">
+        <article class="card" data-video="assets/anim-1.mp4"><div class="thumb">assets/anim-1.mp4</div><div class="meta">Explainer</div></article>
+        <article class="card" data-video="assets/anim-2.mp4"><div class="thumb">assets/anim-2.mp4</div><div class="meta">UI Motion</div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2D illustrations -->
+  <section id="ill-2d" class="reveal">
+    <div class="wrap">
+      <h2>2D Illustrations</h2>
+      <div class="grid cards" style="margin-top:16px">
+        <article class="card" data-image="assets/ill-1.jpg"><div class="thumb">assets/ill-1.jpg</div><div class="meta">Editorial</div></article>
+        <article class="card" data-image="assets/ill-2.jpg"><div class="thumb">assets/ill-2.jpg</div><div class="meta">Science</div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- design & branding -->
+  <section id="design-branding" class="reveal">
+    <div class="wrap">
+      <h2>Graphic Design & Branding</h2>
+      <div class="grid cards" style="margin-top:16px">
+        <article class="card" data-image="assets/brand-1.jpg"><div class="thumb">assets/brand-1.jpg</div><div class="meta">Identity</div></article>
+        <article class="card" data-image="assets/brand-2.jpg"><div class="thumb">assets/brand-2.jpg</div><div class="meta">Poster</div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- photo & video -->
+  <section id="photo-video" class="reveal">
+    <div class="wrap">
+      <h2>Photography & Videography</h2>
+      <div class="grid cards" style="margin-top:16px">
+        <article class="card" data-image="assets/photo-1.jpg"><div class="thumb">assets/photo-1.jpg</div><div class="meta">Series</div></article>
+        <article class="card" data-video="assets/video-1.mp4"><div class="thumb">assets/video-1.mp4</div><div class="meta">Music video</div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- audio -->
+  <section id="audio" class="reveal">
+    <div class="wrap">
+      <h2>Audio Work</h2>
+      <div class="grid cards" style="margin-top:16px">
+        <article class="card" data-audio="assets/track-1.mp3" data-image="assets/audio-1.jpg">
+          <div class="thumb">assets/track-1.mp3</div>
+          <div class="meta">Mix/Master</div>
         </article>
-        <article class="card">
-          <div class="thumb">assets/anim-2.jpg</div>
-          <h4>UI motion</h4>
-          <p class="meta">Timing · Easing</p>
+        <article class="card" data-audio="assets/track-2.mp3" data-image="assets/audio-2.jpg">
+          <div class="thumb">assets/track-2.mp3</div>
+          <div class="meta">Sound Design</div>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- 2D Illustrations -->
-  <section id="ill-2d">
-    <div class="wrap">
-      <h2 class="title">2D Illustrations</h2>
-      <div class="grid cards">
-        <article class="card">
-          <div class="thumb">assets/ill-1.jpg</div>
-          <h4>Science illustration</h4>
-          <p class="meta">Cell/Organelles</p>
-        </article>
-        <article class="card">
-          <div class="thumb">assets/ill-2.jpg</div>
-          <h4>Editorial spot</h4>
-          <p class="meta">Vector, print</p>
-        </article>
-      </div>
-    </div>
-  </section>
+  <footer>© <span id="y"></span> Delinyah Koning</footer>
 
-  <!-- Design & Branding -->
-  <section id="design-branding">
-    <div class="wrap">
-      <h2 class="title">Graphic Design & Branding</h2>
-      <div class="grid cards">
-        <article class="card">
-          <div class="thumb">assets/brand-1.jpg</div>
-          <h4>Identity concept</h4>
-          <p class="meta">Logo · Palette · Type</p>
-        </article>
-        <article class="card">
-          <div class="thumb">assets/brand-2.jpg</div>
-          <h4>Poster / layout</h4>
-          <p class="meta">InDesign</p>
-        </article>
-      </div>
-    </div>
-  </section>
+<script>
+  // year
+  document.getElementById('y').textContent = new Date().getFullYear();
 
-  <!-- Photo & Video -->
-  <section id="photo-video">
-    <div class="wrap">
-      <h2 class="title">Photography & Videography</h2>
-      <div class="grid cards">
-        <article class="card">
-          <div class="thumb">assets/photo-1.jpg</div>
-          <h4>Series title</h4>
-          <p class="meta">Lens · Location</p>
-        </article>
-        <article class="card">
-          <div class="thumb">assets/photo-2.jpg</div>
-          <h4>Music video still</h4>
-          <p class="meta">Edit · Grade</p>
-        </article>
-      </div>
-    </div>
-  </section>
+  // active tab highlight on scroll
+  const tabs=[...document.querySelectorAll('.tab')];
+  const secs=tabs.map(t=>document.querySelector(t.getAttribute('href')));
+  const onScroll=()=>{const y=scrollY+100;let a=0;secs.forEach((s,i)=>{if(s.offsetTop<=y)a=i});tabs.forEach((t,i)=>t.classList.toggle('active',i===a))};
+  addEventListener('scroll',onScroll,{passive:true}); onScroll();
 
-  <!-- Audio -->
-  <section id="audio">
-    <div class="wrap">
-      <h2 class="title">Audio Work</h2>
-      <div class="grid cards">
-        <article class="card">
-          <div class="thumb">assets/audio-1.jpg</div>
-          <h4>Mix/master example</h4>
-          <p class="meta">Reaper · FabFilter</p>
-        </article>
-        <article class="card">
-          <div class="thumb">assets/audio-2.jpg</div>
-          <h4>Sound design</h4>
-          <p class="meta">Film/Short</p>
-        </article>
-      </div>
-    </div>
-  </section>
+  // reveal on view
+  const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('on')), {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-  <footer>
-    © <span id="y"></span> Delinyah Koning · <a href="mailto:you@example.com">you@example.com</a>
-  </footer>
+  // parallax elements: add data-parallax="0.3"
+  const parEls=[...document.querySelectorAll('[data-parallax]')];
+  addEventListener('scroll',()=>parEls.forEach(el=>{
+    const speed=parseFloat(el.dataset.parallax||0.2);
+    el.style.transform=`translateY(${scrollY*speed*-1}px) scale(1.2)`;
+  }),{passive:true});
 
-  <script>
-    // Year
-    document.getElementById('y').textContent = new Date().getFullYear();
+  // custom cursor
+  const cur=document.querySelector('.cursor');
+  addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'});
 
-    // Active tab highlight on scroll
-    const tabs = [...document.querySelectorAll('.tab')];
-    const ids = tabs.map(a => a.getAttribute('href'));
-    const sections = ids.map(id => document.querySelector(id));
-
-    const onScroll = () => {
-      const pos = window.scrollY + 90;
-      let active = 0;
-      sections.forEach((sec, i) => {
-        if (sec && sec.offsetTop <= pos) active = i;
-      });
-      tabs.forEach((t,i)=> t.classList.toggle('active', i===active));
-    };
-    document.addEventListener('scroll', onScroll, {passive:true});
-    onScroll();
-  </script>
+  // project cards: lazy create video/img/audio on hover/in-view
+  const makeMedia=(card)=>{
+    if(card.dataset.made)return;
+    const v=card.dataset.video, img=card.dataset.image, aud=card.dataset.audio;
+    const slot=document.createElement(v?'video':'img');
+    if(v){
+      slot.src=v; slot.muted=true; slot.loop=true; slot.playsInline=true;
+      slot.addEventListener('canplay',()=>slot.play());
+    }else{
+      slot.src=img; slot.loading='lazy';
+    }
+    const thumb=card.querySelector('.thumb');
+    thumb.replaceWith(slot);
+    if(aud){
+      const p=new Audio(aud); p.preload='none';
+      card.addEventListener('mouseenter',()=>{p.currentTime=0; p.play().catch(()=>{})});
+      card.addEventListener('mouseleave',()=>p.pause());
+    }
+    card.dataset.made=1;
+  };
+  const cardObserver=new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting) makeMedia(e.target)
+  }),{threshold:.3});
+  document.querySelectorAll('.card').forEach(c=>{
+    cardObserver.observe(c);
+    c.addEventListener('mouseenter',()=>{ if(c.querySelector('video')) c.querySelector('video').play()});
+    c.addEventListener('mouseleave',()=>{ const v=c.querySelector('video'); if(v) v.pause()});
+  });
+</script>
 </body>
 </html>
