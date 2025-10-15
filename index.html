@@ -6,7 +6,7 @@
 <title>Delinyah Koning — Home</title>
 <meta name="description" content="Portfolio — 3D, 2D, Design, Photo." />
 <style>
-  :root{--bg:#0a0b0f;--ink:#e9ecf5;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px}
+  :root{--bg:#0a0b0f;--ink:#e9ecf5;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px;--split:0px}
   html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
   .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
   header{position:sticky;top:0;z-index:50;background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
@@ -17,35 +17,27 @@
     radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
     radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
     var(--bg)}
-  h1{font-size:clamp(36px,6vw,64px);line-height:1.1;margin:0 0 .6rem}
-  p.sub{color:var(--muted);max-width:760px;margin:0 auto}
-  section{padding:60px 0}.panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
+  section{padding:60px 0}
+  .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
   .grid{display:grid;gap:16px}.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
   .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
   footer{padding:50px 0;color:var(--muted);text-align:center}
 
-  /* === Hero panel with lines + ripple === */
-  .hero-center { text-align:center; position:relative; }
-  .hero-panel {
-    display:inline-block; position:relative; border-radius:24px; overflow:hidden;
-    padding:32px 38px; isolation:isolate; /* keep effects contained */
-    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-    border:1px solid rgba(255,255,255,.08);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 20px 60px rgba(0,0,0,.35);
+  /* ====== RIPPLE TEXT ====== */
+  .hero-center{ text-align:center }
+  .ripple-wrap{ display:inline-block; position:relative }
+  /* stack 4 copies: white base + R, G, B with blend and micro offset */
+  .glitch{ position:relative; display:inline-block; line-height:1.1; margin:0 0 .6rem }
+  .glitch span{
+    position:absolute; inset:0; display:inline-block; filter:url(#ripple);
+    will-change:transform, filter;
   }
-  .hero-panel::after{
-    content:""; position:absolute; inset:0; pointer-events:none;
-    background: radial-gradient(120% 200% at 10% -20%, rgba(155,212,255,.06), transparent 60%),
-                radial-gradient(120% 200% at 110% 120%, rgba(155,212,255,.05), transparent 60%);
-    mix-blend-mode:screen; opacity:.7;
-  }
-  canvas.lines-canvas{
-    position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;
-    /* slightly soften */
-    filter:contrast(120%) saturate(110%);
-  }
-  .hero h1, .hero p.sub { position:relative; z-index:1; }
+  .glitch .base{ position:relative; color:var(--ink); filter:url(#ripple) }
+  .glitch .r{ color:#ff2a6d; mix-blend-mode:screen; transform:translateX(calc(var(--split) * -1)); opacity:.85 }
+  .glitch .g{ color:#2aff79; mix-blend-mode:screen; transform:translateX(calc(var(--split) * .6)); opacity:.9 }
+  .glitch .b{ color:#2ac8ff; mix-blend-mode:screen; transform:translateX(calc(var(--split) * 1.1)); opacity:.9 }
+  .hero-sub{ color:var(--muted); max-width:760px; margin:12px auto 0 }
 
   /* === Custom Cursor (keeps native pointer) === */
   .cursor{
@@ -72,11 +64,15 @@
 
 <section class="hero">
   <div class="wrap hero-center">
-    <div class="hero-panel" id="heroPanel" aria-hidden="true">
-      <canvas class="lines-canvas" id="linesCanvas"></canvas>
-      <!-- Your text sits on top of the canvas -->
-      <h1 id="heroTitle">Cinematic visuals, <br>science-minded design.</h1>
-      <p class="sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
+    <div class="ripple-wrap" id="rippleWrap">
+      <!-- stacked copies for prism split -->
+      <h1 class="glitch" id="heroText" data-text="Cinematic visuals, science-minded design." style="font-size:clamp(36px,6vw,64px)">
+        <span class="base">Cinematic visuals, <br>science-minded design.</span>
+        <span class="r">Cinematic visuals, <br>science-minded design.</span>
+        <span class="g">Cinematic visuals, <br>science-minded design.</span>
+        <span class="b">Cinematic visuals, <br>science-minded design.</span>
+      </h1>
+      <p class="hero-sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
     </div>
   </div>
 </section>
@@ -102,7 +98,33 @@
 
 <footer>© <span id="y"></span> Delinyah Koning</footer>
 
+<!-- Invisible defs: the ripple filter -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- userSpaceOnUse lets us move the ripple in px inside the text box -->
+    <filter id="ripple" x="0" y="0" width="0" height="0" filterUnits="userSpaceOnUse">
+      <!-- a soft circular heightmap we’ll slide under the text -->
+      <feImage id="rip-img" x="0" y="0" width="240" height="240" preserveAspectRatio="none"
+        href='data:image/svg+xml;utf8,
+        <svg xmlns="http://www.w3.org/2000/svg" width="240" height="240">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgb(255,255,255)"/>
+              <stop offset="100%" stop-color="rgb(0,0,0)"/>
+            </radialGradient>
+          </defs>
+          <rect width="100%%" height="100%%" fill="url(#g)"/>
+        </svg>' result="map"/>
+      <feGaussianBlur in="map" stdDeviation="14" result="blur"/>
+      <!-- the actual warp; scale animated in JS -->
+      <feDisplacementMap id="rip-dm" in="SourceGraphic" in2="blur" scale="0"
+                         xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+</svg>
+
 <div class="cursor"></div>
+
 <script>
   // Year
   document.getElementById('y').textContent=new Date().getFullYear();
@@ -115,133 +137,66 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // === Lines + ripple canvas ===
+  // === Ripple text logic ===
   (function(){
-    const panel = document.getElementById('heroPanel');
-    const title = document.getElementById('heroTitle');
-    const canvas = document.getElementById('linesCanvas');
-    const ctx = canvas.getContext('2d', { alpha:true });
+    const wrap = document.getElementById('rippleWrap');
+    const text = document.getElementById('heroText');
+    const filter = document.getElementById('ripple');
+    const img = document.getElementById('rip-img');
+    const disp = document.getElementById('rip-dm');
 
-    let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-    let W=0, H=0;
+    // apply filter to all stacked copies
+    text.querySelectorAll('span').forEach(s => s.style.filter = 'url(#ripple)');
 
-    function resize(){
-      const r = panel.getBoundingClientRect();
-      W = Math.max(1, Math.floor(r.width));
-      H = Math.max(1, Math.floor(r.height));
-      canvas.width = Math.floor(W * DPR);
-      canvas.height = Math.floor(H * DPR);
-      canvas.style.width = W + 'px';
-      canvas.style.height = H + 'px';
-      ctx.setTransform(DPR,0,0,DPR,0,0);
+    const MAP_SIZE = 240; // pixels of the radial map image
+    let hover = false, power = 0, target = 0;
+
+    function setRegion(){
+      const r = text.getBoundingClientRect();
+      // set the filter's region to the text box (in px)
+      filter.setAttribute('x', 0);
+      filter.setAttribute('y', 0);
+      filter.setAttribute('width', r.width);
+      filter.setAttribute('height', r.height);
+      // also position the SVG defs element so coords are relative
+      const style = getComputedStyle(text);
     }
-    resize();
-    window.addEventListener('resize', resize);
+    setRegion();
+    window.addEventListener('resize', setRegion);
 
-    // Line params
-    const spacing = 14; // px between lines
-    const margin = 10;
-    const stroke = 'rgba(155,212,255,0.14)';
-    const strokeBright = 'rgba(155,212,255,0.22)';
-    const lineWidth = 1;
-
-    // Ripple state
-    let rippleX = W/2, rippleY = H/2;
-    let ripplePower = 0;       // grows on hover, decays otherwise
-    let targetPower = 0;
-    let t = 0;
-
-    // Physics-ish tuning
-    const wavelength = 90;     // bigger = wider rings
-    const speed = 2.2;         // animation speed
-    const decay = 0.016;       // spatial decay (smaller = longer range)
-    const maxPower = 10;       // peak amplitude in px
-    const follow = 0.18;       // mouse follow smoothing
-
-    // Hover listeners on the text only
-    let hovering = false;
-    title.addEventListener('mouseenter', ()=>{ targetPower = 1; hovering = true; });
-    title.addEventListener('mouseleave', ()=>{ targetPower = 0; hovering = false; });
-    title.addEventListener('mousemove', (e)=>{
-      const rect = panel.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      // Smooth center towards mouse
-      rippleX += (x - rippleX) * follow;
-      rippleY += (y - rippleY) * follow;
-      // small kick to keep waves lively while moving
-      if (hovering) targetPower = 1;
-    });
-
-    function displace(x, y, time){
-      // distance from ripple center
-      const dx = x - rippleX;
-      const dy = y - rippleY;
-      const d = Math.hypot(dx, dy);
-
-      // radial wave
-      const k = (Math.PI * 2) / wavelength;
-      const wave = Math.sin(d * k - time * speed);
-
-      // exponential spatial decay
-      const falloff = Math.exp(-d * decay);
-
-      return wave * falloff * maxPower * ripplePower;
+    function move(e){
+      const r = text.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      // center the radial map on the cursor
+      img.setAttribute('x', Math.round(x - MAP_SIZE/2));
+      img.setAttribute('y', Math.round(y - MAP_SIZE/2));
+      // small chromatic split while moving
+      document.documentElement.style.setProperty('--split', hover ? '3px' : '0px');
+      target = 42; // desired warp strength while hovering
     }
 
-    function draw(time){
-      t = time * 0.001; // seconds
-
-      // ease ripple power toward target
-      ripplePower += (targetPower - ripplePower) * 0.08;
-
-      ctx.clearRect(0,0,W,H);
-
-      // subtle dark base
-      const grd = ctx.createLinearGradient(0,0,0,H);
-      grd.addColorStop(0,'rgba(0,0,0,0.00)');
-      grd.addColorStop(1,'rgba(0,0,0,0.05)');
-      ctx.fillStyle = grd;
-      ctx.fillRect(0,0,W,H);
-
-      // draw horizontal lines with ripple displacement
-      ctx.lineWidth = lineWidth;
-      for(let y = margin; y <= H - margin; y += spacing){
-        ctx.beginPath();
-        let first = true;
-        for(let x = margin; x <= W - margin; x += 8){
-          const dy = displace(x, y, t);
-          const yy = y + dy;
-          if (first){ ctx.moveTo(x, yy); first = false; }
-          else{ ctx.lineTo(x, yy); }
-        }
-        // slight brightening near the ripple center
-        const near = Math.min(1, Math.hypot(rippleX - W*0.5, rippleY - y) / (W*0.6));
-        ctx.strokeStyle = (near < 0.25) ? strokeBright : stroke;
-        ctx.stroke();
-      }
-
-      // soft highlight ring where the ripple originates
-      if (ripplePower > 0.02){
-        const rad = wavelength * 0.75;
-        const g = ctx.createRadialGradient(rippleX, rippleY, 0, rippleX, rippleY, rad);
-        g.addColorStop(0, 'rgba(155,212,255,0.18)');
-        g.addColorStop(1, 'rgba(155,212,255,0.00)');
-        ctx.globalCompositeOperation = 'lighter';
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(rippleX, rippleY, rad, 0, Math.PI*2);
-        ctx.fill();
-        ctx.globalCompositeOperation = 'source-over';
-      }
-
-      requestAnimationFrame(draw);
+    function enter(){
+      hover = true;
+      target = 42; // peak warp
     }
-    requestAnimationFrame(draw);
+    function leave(){
+      hover = false;
+      target = 0;
+      document.documentElement.style.setProperty('--split', '0px');
+    }
 
-    // On resize, keep the ripple center inside bounds
-    const ro = new ResizeObserver(()=>{ resize(); rippleX = W/2; rippleY = H/2; });
-    ro.observe(panel);
+    text.addEventListener('mousemove', move);
+    text.addEventListener('mouseenter', enter);
+    text.addEventListener('mouseleave', leave);
+
+    // ease the displacement strength for a smooth feel
+    function tick(){
+      power += (target - power) * 0.12;               // ease
+      disp.setAttribute('scale', power.toFixed(2));   // update filter
+      requestAnimationFrame(tick);
+    }
+    tick();
   })();
 </script>
 </body>
