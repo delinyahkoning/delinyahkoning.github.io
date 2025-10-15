@@ -89,22 +89,22 @@
           <feOffset in="maskG" dx="0" dy="0" result="prismG" id="offG"/>
           <feOffset in="maskB" dx="0" dy="0" result="prismB" id="offB"/>
 
-          <!-- Composite back together: base displaced + RGB fringes -->
+          <!-- Composite back together: RGB fringes behind, white text on top -->
           <feMerge>
-            <feMergeNode in="disp"/>
             <feMergeNode in="prismR"/>
             <feMergeNode in="prismG"/>
             <feMergeNode in="prismB"/>
+            <feMergeNode in="disp"/> <!-- text stays on top -->
           </feMerge>
         </filter>
       </defs>
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          This is
+          This issss
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-         a test.
+         a lil test
         </text>
       </g>
     </svg>
@@ -250,8 +250,8 @@
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
       const amt = 3.2 * vMag * active; // max ~3.2px when fast; fades when trail fades
 
-      const dirX = vMag ? (vX / Math.hypot(vX, vY)) : 0;
-      const dirY = vMag ? (vY / Math.hypot(vX, vY)) : 0;
+      const dirLen = Math.hypot(vX, vY) || 1;
+      const dirX = vX / dirLen, dirY = vY / dirLen;
 
       // R opposite motion, G slight with motion, B slight perpendicular
       offR.setAttribute('dx', (-amt*1.0 * dirX).toFixed(2));
