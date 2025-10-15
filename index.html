@@ -84,12 +84,12 @@
           <feComposite in="dispG" in2="strength" operator="in" result="maskG"/>
           <feComposite in="dispB" in2="strength" operator="in" result="maskB"/>
 
-          <!-- Tiny offsets; JS animates dx/dy via IDs below -->
+          <!-- Offsets (animated in JS) -->
           <feOffset in="maskR" dx="0" dy="0" result="prismR" id="offR"/>
           <feOffset in="maskG" dx="0" dy="0" result="prismG" id="offG"/>
           <feOffset in="maskB" dx="0" dy="0" result="prismB" id="offB"/>
 
-          <!-- Composite back together: RGB fringes behind, white text on top -->
+          <!-- Merge RGB fringes behind, white text on top -->
           <feMerge>
             <feMergeNode in="prismR"/>
             <feMergeNode in="prismG"/>
@@ -101,10 +101,10 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          This issss
+          This issssssss
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-         a lil test
+         a lil test hehe
         </text>
       </g>
     </svg>
@@ -248,20 +248,20 @@
       // prism magnitude based on current velocity and how many imprints are alive
       const vMag = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const amt = 3.2 * vMag * active; // max ~3.2px when fast; fades when trail fades
+      const amt = 4.0 * vMag * active; // was 3.2 → slightly stronger
 
       const dirLen = Math.hypot(vX, vY) || 1;
       const dirX = vX / dirLen, dirY = vY / dirLen;
 
-      // R opposite motion, G slight with motion, B slight perpendicular
-      offR.setAttribute('dx', (-amt*1.0 * dirX).toFixed(2));
-      offR.setAttribute('dy', (-amt*1.0 * dirY).toFixed(2));
+      // R opposite motion, G with motion, B perpendicular (slightly boosted)
+      offR.setAttribute('dx', (-amt * 1.1 * dirX).toFixed(2));
+      offR.setAttribute('dy', (-amt * 1.1 * dirY).toFixed(2));
 
-      offG.setAttribute('dx', ( amt*0.6 * dirX).toFixed(2));
-      offG.setAttribute('dy', ( amt*0.6 * dirY).toFixed(2));
+      offG.setAttribute('dx', ( amt * 0.75 * dirX).toFixed(2));
+      offG.setAttribute('dy', ( amt * 0.75 * dirY).toFixed(2));
 
-      offB.setAttribute('dx', ( amt*0.9 * (-dirY)).toFixed(2)); // 90° turn
-      offB.setAttribute('dy', ( amt*0.9 * ( dirX)).toFixed(2));
+      offB.setAttribute('dx', ( amt * 1.2 * (-dirY)).toFixed(2)); // 90° turn
+      offB.setAttribute('dy', ( amt * 1.2 * ( dirX)).toFixed(2));
 
       requestAnimationFrame(animate);
     }
