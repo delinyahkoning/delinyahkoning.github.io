@@ -146,14 +146,14 @@
     // --- Tweakables ---
     const EMIT_PER_MOVE = 5;     // particles per mouse move
     const MAX_PART      = 140;   // max particles
-    const LIFESPAN      = 2.8;   // seconds
-    const BASE_RADIUS   = 16;    // base visual radius (px) before elongation
+    const LIFESPAN      = 3.5;   // seconds
+    const BASE_RADIUS   = 10;    // base visual radius (px) before elongation
     const ELONG_MAX     = 3.2;   // max elongation along direction
     const UPDRIFT       = 22;    // constant upward drift (px/s)
     const FLOW_SPEED    = 38;    // curl field strength (px/s)
-    const FADE          = 0.87;  // accumulation fade (0.80..0.94) lower = longer trails
+    const FADE          = 0.8;   // accumulation fade (0.80..0.94) lower = longer trails
     const OPACITY       = 0.18;  // per-particle paint opacity
-    const DM_SCALE_HOVER= 26;    // displacement strength while hovering
+    const DM_SCALE_HOVER= 40;    // displacement strength while hovering
     const DM_SCALE_IDLE = 0;
 
     const svg   = document.getElementById('heroSVG');
@@ -387,7 +387,7 @@
           This...,
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          is a test.
+          is test #7239.
         </text>
       </g>
     </svg>
