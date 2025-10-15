@@ -20,6 +20,26 @@
   .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
   footer{padding:50px 0;color:var(--muted);text-align:center}
+
+  /* === Custom Cursor === */
+  body, a, button {
+    cursor: none; /* hide default cursor */
+  }
+
+  .cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: rgba(155,212,255,0.15);
+    border: 1px solid rgba(155,212,255,0.4);
+    transform: translate(-50%, -50%);
+    transition: width 0.15s ease, height 0.15s ease, background 0.2s ease;
+    z-index: 9999;
+  }
 </style>
 </head>
 <body>
@@ -63,6 +83,28 @@
 </section>
 
 <footer>© <span id="y"></span> Delinyah Koning</footer>
-<script>document.getElementById('y').textContent=new Date().getFullYear()</script>
+
+<div class="cursor"></div>
+<script>
+  document.getElementById('y').textContent=new Date().getFullYear();
+  const cursor = document.querySelector(".cursor");
+  document.addEventListener("mousemove", e => {
+    cursor.style.top = e.clientY + "px";
+    cursor.style.left = e.clientX + "px";
+  });
+  document.querySelectorAll("a, button").forEach(el => {
+    el.addEventListener("mouseenter", () => {
+      cursor.style.width = "36px";
+      cursor.style.height = "36px";
+      cursor.style.background = "rgba(155,212,255,0.25)";
+    });
+    el.addEventListener("mouseleave", () => {
+      cursor.style.width = "22px";
+      cursor.style.height = "22px";
+      cursor.style.background = "rgba(155,212,255,0.15)";
+    });
+  });
+</script>
+
 </body>
 </html>
