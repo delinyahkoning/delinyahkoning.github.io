@@ -13,13 +13,39 @@
   .nav{display:flex;align-items:center;gap:16px;padding:14px 0}.brand{font-weight:700}.spacer{flex:1}
   .tabs{display:flex;gap:10px;flex-wrap:wrap}.tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
   .tab:hover{background:#131623}.tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
-  .hero{min-height:58vh;display:grid;place-items:center;background:radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),var(--bg)}
-  h1{font-size:clamp(36px,6vw,64px);line-height:1.1;margin:0 0 .6rem} p.sub{color:var(--muted);max-width:760px;margin:0 auto}
+  .hero{min-height:58vh;display:grid;place-items:center;background:
+    radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
+    radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
+    var(--bg)}
+  h1{font-size:clamp(36px,6vw,64px);line-height:1.1;margin:0 0 .6rem}
+  p.sub{color:var(--muted);max-width:760px;margin:0 auto}
   section{padding:60px 0}.panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
   .grid{display:grid;gap:16px}.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
   .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
   footer{padding:50px 0;color:var(--muted);text-align:center}
+
+  /* === Hero panel with lines + ripple === */
+  .hero-center { text-align:center; position:relative; }
+  .hero-panel {
+    display:inline-block; position:relative; border-radius:24px; overflow:hidden;
+    padding:32px 38px; isolation:isolate; /* keep effects contained */
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 20px 60px rgba(0,0,0,.35);
+  }
+  .hero-panel::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background: radial-gradient(120% 200% at 10% -20%, rgba(155,212,255,.06), transparent 60%),
+                radial-gradient(120% 200% at 110% 120%, rgba(155,212,255,.05), transparent 60%);
+    mix-blend-mode:screen; opacity:.7;
+  }
+  canvas.lines-canvas{
+    position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none;
+    /* slightly soften */
+    filter:contrast(120%) saturate(110%);
+  }
+  .hero h1, .hero p.sub { position:relative; z-index:1; }
 
   /* === Custom Cursor (keeps native pointer) === */
   .cursor{
@@ -45,9 +71,13 @@
 </header>
 
 <section class="hero">
-  <div class="wrap" style="text-align:center">
-    <h1>Cinematic visuals, <br>science-minded design.</h1>
-    <p class="sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
+  <div class="wrap hero-center">
+    <div class="hero-panel" id="heroPanel" aria-hidden="true">
+      <canvas class="lines-canvas" id="linesCanvas"></canvas>
+      <!-- Your text sits on top of the canvas -->
+      <h1 id="heroTitle">Cinematic visuals, <br>science-minded design.</h1>
+      <p class="sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
+    </div>
   </div>
 </section>
 
@@ -74,13 +104,145 @@
 
 <div class="cursor"></div>
 <script>
+  // Year
   document.getElementById('y').textContent=new Date().getFullYear();
+
+  // === Custom cursor (keeps native pointer) ===
   const cursor=document.querySelector(".cursor");
   document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
   document.querySelectorAll("a,button").forEach(el=>{
     el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(155,212,255,.25)";});
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
+
+  // === Lines + ripple canvas ===
+  (function(){
+    const panel = document.getElementById('heroPanel');
+    const title = document.getElementById('heroTitle');
+    const canvas = document.getElementById('linesCanvas');
+    const ctx = canvas.getContext('2d', { alpha:true });
+
+    let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    let W=0, H=0;
+
+    function resize(){
+      const r = panel.getBoundingClientRect();
+      W = Math.max(1, Math.floor(r.width));
+      H = Math.max(1, Math.floor(r.height));
+      canvas.width = Math.floor(W * DPR);
+      canvas.height = Math.floor(H * DPR);
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Line params
+    const spacing = 14; // px between lines
+    const margin = 10;
+    const stroke = 'rgba(155,212,255,0.14)';
+    const strokeBright = 'rgba(155,212,255,0.22)';
+    const lineWidth = 1;
+
+    // Ripple state
+    let rippleX = W/2, rippleY = H/2;
+    let ripplePower = 0;       // grows on hover, decays otherwise
+    let targetPower = 0;
+    let t = 0;
+
+    // Physics-ish tuning
+    const wavelength = 90;     // bigger = wider rings
+    const speed = 2.2;         // animation speed
+    const decay = 0.016;       // spatial decay (smaller = longer range)
+    const maxPower = 10;       // peak amplitude in px
+    const follow = 0.18;       // mouse follow smoothing
+
+    // Hover listeners on the text only
+    let hovering = false;
+    title.addEventListener('mouseenter', ()=>{ targetPower = 1; hovering = true; });
+    title.addEventListener('mouseleave', ()=>{ targetPower = 0; hovering = false; });
+    title.addEventListener('mousemove', (e)=>{
+      const rect = panel.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      // Smooth center towards mouse
+      rippleX += (x - rippleX) * follow;
+      rippleY += (y - rippleY) * follow;
+      // small kick to keep waves lively while moving
+      if (hovering) targetPower = 1;
+    });
+
+    function displace(x, y, time){
+      // distance from ripple center
+      const dx = x - rippleX;
+      const dy = y - rippleY;
+      const d = Math.hypot(dx, dy);
+
+      // radial wave
+      const k = (Math.PI * 2) / wavelength;
+      const wave = Math.sin(d * k - time * speed);
+
+      // exponential spatial decay
+      const falloff = Math.exp(-d * decay);
+
+      return wave * falloff * maxPower * ripplePower;
+    }
+
+    function draw(time){
+      t = time * 0.001; // seconds
+
+      // ease ripple power toward target
+      ripplePower += (targetPower - ripplePower) * 0.08;
+
+      ctx.clearRect(0,0,W,H);
+
+      // subtle dark base
+      const grd = ctx.createLinearGradient(0,0,0,H);
+      grd.addColorStop(0,'rgba(0,0,0,0.00)');
+      grd.addColorStop(1,'rgba(0,0,0,0.05)');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0,0,W,H);
+
+      // draw horizontal lines with ripple displacement
+      ctx.lineWidth = lineWidth;
+      for(let y = margin; y <= H - margin; y += spacing){
+        ctx.beginPath();
+        let first = true;
+        for(let x = margin; x <= W - margin; x += 8){
+          const dy = displace(x, y, t);
+          const yy = y + dy;
+          if (first){ ctx.moveTo(x, yy); first = false; }
+          else{ ctx.lineTo(x, yy); }
+        }
+        // slight brightening near the ripple center
+        const near = Math.min(1, Math.hypot(rippleX - W*0.5, rippleY - y) / (W*0.6));
+        ctx.strokeStyle = (near < 0.25) ? strokeBright : stroke;
+        ctx.stroke();
+      }
+
+      // soft highlight ring where the ripple originates
+      if (ripplePower > 0.02){
+        const rad = wavelength * 0.75;
+        const g = ctx.createRadialGradient(rippleX, rippleY, 0, rippleX, rippleY, rad);
+        g.addColorStop(0, 'rgba(155,212,255,0.18)');
+        g.addColorStop(1, 'rgba(155,212,255,0.00)');
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(rippleX, rippleY, rad, 0, Math.PI*2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+
+    // On resize, keep the ripple center inside bounds
+    const ro = new ResizeObserver(()=>{ resize(); rippleX = W/2; rippleY = H/2; });
+    ro.observe(panel);
+  })();
 </script>
 </body>
 </html>
