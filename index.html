@@ -24,9 +24,9 @@
   .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
   footer{padding:50px 0;color:var(--muted);text-align:center}
-
   .hero-center{text-align:center}
   .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
+  .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
 
   /* cursor */
   .cursor{
@@ -35,9 +35,6 @@
     border:1px solid rgba(155,212,255,.4);transform:translate(-50%,-50%);
     transition:width .15s,height .15s,background .2s;z-index:9999;
   }
-
-  /* make the SVG scale nicely */
-  .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
 </style>
 </head>
 <body>
@@ -56,26 +53,33 @@
 
 <section class="hero">
   <div class="wrap hero-center">
-    <!-- Text in SVG so we can apply a paint-only filter (no layout shift) -->
+    <!-- Text in SVG so we can filter the paint (no layout shift, no clipping) -->
     <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <!-- Oversized region so displaced pixels don't clip -->
-        <filter id="localTug" x="-60%" y="-200%" width="220%" height="500%" filterUnits="objectBoundingBox">
-          <!-- Normal map image (from offscreen canvas) -->
+        <!-- big filter region so displaced pixels never get cut -->
+        <filter id="tugFX" x="-80%" y="-260%" width="260%" height="700%" filterUnits="objectBoundingBox">
+          <!-- the dynamic normal map -->
           <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
-          <feGaussianBlur in="map" stdDeviation="14" result="blur"/>
-          <!-- Warp using R->X, G->Y -->
+          <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
+
+          <!-- main displacement -->
           <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="0"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
+
+          <!-- tiny RGB prism (paint-only) -->
+          <feDropShadow in="disp" dx="-1.1" dy="-0.8" stdDeviation="0.35" flood-color="#ff2a6d" flood-opacity="0.9" result="r"/>
+          <feDropShadow in="disp" dx="0.8" dy="0.5" stdDeviation="0.35" flood-color="#2aff79" flood-opacity="0.9" result="g"/>
+          <feDropShadow in="disp" dx="1.3" dy="1.0" stdDeviation="0.35" flood-color="#2ac8ff" flood-opacity="0.9" result="b"/>
+          <feMerge><feMergeNode in="disp"/><feMergeNode in="r"/><feMergeNode in="g"/><feMergeNode in="b"/></feMerge>
         </filter>
       </defs>
 
-      <g filter="url(#localTug)">
+      <g filter="url(#tugFX)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          This is,
+          This is test
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          a test.
+          #2398312.
         </text>
       </g>
     </svg>
@@ -108,41 +112,41 @@
 <div class="cursor"></div>
 
 <script>
-  // Year
+  // footer year
   document.getElementById('y').textContent = new Date().getFullYear();
 
-  // Cursor (keeping yours)
-  const cursor = document.querySelector(".cursor");
+  // your cursor
+  const cursor=document.querySelector(".cursor");
   document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
   document.querySelectorAll("a,button").forEach(el=>{
     el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(155,212,255,.25)";});
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // ===== Localized tug/stretch filter (directional, with short trail) =====
+  // ===== Localized, direction-aware tug + ripple echo =====
   (function(){
     const svg   = document.getElementById('heroSVG');
     const nmEl  = document.getElementById('nm');
     const dmEl  = document.getElementById('dm');
 
-    // Offscreen canvas (NOT added to DOM) for the normal map
     const vb = svg.viewBox.baseVal; // 1200x360
-    const DPR = 1; // keep 1:1 with filter coords for crisp mapping
-    const c = document.createElement('canvas');
+    const c = document.createElement('canvas'); // offscreen normal map
     const ctx = c.getContext('2d');
-    c.width = vb.width * DPR; c.height = vb.height * DPR;
+    c.width = vb.width; c.height = vb.height;
 
-    // Trail of "imprints" (short-lived anisotropic blobs)
-    const imprints = []; // {x,y,vx,vy,age}
-    const MAX_IMPRINTS = 14;
-    const LIFE = 420;          // ms per imprint
-    const BASE = 128;          // neutral channel
-    const STRENGTH = 48;       // px displacement max
-    const RADIUS = 85;         // base radius
-    const STRETCH = 2.4;       // elongation along velocity
-    const EASING = t => t<.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2; // smooth in/out
+    // stronger + cooler feel
+    const MAX_IMPRINTS = 22;     // short trail
+    const LIFE   = 520;          // ms per imprint
+    const BASE   = 128;          // neutral channel
+    const STRENGTH = 90;         // overall intensity (we trim below)
+    const RADIUS = 120;          // area affected
+    const STRETCH= 3.0;          // elongation along motion
+    const EASING = t => t*t*(3-2*t); // smoothstep
 
-    // map cursor to viewBox units
+    // velocity -> global scale
+    let hover=false, last={x:vb.width/2, y:vb.height/2}, vMag=0, scale=0;
+    const imprints=[]; // {x,y,vx,vy,t}
+
     function toVB(e){
       const r = svg.getBoundingClientRect();
       return {
@@ -151,79 +155,75 @@
       };
     }
 
-    let lastPos = {x: vb.width/2, y: vb.height/2};
-    let hover = false;
-
-    svg.addEventListener('mousemove', (e)=>{
+    svg.addEventListener('mousemove', e=>{
       const p = toVB(e);
-      const vx = p.x - lastPos.x;
-      const vy = p.y - lastPos.y;
-      lastPos = p;
-      hover = true;
+      const vx = p.x - last.x, vy = p.y - last.y;
+      vMag = Math.hypot(vx,vy);
+      last = p; hover=true;
 
-      imprints.unshift({ x:p.x, y:p.y, vx, vy, t: performance.now() });
-      if (imprints.length > MAX_IMPRINTS) imprints.pop();
+      imprints.unshift({x:p.x,y:p.y,vx,vy,t:performance.now()});
+      if (imprints.length>MAX_IMPRINTS) imprints.pop();
     });
+    svg.addEventListener('mouseleave', ()=>{ hover=false; });
 
-    svg.addEventListener('mouseleave', ()=>{ hover = false; });
+    function drawNormal(){
+      ctx.fillStyle='rgb(128,128,0)'; ctx.fillRect(0,0,c.width,c.height);
 
-    function drawNormalMap(){
-      // clear to neutral normal (128,128,0)
-      ctx.clearRect(0,0,c.width,c.height);
-      ctx.fillStyle = 'rgb(128,128,0)'; ctx.fillRect(0,0,c.width,c.height);
+      const now=performance.now();
+      for(let i=imprints.length-1;i>=0;i--){
+        const it=imprints[i]; const age = now-it.t;
+        if (age>LIFE){ imprints.splice(i,1); continue; }
 
-      const now = performance.now();
-
-      // draw each imprint as an oriented soft ellipse that fades & expands
-      for (let i=imprints.length-1; i>=0; i--){
-        const it = imprints[i];
-        const age = now - it.t;
-        if (age > LIFE){ imprints.splice(i,1); continue; }
-
-        const t = age / LIFE;               // 0..1
-        const fade = 1 - EASING(t);         // ease-out
-        const grow = 1 + t * 0.8;           // expands a bit over time
+        const t = age/LIFE;             // 0..1
+        const fade = 1 - EASING(t);     // ease out
+        const grow = 1 + t*0.9;         // expand a bit over life
 
         const len = Math.hypot(it.vx,it.vy) || 1;
         const ux = it.vx/len, uy = it.vy/len;
 
-        const disp = STRENGTH * Math.min(1, len/18) * fade; // stronger when moving faster
-        const pushX = BASE + ux * disp;
-        const pushY = BASE + uy * disp;
+        // base displacement strength scaled by velocity + fade
+        const disp = Math.min(1, len/18) * fade;
 
-        const cx = it.x, cy = it.y;
-        const rx = RADIUS * STRETCH * grow;
-        const ry = RADIUS * 0.8   * grow;
+        // primary lobe
+        paintLobe(it.x, it.y, ux, uy, disp, grow, 1.0);
 
-        // draw oriented ellipse by transforming context
-        ctx.save();
-        ctx.translate(cx,cy);
-        ctx.rotate(Math.atan2(uy,ux));
-        ctx.scale(rx, ry);
-
-        // soft radial that encodes direction in R/G
-        const g = ctx.createRadialGradient(0,0,0, 0,0,1);
-        g.addColorStop(0.00, `rgb(${pushX},${pushY},0)`);
-        g.addColorStop(0.65, `rgb(${BASE+(pushX-BASE)*0.5},${BASE+(pushY-BASE)*0.5},0)`);
-        g.addColorStop(1.00, `rgb(${BASE},${BASE},0)`);
-
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
-        ctx.restore();
+        // two faint echo rings that trail behind (cool factor 🔥)
+        paintLobe(it.x - ux*22, it.y - uy*22, ux, uy, disp*0.55, grow*1.15, 0.7);
+        paintLobe(it.x - ux*44, it.y - uy*44, ux, uy, disp*0.30, grow*1.32, 0.5);
       }
 
-      // upload to filter
       nmEl.setAttribute('href', c.toDataURL('image/png'));
     }
 
-    // ease the overall scale so it “breathes” in/out when hovering
-    let scale = 0;
-    function tick(){
-      const target = hover ? 1 : 0;
-      scale += (target - scale) * 0.15;
-      dmEl.setAttribute('scale', (scale * 1).toFixed(2) * STRENGTH / 1.6); // global trim
+    function paintLobe(cx,cy,ux,uy,disp,grow,intensity){
+      const pushX = BASE + ux * STRENGTH * 0.6 * disp * intensity;
+      const pushY = BASE + uy * STRENGTH * 0.6 * disp * intensity;
 
-      drawNormalMap();
+      const rx = RADIUS * STRETCH * grow;
+      const ry = RADIUS * 0.8   * grow;
+
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.rotate(Math.atan2(uy,ux));
+      ctx.scale(rx,ry);
+
+      const g = ctx.createRadialGradient(0,0,0,0,0,1);
+      g.addColorStop(0.00, `rgb(${pushX},${pushY},0)`);
+      g.addColorStop(0.55, `rgb(${(pushX+BASE)/2},${(pushY+BASE)/2},0)`);
+      g.addColorStop(1.00, `rgb(${BASE},${BASE},0)`);
+      ctx.fillStyle=g;
+      ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+
+    function tick(){
+      // velocity-aware global scale (more speed = more drama), eases back smoothly
+      const desired = hover ? Math.min(1, vMag/20) : 0;
+      scale += (desired - scale) * 0.18;
+      dmEl.setAttribute('scale', (scale * STRENGTH).toFixed(2));
+
+      drawNormal();
+      vMag *= 0.85; // decay velocity feel
       requestAnimationFrame(tick);
     }
     tick();
