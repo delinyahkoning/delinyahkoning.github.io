@@ -28,6 +28,294 @@
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
   footer{padding:50px 0;color:var(--muted);text-align:center}
 
+  .hero-center{text-align:center; position:relative}
+  .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
+  .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
+
+  /* Smoke canvas sits on top of the text but pointer-events none */
+  #smokeCanvas{
+    position:absolute; inset:auto 0 auto 0; /* horizontal center via width of wrap */
+    margin:0 auto;
+    pointer-events:none; display:block; opacity:0.9;
+    filter:contrast(105%) saturate(105%);
+  }
+
+  /* === Custom Cursor (keeps native pointer) === */
+  .cursor{
+    position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
+    pointer-events:none;background:rgba(155,212,255,.15);
+    border:1px solid rgba(155,212,255,.4);transform:translate(-50%,-50%);
+    transition:width .15s,height .15s,background .2s;z-index:9999;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <div class="brand">Delinyah Koning</div><div class="spacer"></div>
+    <nav class="tabs">
+      <a class="tab active" href="/">Home</a>
+      <a class="tab" href="/3d/">3D</a>
+      <a class="tab" href="/2d/">2D</a>
+      <a class="tab" href="/design/">Design</a>
+      <a class="tab" href="/photo/">Photo</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-center">
+    <!-- TEXT IN SVG -->
+    <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <!-- Oversized region so nothing clips while warping -->
+        <filter id="smokeFilter" x="-80%" y="-300%" width="260%" height="700%" filterUnits="objectBoundingBox">
+          <!-- Displacement field baseline: fine FBM for filament detail -->
+          <feTurbulence id="flowFine" type="fractalNoise"
+                        baseFrequency="0.012 0.018" numOctaves="4" seed="7" result="fine"/>
+          <!-- Smoke mask (from canvas) -->
+          <feImage id="smokeMask" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="maskRaw"/>
+          <feGaussianBlur in="maskRaw" stdDeviation="18" edgeMode="duplicate" result="maskSoft"/>
+          <!-- Localize displacement to the wisps -->
+          <feComposite in="fine" in2="maskSoft" operator="in" result="localFlow"/>
+          <!-- Gentle displacement with the localized flow -->
+          <feDisplacementMap id="dm" in="SourceGraphic" in2="localFlow" scale="26"
+                             xChannelSelector="R" yChannelSelector="G" result="disp"/>
+          <!-- Tiny RGB shimmer (paint-only; no layout shift) -->
+          <feDropShadow in="disp" dx="-0.7" dy="-0.5" stdDeviation="0.25" flood-color="#ff2a6d" flood-opacity="0.9" result="r"/>
+          <feDropShadow in="disp" dx="0.5" dy="0.3" stdDeviation="0.25" flood-color="#2aff79" flood-opacity="0.9" result="g"/>
+          <feDropShadow in="disp" dx="0.9" dy="0.7" stdDeviation="0.25" flood-color="#2ac8ff" flood-opacity="0.9" result="b"/>
+          <feMerge><feMergeNode in="disp"/><feMergeNode in="r"/><feMergeNode in="g"/><feMergeNode in="b"/></feMerge>
+        </filter>
+      </defs>
+
+      <g filter="url(#smokeFilter)">
+        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
+          This is...
+        </text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
+          a test.
+        </text>
+      </g>
+    </svg>
+
+    <!-- The smoke canvas is sized to the SVG viewBox and centered -->
+    <canvas id="smokeCanvas" width="1200" height="360"></canvas>
+
+    <p class="hero-sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap" style="display:grid;gap:20px;grid-template-columns:1.2fr .8fr">
+    <div class="panel">
+      <h2 style="margin-top:0">Featured Work</h2>
+      <div class="grid cards" style="margin-top:12px">
+        <article class="card"><div class="thumb">assets/feat-1.mp4</div><strong>Lookdev Shot</strong><div class="sub" style="font-size:13px">Blender · 2025</div></article>
+        <article class="card"><div class="thumb">assets/feat-2.jpg</div><strong>Science Illustration</strong><div class="sub" style="font-size:13px">Vectors · 2025</div></article>
+        <article class="card"><div class="thumb">assets/feat-3.mp4</div><strong>Explainer Motion</strong><div class="sub" style="font-size:13px">AE · 30s</div></article>
+      </div>
+    </div>
+    <aside class="panel">
+      <h2 style="margin-top:0">About</h2>
+      <p class="sub">Biomedical research background × creative direction. I build clear, cinematic visuals for science, culture, and brands.</p>
+      <p><a class="tab" href="assets/Delinyah-Koning-Resume.pdf" target="_blank" style="display:inline-block">Resume (PDF)</a></p>
+      <p><a class="tab" href="mailto:you@example.com">you@example.com</a></p>
+    </aside>
+  </div>
+</section>
+
+<footer>© <span id="y"></span> Delinyah Koning</footer>
+
+<div class="cursor"></div>
+
+<script>
+  // Year
+  document.getElementById('y').textContent=new Date().getFullYear();
+
+  // Custom cursor (keeps native)
+  const cursor=document.querySelector(".cursor");
+  document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
+  document.querySelectorAll("a,button").forEach(el=>{
+    el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(155,212,255,.25)";});
+    el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
+  });
+
+  // ===================== WISPY CIGARETTE SMOKE =====================
+  (function(){
+    // --- Tweakables ---
+    const EMIT_PER_MOVE = 5;     // particles per mouse move
+    const MAX_PART      = 140;   // max particles
+    const LIFESPAN      = 2.8;   // seconds
+    const BASE_RADIUS   = 16;    // base visual radius (px) before elongation
+    const ELONG_MAX     = 3.2;   // max elongation along direction
+    const UPDRIFT       = 22;    // constant upward drift (px/s)
+    const FLOW_SPEED    = 38;    // curl field strength (px/s)
+    const FADE          = 0.87;  // accumulation fade (0.80..0.94) lower = longer trails
+    const OPACITY       = 0.18;  // per-particle paint opacity
+    const DM_SCALE_HOVER= 26;    // displacement strength while hovering
+    const DM_SCALE_IDLE = 0;
+
+    const svg   = document.getElementById('heroSVG');
+    const smoke = document.getElementById('smokeCanvas');
+    const ctx   = smoke.getContext('2d');
+    const mask  = document.getElementById('smokeMask');
+    const dm    = document.getElementById('dm');
+    const fine  = document.getElementById('flowFine');
+
+    // Center canvas to the SVG width
+    function sizeCanvas(){
+      const rect = svg.getBoundingClientRect();
+      // keep canvas' internal pixels equal to viewBox (1200x360) for sharp mapping
+      smoke.style.width  = rect.width  + 'px';
+      smoke.style.height = rect.height + 'px';
+      smoke.style.left   = rect.left + 'px';
+      // vertically center inside the wrap
+      const wrap = document.querySelector('.hero-center').getBoundingClientRect();
+      smoke.style.top = (rect.top - wrap.top) + 'px';
+    }
+    sizeCanvas(); window.addEventListener('resize', sizeCanvas);
+
+    // Vector field: curl noise (stable swirls)
+    function hash(n){ return Math.sin(n)*43758.5453 % 1; }
+    function noise2(x,y){
+      const xi=Math.floor(x), yi=Math.floor(y);
+      const xf=x-xi, yf=y-yi;
+      const s=hash(xi*57+yi*131), t=hash((xi+1)*57+yi*131);
+      const u=hash(xi*57+(yi+1)*131), v=hash((xi+1)*57+(yi+1)*131);
+      const sx=xf*xf*(3-2*xf), sy=yf*yf*(3-2*yf);
+      return (s*(1-sx)+t*sx)*(1-sy)+(u*(1-sx)+v*sx)*sy;
+    }
+    function curl(x,y,t){
+      // slowly evolving field
+      const s=0.005, tt=t*0.05;
+      const e=0.001;
+      const dx = noise2((x+e)*s, (y+tt)*s) - noise2((x-e)*s, (y+tt)*s);
+      const dy = noise2((x+tt)*s, (y+e)*s) - noise2((x+tt)*s, (y-e)*s);
+      return {x: dy, y: -dx}; // rotated gradient => divergence-free
+    }
+
+    const parts=[];
+    let hover=false, mx=600, my=180;
+    svg.addEventListener('mousemove', (e)=>{
+      const r=svg.getBoundingClientRect();
+      mx = (e.clientX - r.left)/r.width*1200;
+      my = (e.clientY - r.top )/r.height*360;
+      hover=true;
+      for(let i=0;i<EMIT_PER_MOVE;i++){
+        if (parts.length>=MAX_PART) parts.shift();
+        const ang=Math.random()*Math.PI*2;
+        const spd= 14 + Math.random()*12;
+        parts.push({
+          x:mx + (Math.random()-0.5)*6,
+          y:my + (Math.random()-0.5)*6,
+          vx:Math.cos(ang)*spd,
+          vy:Math.sin(ang)*spd - 8,
+          age:0,
+          life:LIFESPAN*(0.9+Math.random()*0.2),
+          r:BASE_RADIUS*(0.8+Math.random()*0.4),
+        });
+      }
+    });
+    svg.addEventListener('mouseleave', ()=>hover=false);
+
+    let last=performance.now()/1000;
+    function frame(){
+      const now=performance.now()/1000, dt=Math.min(0.033, now-last); last=now;
+
+      // animate fine noise slightly (adds filament detail in displacement)
+      const bx = 0.012 + Math.sin(now*0.4)*0.0016;
+      const by = 0.018 + Math.cos(now*0.3)*0.0019;
+      fine.setAttribute('baseFrequency', `${bx.toFixed(4)} ${by.toFixed(4)}`);
+
+      // ease displacement
+      const target = hover? DM_SCALE_HOVER : DM_SCALE_IDLE;
+      const cur = parseFloat(dm.getAttribute('scale')) || 0;
+      dm.setAttribute('scale', (cur + (target-cur)*0.12).toFixed(2));
+
+      // fade accumulation toward transparent for smooth trails
+      ctx.globalCompositeOperation='source-over';
+      ctx.fillStyle = `rgba(0,0,0,${1-FADE})`;
+      ctx.fillRect(0,0,smoke.width,smoke.height);
+
+      // advect + draw
+      ctx.globalCompositeOperation='lighter'; // soft additive
+      for(let i=parts.length-1;i>=0;i--){
+        const p=parts[i];
+        p.age += dt;
+        if (p.age >= p.life){ parts.splice(i,1); continue; }
+
+        // curl flow + upward drift
+        const f = curl(p.x, p.y, now);
+        p.vx += f.x * FLOW_SPEED * dt;
+        p.vy += (f.y * FLOW_SPEED - UPDRIFT) * dt;
+
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+
+        // visual params
+        const tNorm = p.age/p.life;
+        const alpha = OPACITY * (1 - tNorm);
+        const elong = 1 + ELONG_MAX * Math.min(1, tNorm*1.2); // longer as it ages
+        const angle = Math.atan2(p.vy, p.vx);
+
+        // draw elongated soft stroke (ellipse)
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(angle);
+        ctx.scale(p.r*elong, p.r*0.6);
+        const g = ctx.createRadialGradient(0,0,0, 0,0,1);
+        g.addColorStop(0,   `rgba(255,255,255,${alpha})`);
+        g.addColorStop(0.5, `rgba(255,255,255,${alpha*0.5})`);
+        g.addColorStop(1,   `rgba(255,255,255,0)`);
+        ctx.fillStyle=g;
+        ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+
+      // send the smoke canvas to the SVG filter as a mask
+      mask.setAttribute('href', smoke.toDataURL('image/png'));
+
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
+  // keep canvas positioned on resize
+  window.addEventListener('resize', ()=>{ /* handled inside sizeCanvas() */ });
+</script>
+</body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Delinyah Koning — Home</title>
+<meta name="description" content="Portfolio — 3D, 2D, Design, Photo." />
+<style>
+  :root{--bg:#0a0b0f;--ink:#e9ecf5;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  header{position:sticky;top:0;z-index:50;background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
+  .nav{display:flex;align-items:center;gap:16px;padding:14px 0}.brand{font-weight:700}.spacer{flex:1}
+  .tabs{display:flex;gap:10px;flex-wrap:wrap}
+  .tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
+  .tab:hover{background:#131623}
+  .tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
+  .hero{min-height:58vh;display:grid;place-items:center;background:
+    radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
+    radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
+    var(--bg)}
+  section{padding:60px 0}
+  .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
+  .grid{display:grid;gap:16px}
+  .cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
+  .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
+  footer{padding:50px 0;color:var(--muted);text-align:center}
+
   .hero-center{text-align:center}
   .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
   .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
