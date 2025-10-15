@@ -62,37 +62,37 @@
           <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
           <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
 
-          <!-- Base displacement (unchanged) -->
+          <!-- Base displacement -->
           <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
 
-          <!-- ===== Prism SHADOW: 100% constrained to glyphs; strength from normal-map only ===== -->
-          <!-- build strength = |blur - neutral|, NOT using disp; then intersect with SourceAlpha -->
+          <!-- ================= PRISM EDGE (no base tint, no duplicate text) ================= -->
+          <!-- Build strength from the normal map only (how far from neutral), then confine to glyphs -->
           <feFlood flood-color="rgb(128,128,0)" result="neutral"/>
-          <feBlend in="blur" in2="neutral" mode="difference" result="dev"/>
-          <feColorMatrix in="dev" type="saturate" values="0" result="devL"/>
-          <feComponentTransfer in="devL" result="strengthGamma">
-            <feFuncR type="gamma" amplitude="1" exponent="1.6" offset="0"/>
-            <feFuncG type="gamma" amplitude="1" exponent="1.6" offset="0"/>
-            <feFuncB type="gamma" amplitude="1" exponent="1.6" offset="0"/>
+          <feBlend in="blur" in2="neutral" mode="difference" result="dev"/>   <!-- |normal - neutral| -->
+          <feColorMatrix in="dev" type="saturate" values="0" result="devL"/>  <!-- luminance -->
+          <feComponentTransfer in="devL" result="strength">
+            <feFuncR type="gamma" amplitude="1" exponent="1.4" offset="0"/>
+            <feFuncG type="gamma" amplitude="1" exponent="1.4" offset="0"/>
+            <feFuncB type="gamma" amplitude="1" exponent="1.4" offset="0"/>
           </feComponentTransfer>
-          <feGaussianBlur in="strengthGamma" stdDeviation="1.2" result="strengthSoft"/>
-          <feComposite in="strengthSoft" in2="SourceAlpha" operator="in" result="strength"/>
+          <feGaussianBlur in="strength" stdDeviation="1.2" result="strengthSoft"/>
+          <feComposite in="strengthSoft" in2="SourceAlpha" operator="in" result="edgeOnly"/> <!-- inside glyphs only -->
 
-          <!-- color the strength (no tint of base), then offset (JS moves dx/dy via ids) -->
+          <!-- Color the edge-only mask, then offset (JS animates dx/dy via offR/offG/offB) -->
           <feFlood flood-color="#ff2a6d" flood-opacity="0.75" result="fR"/>
           <feFlood flood-color="#2aff79" flood-opacity="0.75" result="fG"/>
           <feFlood flood-color="#2ac8ff" flood-opacity="0.75" result="fB"/>
 
-          <feComposite in="fR" in2="strength" operator="in" result="rimR"/>
-          <feComposite in="fG" in2="strength" operator="in" result="rimG"/>
-          <feComposite in="fB" in2="strength" operator="in" result="rimB"/>
+          <feComposite in="fR" in2="edgeOnly" operator="in" result="rimR"/>
+          <feComposite in="fG" in2="edgeOnly" operator="in" result="rimG"/>
+          <feComposite in="fB" in2="edgeOnly" operator="in" result="rimB"/>
 
           <feOffset in="rimR" dx="0" dy="0" result="prismR" id="offR"/>
           <feOffset in="rimG" dx="0" dy="0" result="prismG" id="offG"/>
           <feOffset in="rimB" dx="0" dy="0" result="prismB" id="offB"/>
 
-          <!-- Composite back: displaced base + subtle RGB rims -->
+          <!-- Compose: displaced white text + subtle RGB rims -->
           <feMerge>
             <feMergeNode in="disp"/>
             <feMergeNode in="prismR"/>
@@ -104,10 +104,10 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          Cinematic visuals,
+          this is test
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          science-minded design.
+          #200000
         </text>
       </g>
     </svg>
@@ -123,7 +123,7 @@
       <div class="grid cards" style="margin-top:12px">
         <article class="card"><div class="thumb">assets/feat-1.mp4</div><strong>Lookdev Shot</strong><div class="sub" style="font-size:13px">Blender · 2025</div></article>
         <article class="card"><div class="thumb">assets/feat-2.jpg</div><strong>Science Illustration</strong><div class="sub" style="font-size:13px">Vectors · 2025</div></article>
-        <article class="card"><div class="thumb">assets/feat-3.mp4</div><strong>Explainer Motion</strong><div class="sub" style="font-size:13px)">AE · 30s</div></article>
+        <article class="card"><div class="thumb">assets/feat-3.mp4</div><strong>Explainer Motion</strong><div class="sub" style="font-size:13px">AE · 30s</div></article>
       </div>
     </div>
     <aside class="panel">
@@ -149,7 +149,7 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // ================== Liquify-like local warp (no alpha change) + PRISM ==================
+  // ================== Liquify-like local warp (no alpha change) + PRISM offsets ==================
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
@@ -244,7 +244,7 @@
       nmEl.setAttribute('href', c.toDataURL('image/png'));
     }
 
-    // Animate + RGB prism offsets (masked to glyphs, fades with strength)
+    // Animate + RGB prism offsets (magnitude fades with trail)
     function animate(){
       drawNormalMap();
 
