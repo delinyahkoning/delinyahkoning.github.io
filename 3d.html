@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Delinyah Koning — 3D</title>
+<meta name="description" content="3D work — lookdev, lighting, simulation." />
 <style>
   :root{--bg:#0a0b0f;--ink:#e9ecf5;--muted:#9aa0b3;--panel:#10121a;--radius:18px;--max:1200px}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
@@ -16,6 +17,14 @@
   section{padding:50px 0}.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
   .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
+
+  /* === Custom Cursor (keeps native pointer) === */
+  .cursor{
+    position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
+    pointer-events:none;background:rgba(155,212,255,.15);
+    border:1px solid rgba(155,212,255,.4);transform:translate(-50%,-50%);
+    transition:width .15s,height .15s,background .2s;z-index:9999;
+  }
 </style>
 </head>
 <body>
@@ -23,11 +32,11 @@
   <div class="wrap nav">
     <div class="brand">Delinyah Koning</div><div class="spacer"></div>
     <nav class="tabs">
-      <a class="tab" href="index.html">Home</a>
-      <a class="tab active" href="3d.html">3D</a>
-      <a class="tab" href="2d.html">2D</a>
-      <a class="tab" href="design.html">Design</a>
-      <a class="tab" href="photo-video.html">Photo/Video</a>
+      <a class="tab" href="/">Home</a>
+      <a class="tab active" href="/3d/">3D</a>
+      <a class="tab" href="/2d/">2D</a>
+      <a class="tab" href="/design/">Design</a>
+      <a class="tab" href="/photo/">Photo</a>
     </nav>
   </div>
 </header>
@@ -41,10 +50,20 @@
 
 <section>
   <div class="wrap grid">
-    <article class="card"><div class="thumb">assets/3d-1.mp4</div><strong>Frame study</strong><div class="sub" style="font-size:13px">Blender · Cycles</div></article>
-    <article class="card"><div class="thumb">assets/3d-2.mp4</div><strong>Procedural shader</strong><div class="sub" style="font-size:13px">Nodes</div></article>
-    <article class="card"><div class="thumb">assets/3d-3.jpg</div><strong>Sci-viz</strong><div class="sub" style="font-size:13px">Protein/organelle</div></article>
+    <article class="card"><div class="thumb">/assets/3d-1.mp4</div><strong>Frame study</strong><div class="sub" style="font-size:13px">Blender · Cycles</div></article>
+    <article class="card"><div class="thumb">/assets/3d-2.mp4</div><strong>Procedural shader</strong><div class="sub" style="font-size:13px">Nodes</div></article>
+    <article class="card"><div class="thumb">/assets/3d-3.jpg</div><strong>Sci-viz</strong><div class="sub" style="font-size:13px">Protein/organelle</div></article>
   </div>
 </section>
+
+<div class="cursor"></div>
+<script>
+  const cursor=document.querySelector(".cursor");
+  document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
+  document.querySelectorAll("a,button").forEach(el=>{
+    el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(155,212,255,.25)";});
+    el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
+  });
+</script>
 </body>
 </html>
