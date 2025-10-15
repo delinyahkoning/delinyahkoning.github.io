@@ -24,11 +24,12 @@
   .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
   footer{padding:50px 0;color:var(--muted);text-align:center}
+
   .hero-center{text-align:center}
   .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
   .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
 
-  /* cursor */
+  /* cursor (yours) */
   .cursor{
     position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
     pointer-events:none;background:rgba(155,212,255,.15);
@@ -53,33 +54,37 @@
 
 <section class="hero">
   <div class="wrap hero-center">
-    <!-- Text in SVG so we can filter the paint (no layout shift, no clipping) -->
-    <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
+    <!-- TEXT lives in SVG so we can filter paint without layout shift -->
+    <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Cinematic visuals, science-minded design.">
       <defs>
-        <!-- big filter region so displaced pixels never get cut -->
-        <filter id="tugFX" x="-80%" y="-260%" width="260%" height="700%" filterUnits="objectBoundingBox">
-          <!-- the dynamic normal map -->
-          <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
-          <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
-
-          <!-- main displacement -->
-          <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="0"
+        <!-- Big region so displaced pixels never clip -->
+        <filter id="smokeLocal" x="-60%" y="-220%" width="220%" height="540%" filterUnits="objectBoundingBox">
+          <!-- animated noise for twirl -->
+          <feTurbulence id="twirlNoise" type="fractalNoise" baseFrequency="0.010 0.016" numOctaves="4" seed="9" result="noise"/>
+          <!-- radial cursor mask (from small canvas) -->
+          <feImage id="cursorMask" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="mask"/>
+          <feGaussianBlur in="mask" stdDeviation="18" edgeMode="duplicate" result="maskSoft"/>
+          <!-- localize noise to mask -->
+          <feComposite in="noise" in2="maskSoft" operator="in" result="localNoise"/>
+          <!-- displacement -->
+          <feDisplacementMap id="dm" in="SourceGraphic" in2="localNoise" scale="0"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
-
-          <!-- tiny RGB prism (paint-only) -->
-          <feDropShadow in="disp" dx="-1.1" dy="-0.8" stdDeviation="0.35" flood-color="#ff2a6d" flood-opacity="0.9" result="r"/>
-          <feDropShadow in="disp" dx="0.8" dy="0.5" stdDeviation="0.35" flood-color="#2aff79" flood-opacity="0.9" result="g"/>
-          <feDropShadow in="disp" dx="1.3" dy="1.0" stdDeviation="0.35" flood-color="#2ac8ff" flood-opacity="0.9" result="b"/>
-          <feMerge><feMergeNode in="disp"/><feMergeNode in="r"/><feMergeNode in="g"/><feMergeNode in="b"/></feMerge>
+          <!-- fade the alpha slightly inside mask (arithmetic mix) -->
+          <feComposite in="disp" in2="maskSoft" operator="arithmetic" k1="1" k2="0" k3="-0.5" k4="0" result="dimmed"/>
+          <!-- subtle RGB shimmer -->
+          <feDropShadow in="dimmed" dx="-0.9" dy="-0.7" stdDeviation="0.3" flood-color="#ff2a6d" flood-opacity="0.85" result="r"/>
+          <feDropShadow in="dimmed" dx="0.6" dy="0.4" stdDeviation="0.3"  flood-color="#2aff79" flood-opacity="0.85" result="g"/>
+          <feDropShadow in="dimmed" dx="1.1" dy="0.9" stdDeviation="0.3"  flood-color="#2ac8ff" flood-opacity="0.85" result="b"/>
+          <feMerge><feMergeNode in="dimmed"/><feMergeNode in="r"/><feMergeNode in="g"/><feMergeNode in="b"/></feMerge>
         </filter>
       </defs>
 
-      <g filter="url(#tugFX)">
+      <g id="textGroup" filter="url(#smokeLocal)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          This is test
+          Cinematic visuals,
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          #2398312.
+          science-minded design.
         </text>
       </g>
     </svg>
@@ -112,10 +117,8 @@
 <div class="cursor"></div>
 
 <script>
-  // footer year
-  document.getElementById('y').textContent = new Date().getFullYear();
-
-  // your cursor
+  // year + cursor (yours)
+  document.getElementById('y').textContent=new Date().getFullYear();
   const cursor=document.querySelector(".cursor");
   document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
   document.querySelectorAll("a,button").forEach(el=>{
@@ -123,29 +126,33 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // ===== Localized, direction-aware tug + ripple echo =====
+  // ============ Local smoke-twirl (directional, fades out) ============
   (function(){
+    // TWEAKS — bump these if you want it stronger
+    const RADIUS       = 150;   // px radius of effect
+    const TRAIL        = 10;    // how many recent cursor points to keep
+    const SCALE_MAX    = 48;    // displacement strength at full power
+    const ALPHA_FADE   = 0.55;  // 0..1 how much to dim inside the mask
+    const NOISE_SPEED  = 0.35;  // twirl animation speed
+    const FOLLOW       = 0.2;   // cursor smoothing (lower = smoother)
+    const EASE         = 0.14;  // scale easing
+
     const svg   = document.getElementById('heroSVG');
-    const nmEl  = document.getElementById('nm');
-    const dmEl  = document.getElementById('dm');
+    const vb    = svg.viewBox.baseVal; // 1200x360
+    const nmImg = document.getElementById('cursorMask'); // actually the mask
+    const dm    = document.getElementById('dm');
+    const n     = document.getElementById('twirlNoise');
 
-    const vb = svg.viewBox.baseVal; // 1200x360
-    const c = document.createElement('canvas'); // offscreen normal map
-    const ctx = c.getContext('2d');
+    // Offscreen canvas for the radial+trail mask (grayscale)
+    const c = document.createElement('canvas');
     c.width = vb.width; c.height = vb.height;
+    const ctx = c.getContext('2d');
 
-    // stronger + cooler feel
-    const MAX_IMPRINTS = 22;     // short trail
-    const LIFE   = 520;          // ms per imprint
-    const BASE   = 128;          // neutral channel
-    const STRENGTH = 90;         // overall intensity (we trim below)
-    const RADIUS = 120;          // area affected
-    const STRETCH= 3.0;          // elongation along motion
-    const EASING = t => t*t*(3-2*t); // smoothstep
-
-    // velocity -> global scale
-    let hover=false, last={x:vb.width/2, y:vb.height/2}, vMag=0, scale=0;
-    const imprints=[]; // {x,y,vx,vy,t}
+    // trail of points for a short flow
+    const pts = [];
+    let mx = vb.width/2, my = vb.height/2;
+    let cx = mx, cy = my;
+    let power = 0, target = 0, t = 0;
 
     function toVB(e){
       const r = svg.getBoundingClientRect();
@@ -155,75 +162,58 @@
       };
     }
 
+    // only react when hovering the text group area
+    const hit = document.getElementById('textGroup');
     svg.addEventListener('mousemove', e=>{
       const p = toVB(e);
-      const vx = p.x - last.x, vy = p.y - last.y;
-      vMag = Math.hypot(vx,vy);
-      last = p; hover=true;
-
-      imprints.unshift({x:p.x,y:p.y,vx,vy,t:performance.now()});
-      if (imprints.length>MAX_IMPRINTS) imprints.pop();
+      mx = p.x; my = p.y;
+      target = 1;
+      pts.unshift({x:mx, y:my, age:0});
+      if (pts.length > TRAIL) pts.pop();
     });
-    svg.addEventListener('mouseleave', ()=>{ hover=false; });
+    svg.addEventListener('mouseleave', ()=>{ target = 0; });
 
-    function drawNormal(){
-      ctx.fillStyle='rgb(128,128,0)'; ctx.fillRect(0,0,c.width,c.height);
+    function drawMask(){
+      // clear
+      ctx.clearRect(0,0,c.width,c.height);
+      // draw newest→oldest blobs with decreasing alpha + growing radius
+      for(let i=0;i<pts.length;i++){
+        const k = i/(TRAIL-1||1);
+        const r = RADIUS * (0.7 + 0.6*k);
+        const a = (0.45 * (1-k)) * (0.5 + power*0.5); // stronger when active
+        const g = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+        g.addColorStop(0,   `rgba(255,255,255,${a})`);
+        g.addColorStop(0.6, `rgba(255,255,255,${a*0.6})`);
+        g.addColorStop(1,   `rgba(255,255,255,0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
 
-      const now=performance.now();
-      for(let i=imprints.length-1;i>=0;i--){
-        const it=imprints[i]; const age = now-it.t;
-        if (age>LIFE){ imprints.splice(i,1); continue; }
-
-        const t = age/LIFE;             // 0..1
-        const fade = 1 - EASING(t);     // ease out
-        const grow = 1 + t*0.9;         // expand a bit over life
-
-        const len = Math.hypot(it.vx,it.vy) || 1;
-        const ux = it.vx/len, uy = it.vy/len;
-
-        // base displacement strength scaled by velocity + fade
-        const disp = Math.min(1, len/18) * fade;
-
-        // primary lobe
-        paintLobe(it.x, it.y, ux, uy, disp, grow, 1.0);
-
-        // two faint echo rings that trail behind (cool factor 🔥)
-        paintLobe(it.x - ux*22, it.y - uy*22, ux, uy, disp*0.55, grow*1.15, 0.7);
-        paintLobe(it.x - ux*44, it.y - uy*44, ux, uy, disp*0.30, grow*1.32, 0.5);
+        // advance age; slight drift toward previous point to create “flow”
+        pts[i].age += 1;
       }
-
-      nmEl.setAttribute('href', c.toDataURL('image/png'));
-    }
-
-    function paintLobe(cx,cy,ux,uy,disp,grow,intensity){
-      const pushX = BASE + ux * STRENGTH * 0.6 * disp * intensity;
-      const pushY = BASE + uy * STRENGTH * 0.6 * disp * intensity;
-
-      const rx = RADIUS * STRETCH * grow;
-      const ry = RADIUS * 0.8   * grow;
-
-      ctx.save();
-      ctx.translate(cx,cy);
-      ctx.rotate(Math.atan2(uy,ux));
-      ctx.scale(rx,ry);
-
-      const g = ctx.createRadialGradient(0,0,0,0,0,1);
-      g.addColorStop(0.00, `rgb(${pushX},${pushY},0)`);
-      g.addColorStop(0.55, `rgb(${(pushX+BASE)/2},${(pushY+BASE)/2},0)`);
-      g.addColorStop(1.00, `rgb(${BASE},${BASE},0)`);
-      ctx.fillStyle=g;
-      ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
-      ctx.restore();
+      nmImg.setAttribute('href', c.toDataURL('image/png'));
     }
 
     function tick(){
-      // velocity-aware global scale (more speed = more drama), eases back smoothly
-      const desired = hover ? Math.min(1, vMag/20) : 0;
-      scale += (desired - scale) * 0.18;
-      dmEl.setAttribute('scale', (scale * STRENGTH).toFixed(2));
+      t += 0.016;
 
-      drawNormal();
-      vMag *= 0.85; // decay velocity feel
+      // noise animation (twirl feel)
+      const bx = 0.010 + Math.sin(t*NOISE_SPEED)*0.003;
+      const by = 0.016 + Math.cos(t*NOISE_SPEED*0.8)*0.003;
+      n.setAttribute('baseFrequency', `${bx.toFixed(4)} ${by.toFixed(4)}`);
+
+      // move mask center smoothly toward mouse
+      cx += (mx - cx)*FOLLOW;
+      cy += (my - cy)*FOLLOW;
+
+      // ease power
+      power += (target - power) * EASE;
+      const scale = (power * SCALE_MAX).toFixed(2);
+      dm.setAttribute('scale', scale);
+
+      // also dim strength (k3 in arithmetic) based on ALPHA_FADE*power
+      // (feComposite arithmetic k3 is set to -0.5 above; we leave it, mask already modulates)
+      drawMask();
       requestAnimationFrame(tick);
     }
     tick();
