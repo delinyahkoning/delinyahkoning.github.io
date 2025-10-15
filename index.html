@@ -66,45 +66,30 @@
           <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
 
-          <!-- ==================== PRISM EDGE (visible, smooth) ==================== -->
-          <!-- Displacement strength from normal map (distance from neutral 128,128) -->
+          <!-- ===== Prism mask: strength of displacement (|map - neutral|) ===== -->
           <feFlood flood-color="rgb(128,128,0)" result="neutral"/>
-          <feBlend in="blur" in2="neutral" mode="difference" result="dev"/>
-          <feColorMatrix in="dev" type="saturate" values="0" result="devL"/>
-          <feComponentTransfer in="devL" result="strength">
-            <feFuncR type="gamma" amplitude="1" exponent="1.4" offset="0"/>
-            <feFuncG type="gamma" amplitude="1" exponent="1.4" offset="0"/>
-            <feFuncB type="gamma" amplitude="1" exponent="1.4" offset="0"/>
-          </feComponentTransfer>
-          <feGaussianBlur in="strength" stdDeviation="1.3" result="strengthSoft"/>
+          <feBlend in="blur" in2="neutral" mode="difference" result="diff"/>          <!-- abs deviation -->
+          <feColorMatrix in="diff" type="saturate" values="0" result="strengthLum"/>  <!-- luminance -->
+          <feGaussianBlur in="strengthLum" stdDeviation="3" result="strength"/>       <!-- soften -->
 
-          <!-- 1px rim from glyph alpha (no duplicated fills) -->
-          <feMorphology in="SourceAlpha" operator="dilate" radius="1.1" result="aDilate"/>
-          <feMorphology in="SourceAlpha" operator="erode"  radius="0.6" result="aErode"/>
-          <feComposite in="aDilate" in2="aErode" operator="out" result="edgeBase"/>
-          <feGaussianBlur in="edgeBase" stdDeviation="0.5" result="edgeSoft"/>
+          <!-- Isolate channels of displaced text, mask by strength, then offset -->
+          <feColorMatrix in="disp" type="matrix" result="dispR"
+            values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+          <feColorMatrix in="disp" type="matrix" result="dispG"
+            values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+          <feColorMatrix in="disp" type="matrix" result="dispB"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
 
-          <!-- Only show RGB where BOTH edge and strength exist -->
-          <feComposite in="edgeSoft" in2="strengthSoft" operator="in" result="rimMask"/>
+          <feComposite in="dispR" in2="strength" operator="in" result="maskR"/>
+          <feComposite in="dispG" in2="strength" operator="in" result="maskG"/>
+          <feComposite in="dispB" in2="strength" operator="in" result="maskB"/>
 
-          <!-- Color the rim; JS offsets these -->
-          <feFlood flood-color="#ff2a6d" flood-opacity="0.85" result="fR"/>
-          <feFlood flood-color="#2aff79" flood-opacity="0.85" result="fG"/>
-          <feFlood flood-color="#2ac8ff" flood-opacity="0.85" result="fB"/>
+          <!-- Tiny offsets; JS animates dx/dy via IDs below -->
+          <feOffset in="maskR" dx="0" dy="0" result="prismR" id="offR"/>
+          <feOffset in="maskG" dx="0" dy="0" result="prismG" id="offG"/>
+          <feOffset in="maskB" dx="0" dy="0" result="prismB" id="offB"/>
 
-          <feComposite in="fR" in2="rimMask" operator="in" result="rimR0"/>
-          <feComposite in="fG" in2="rimMask" operator="in" result="rimG0"/>
-          <feComposite in="fB" in2="rimMask" operator="in" result="rimB0"/>
-
-          <feOffset in="rimR0" dx="0" dy="0" result="prismR_raw" id="offR"/>
-          <feOffset in="rimG0" dx="0" dy="0" result="prismG_raw" id="offG"/>
-          <feOffset in="rimB0" dx="0" dy="0" result="prismB_raw" id="offB"/>
-
-          <feGaussianBlur in="prismR_raw" stdDeviation="0.45" result="prismR"/>
-          <feGaussianBlur in="prismG_raw" stdDeviation="0.45" result="prismG"/>
-          <feGaussianBlur in="prismB_raw" stdDeviation="0.45" result="prismB"/>
-
-          <!-- Compose: displaced white text + RGB rim -->
+          <!-- Composite back together: base displaced + RGB fringes -->
           <feMerge>
             <feMergeNode in="disp"/>
             <feMergeNode in="prismR"/>
@@ -116,13 +101,172 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          Cinematic visuals,
+          This is
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          science-minded design.
+         a lil test.
         </text>
       </g>
     </svg>
 
     <p class="hero-sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
- 
+  </div>
+</section>
+
+<section>
+  <div class="wrap" style="display:grid;gap:20px;grid-template-columns:1.2fr .8fr">
+    <div class="panel">
+      <h2 style="margin-top:0">Featured Work</h2>
+      <div class="grid cards" style="margin-top:12px">
+        <article class="card"><div class="thumb">assets/feat-1.mp4</div><strong>Lookdev Shot</strong><div class="sub" style="font-size:13px">Blender · 2025</div></article>
+        <article class="card"><div class="thumb">assets/feat-2.jpg</div><strong>Science Illustration</strong><div class="sub" style="font-size:13px">Vectors · 2025</div></article>
+        <article class="card"><div class="thumb">assets/feat-3.mp4</div><strong>Explainer Motion</strong><div class="sub" style="font-size:13px">AE · 30s</div></article>
+      </div>
+    </div>
+    <aside class="panel">
+      <h2 style="margin-top:0">About</h2>
+      <p class="sub">Biomedical research background × creative direction. I build clear, cinematic visuals for science, culture, and brands.</p>
+      <p><a class="tab" href="assets/Delinyah-Koning-Resume.pdf" target="_blank" style="display:inline-block">Resume (PDF)</a></p>
+      <p><a class="tab" href="mailto:you@example.com">you@example.com</a></p>
+    </aside>
+  </div>
+</section>
+
+<footer>© <span id="y"></span> Delinyah Koning</footer>
+
+<div class="cursor"></div>
+
+<script>
+  // Year + your cursor
+  document.getElementById('y').textContent = new Date().getFullYear();
+  const cursor=document.querySelector(".cursor");
+  document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
+  document.querySelectorAll("a,button").forEach(el=>{
+    el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(155,212,255,.25)";});
+    el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
+  });
+
+  // ================== Liquify-like local warp (no alpha change) + PRISM ==================
+  (function(){
+    const svg  = document.getElementById('heroSVG');
+    const nmEl = document.getElementById('nm');
+    const dm   = document.getElementById('dm');
+    const offR = document.getElementById('offR');
+    const offG = document.getElementById('offG');
+    const offB = document.getElementById('offB');
+
+    const vb   = svg.viewBox.baseVal; // 1200x360
+    const c = document.createElement('canvas');
+    const ctx = c.getContext('2d');
+    c.width = vb.width; c.height = vb.height;
+
+    const MAX_IMPRINTS = 22;
+    const LIFE = 520;
+    const BASE = 128;
+    const BASE_RADIUS = 110;
+    const STRETCH = 2.6;
+    const TWIRL = 0.9;
+    const POWER = 1.0;
+
+    const imprints = []; // {x,y,vx,vy,t}
+    let last = {x: vb.width/2, y: vb.height/2};
+    let vX = 0, vY = 0; // current mouse velocity (for prism direction)
+
+    function toVB(e){
+      const r = svg.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left) / r.width  * vb.width,
+        y: (e.clientY - r.top)  / r.height * vb.height
+      };
+    }
+
+    svg.addEventListener('mousemove', (e)=>{
+      const p = toVB(e);
+      vX = p.x - last.x; vY = p.y - last.y;
+      last = p;
+
+      imprints.unshift({x:p.x, y:p.y, vx:vX, vy:vY, t: performance.now()});
+      if (imprints.length > MAX_IMPRINTS) imprints.pop();
+    });
+
+    svg.addEventListener('mouseleave', ()=>{ vX = vY = 0; });
+
+    function clamp(v){ return Math.max(0, Math.min(255, v)); }
+    function mix(a,b,t){ return a*(1-t)+b*t; }
+
+    function drawNormalMap(){
+      ctx.clearRect(0,0,c.width,c.height);
+      ctx.fillStyle = 'rgb(128,128,0)'; ctx.fillRect(0,0,c.width,c.height);
+
+      const now = performance.now();
+
+      for (let i=imprints.length-1;i>=0;i--){
+        const it = imprints[i];
+        const age = now - it.t;
+        if (age > LIFE){ imprints.splice(i,1); continue; }
+
+        const t = age / LIFE;
+        const ease = 1 - (t*t*(3 - 2*t));
+        const grow = 1 + 0.9*t;
+
+        const vlen = Math.hypot(it.vx, it.vy) || 1;
+        const ux = it.vx / vlen, uy = it.vy / vlen;
+        const disp = POWER * Math.min(1.2, vlen/14) * ease * 110;
+
+        const cx = it.x, cy = it.y;
+        const rx = BASE_RADIUS * STRETCH * grow;
+        const ry = BASE_RADIUS * 0.85   * grow;
+
+        ctx.save();
+        ctx.translate(cx,cy);
+        ctx.rotate(Math.atan2(uy,ux));
+        ctx.scale(rx, ry);
+
+        const pushX = BASE + (ux * disp * 0.6);
+        const pushY = BASE + (uy * disp * 0.6);
+        const spinX = BASE + ((-uy) * disp * TWIRL * 0.6);
+        const spinY = BASE + (( ux) * disp * TWIRL * 0.6);
+
+        const g = ctx.createRadialGradient(0,0,0, 0,0,1);
+        g.addColorStop(0.00, `rgb(${clamp(pushX)},${clamp(pushY)},0)`);
+        g.addColorStop(0.45, `rgb(${clamp(mix(pushX,spinX,0.5))},${clamp(mix(pushY,spinY,0.5))},0)`);
+        g.addColorStop(0.85, `rgb(128,128,0)`);
+        g.addColorStop(1.00, `rgb(128,128,0)`);
+
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+
+      nmEl.setAttribute('href', c.toDataURL('image/png'));
+    }
+
+    // Animate + RGB prism offsets
+    function animate(){
+      drawNormalMap();
+
+      // prism magnitude based on current velocity and how many imprints are alive
+      const vMag = Math.min(1, Math.hypot(vX, vY) / 24);
+      const active = Math.min(1, imprints.length / MAX_IMPRINTS);
+      const amt = 3.2 * vMag * active; // max ~3.2px when fast; fades when trail fades
+
+      const dirX = vMag ? (vX / Math.hypot(vX, vY)) : 0;
+      const dirY = vMag ? (vY / Math.hypot(vX, vY)) : 0;
+
+      // R opposite motion, G slight with motion, B slight perpendicular
+      offR.setAttribute('dx', (-amt*1.0 * dirX).toFixed(2));
+      offR.setAttribute('dy', (-amt*1.0 * dirY).toFixed(2));
+
+      offG.setAttribute('dx', ( amt*0.6 * dirX).toFixed(2));
+      offG.setAttribute('dy', ( amt*0.6 * dirY).toFixed(2));
+
+      offB.setAttribute('dx', ( amt*0.9 * (-dirY)).toFixed(2)); // 90° turn
+      offB.setAttribute('dy', ( amt*0.9 * ( dirX)).toFixed(2));
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+  })();
+</script>
+</body>
+</html>
