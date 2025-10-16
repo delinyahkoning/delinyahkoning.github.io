@@ -14,6 +14,7 @@
   .nav{display:flex;align-items:center;gap:16px;padding:14px 0}.brand{font-weight:700}.spacer{flex:1}
   .tabs{display:flex;gap:10px;flex-wrap:wrap}.tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
   .tab:hover{background:#131623}.tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
+
   .hero{
     min-height:46vh;
     display:grid;
@@ -67,7 +68,7 @@
   .lightbox__frame{
     position:relative;
     display:flex; align-items:center; justify-content:center;
-    border:none;                 /* border removed */
+    border:none;                 /* no border */
     border-radius:14px;
     padding:8px;
     background:transparent;
@@ -89,78 +90,42 @@
   }
   .lightbox__sr{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 
-  /* === Cosmic cursor: glossy planet + orbiting moon === */
+  /* === Minimal cosmic cursor: solid planet + white moon === */
   .cursor{
     position:fixed; top:0; left:0;
     width:28px; height:28px;
     transform:translate(-50%,-50%);
     pointer-events:none; z-index:9999;
-    will-change: transform;
   }
+  /* solid planet in light blue (accent) */
   .cursor__planet{
     position:absolute; left:50%; top:50%;
     width:16px; height:16px; border-radius:50%;
     transform:translate(-50%,-50%);
-    background:
-      radial-gradient(60% 60% at 35% 35%, rgba(255,255,255,.85), rgba(155,212,255,.65) 35%, rgba(120,170,220,.35) 60%, rgba(100,140,200,.15) 75%, rgba(100,140,200,0) 100%),
-      radial-gradient(80% 80% at 75% 75%, rgba(0,0,0,.35), rgba(0,0,0,0) 65%);
-    border:1px solid rgba(200,230,255,.35);
-    box-shadow:
-      inset 0 0 4px rgba(255,255,255,.25),
-      0 0 12px rgba(155,212,255,.28);
-    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    background: var(--accent);
   }
-  .cursor__planet::before{
-    content:"";
-    position:absolute; left:50%; top:50%;
-    width:9px; height:9px; border-radius:50%;
-    transform:translate(-60%,-60%) rotate(-12deg);
-    background:
-      radial-gradient(50% 50% at 45% 45%, rgba(255,255,255,.9), rgba(255,255,255,.35) 55%, rgba(255,255,255,0) 70%);
-    filter: blur(.2px);
-    opacity:.95;
-    pointer-events:none;
-  }
-  .cursor__planet::after{
-    content:"";
-    position:absolute; inset:-1px; border-radius:inherit;
-    background:
-      radial-gradient(70% 70% at 78% 78%, rgba(0,0,0,.45), rgba(0,0,0,0) 60%),
-      radial-gradient(90% 90% at 30% 30%, rgba(155,212,255,.15), rgba(155,212,255,0) 65%);
-    pointer-events:none;
-  }
-
+  /* orbit path container (invisible, just rotates the moon) */
   .cursor__orbit{
     position:absolute; left:50%; top:50%;
     width:26px; height:26px; border-radius:50%;
     transform:translate(-50%,-50%);
     animation: cursor-spin 2.25s linear infinite;
-    transition: width .18s ease, height .18s ease;
   }
+  /* small white moon */
   .cursor__satellite{
     position:absolute; left:50%; top:50%;
     width:6px; height:6px; border-radius:50%;
     transform: translate(11px,-50%);
     background: var(--ink);
-    box-shadow: 0 0 8px rgba(155,212,255,.6), 0 0 2px rgba(255,255,255,.9) inset;
   }
-
-  .cursor--hover .cursor__planet{
-    transform:translate(-50%,-50%) scale(1.18);
-    box-shadow:
-      inset 0 0 5px rgba(255,255,255,.3),
-      0 0 16px rgba(155,212,255,.38);
-  }
-  .cursor--hover .cursor__orbit{ width:36px; height:36px; }
-  .cursor--hover .cursor__satellite{ transform: translate(16px,-50%); }
-  .cursor--down .cursor__planet{ filter: brightness(1.06) saturate(1.05); }
+  /* optional: tiny feedback on hover/press (kept subtle) */
+  .cursor--hover .cursor__planet{ transform:translate(-50%,-50%) scale(1.12); }
+  .cursor--hover .cursor__orbit{ width:34px; height:34px; }
+  .cursor--hover .cursor__satellite{ transform: translate(15px,-50%); }
+  .cursor--down .cursor__planet{ transform:translate(-50%,-50%) scale(1.0); }
 
   @keyframes cursor-spin{ to { transform: translate(-50%,-50%) rotate(360deg); } }
-  @keyframes cursor-pulse{
-    0% { transform:translate(-50%,-50%) scale(1); }
-    50%{ transform:translate(-50%,-50%) scale(1.28); }
-    100%{transform:translate(-50%,-50%) scale(1); }
-  }
+
   @media (prefers-reduced-motion: reduce){
     .cursor__orbit{ animation: none; }
   }
@@ -224,7 +189,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
       </g>
     </svg>
 
@@ -291,7 +256,7 @@
   </div>
 </div>
 
-<!-- Cosmic cursor -->
+<!-- Minimal cosmic cursor -->
 <div class="cursor" aria-hidden="true">
   <span class="cursor__orbit">
     <span class="cursor__satellite"></span>
@@ -303,7 +268,7 @@
   // Year
   document.getElementById('y').textContent = new Date().getFullYear();
 
-  // === Cosmic cursor follow + states ===
+  // === Cursor follow + simple states ===
   const cursorEl = document.querySelector('.cursor');
   document.addEventListener('mousemove', (e)=>{
     cursorEl.style.top  = e.clientY + 'px';
@@ -375,7 +340,7 @@
     lb.addEventListener('click', (e)=>{ if(!frame.contains(e.target)) close(); });
   })();
 
-  // ===== Liquify + PRISM — prism fades out with the trail (same timing) =====
+  // ===== Liquify + PRISM — (unchanged logic) =====
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
@@ -388,7 +353,6 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    // Text warp (unchanged)
     const MAX_IMPRINTS = 150;
     const LIFE = 9000;
     const BASE = 128;
@@ -401,7 +365,6 @@
     let last = {x: vb.width/2, y: vb.height/2};
     let vX = 0, vY = 0;
 
-    // Keep last direction for prism even after mouse leaves
     let lastDirX = 1, lastDirY = 0;
 
     function toVB(e){
@@ -417,7 +380,6 @@
       vX = p.x - last.x; vY = p.y - last.y;
       last = p;
 
-      // update last non-zero direction
       const vlen = Math.hypot(vX, vY);
       if (vlen > 0.001) {
         lastDirX = vX / vlen;
@@ -428,7 +390,6 @@
       if (imprints.length > MAX_IMPRINTS) imprints.pop();
     });
 
-    // Do not zero direction on mouseleave; let the trail drive the fade
     svg.addEventListener('mouseleave', ()=>{ /* let it fade on its own */ });
 
     function clamp(v){ return Math.max(0, Math.min(255, v)); }
@@ -489,14 +450,13 @@
     let prevTarget = 0;
 
     const ATTACK_MS  = 700;
-    const RELEASE_MS = 500; // short smoothing; overall decay is driven by trail LIFE
+    const RELEASE_MS = 500;
 
     function animate(){
       drawNormalMap();
 
-      // Activity from the trail (0..1) — makes prism fade with the same timing as the warp
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const target = 2.5 * active; // gain unchanged, now independent of instantaneous velocity
+      const target = 2.5 * active;
 
       const now = performance.now();
       const dt  = now - lastTime;
@@ -509,16 +469,13 @@
       smoothAmt += (target - smoothAmt) * alpha;
       prevTarget = target;
 
-      // Use last known direction so the prism doesn't snap on mouseleave
       const dirX = lastDirX, dirY = lastDirY;
 
       const amt = smoothAmt;
       offR.setAttribute('dx', (-amt * 1.30 * dirX).toFixed(2));
       offR.setAttribute('dy', (-amt * 1.30 * dirY).toFixed(2));
-
       offG.setAttribute('dx', ( amt * 0.95 * dirX).toFixed(2));
       offG.setAttribute('dy', ( amt * 0.95 * dirY).toFixed(2));
-
       offB.setAttribute('dx', ( amt * 1.45 * (-dirY)).toFixed(2));
       offB.setAttribute('dy', ( amt * 1.45 * ( dirX)).toFixed(2));
 
@@ -529,4 +486,3 @@
 </script>
 </body>
 </html>
-
