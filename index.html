@@ -104,7 +104,7 @@
           This is
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-         a lil test.
+        test #2.
         </text>
       </g>
     </svg>
@@ -160,8 +160,9 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    const MAX_IMPRINTS = 22;
-    const LIFE = 520;
+    // === Tweaks for stronger + longer trail ===
+    const MAX_IMPRINTS = 32;      // was 22
+    const LIFE = 1200;            // was 520 (ms)
     const BASE = 128;
     const BASE_RADIUS = 110;
     const STRETCH = 2.6;
@@ -206,7 +207,7 @@
         if (age > LIFE){ imprints.splice(i,1); continue; }
 
         const t = age / LIFE;
-        const ease = 1 - (t*t*(3 - 2*t));
+        const ease = 1 - (t*t*(3 - 2*t)); // smoothstep-down
         const grow = 1 + 0.9*t;
 
         const vlen = Math.hypot(it.vx, it.vy) || 1;
@@ -245,23 +246,23 @@
     function animate(){
       drawNormalMap();
 
-      // prism magnitude based on current velocity and how many imprints are alive
+      // stronger prism + longer persistence via higher LIFE and more imprints
       const vMag = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const amt = 4.0 * vMag * active; // was 3.2 → slightly stronger
+      const amt = 5.0 * vMag * active; // was 4.0
 
       const dirLen = Math.hypot(vX, vY) || 1;
       const dirX = vX / dirLen, dirY = vY / dirLen;
 
-      // R opposite motion, G with motion, B perpendicular (slightly boosted)
-      offR.setAttribute('dx', (-amt * 1.1 * dirX).toFixed(2));
-      offR.setAttribute('dy', (-amt * 1.1 * dirY).toFixed(2));
+      // R opposite motion, G with motion, B perpendicular (all slightly stronger)
+      offR.setAttribute('dx', (-amt * 1.25 * dirX).toFixed(2));
+      offR.setAttribute('dy', (-amt * 1.25 * dirY).toFixed(2));
 
-      offG.setAttribute('dx', ( amt * 0.75 * dirX).toFixed(2));
-      offG.setAttribute('dy', ( amt * 0.75 * dirY).toFixed(2));
+      offG.setAttribute('dx', ( amt * 0.90 * dirX).toFixed(2));
+      offG.setAttribute('dy', ( amt * 0.90 * dirY).toFixed(2));
 
-      offB.setAttribute('dx', ( amt * 1.2 * (-dirY)).toFixed(2)); // 90° turn
-      offB.setAttribute('dy', ( amt * 1.2 * ( dirX)).toFixed(2));
+      offB.setAttribute('dx', ( amt * 1.40 * (-dirY)).toFixed(2)); // 90° turn
+      offB.setAttribute('dy', ( amt * 1.40 * ( dirX)).toFixed(2));
 
       requestAnimationFrame(animate);
     }
