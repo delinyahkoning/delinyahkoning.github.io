@@ -87,6 +87,9 @@
   .pill--mint{ color:var(--mint); }
   .pill--peach{ color:var(--peach); }
 
+  /* flush variant for aligning pill edge to panel text edge */
+  .pill--flush{ margin-left:0 !important; }
+
   /* ===== LIGHTBOX (centered, smaller) with UNIFORM BLURRED/DIMMED overlay ===== */
   .lightbox{
     position:fixed; inset:0; z-index:9998;
@@ -196,30 +199,22 @@
           <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
           <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
-
-          <!-- Strength mask -->
           <feFlood flood-color="rgb(128,128,0)" result="neutral"/>
           <feBlend in="blur" in2="neutral" mode="difference" result="diff"/>
           <feColorMatrix in="diff" type="saturate" values="0" result="strengthLum"/>
           <feGaussianBlur in="strengthLum" stdDeviation="3" result="strength"/>
-
-          <!-- Channel separation -->
           <feColorMatrix in="disp" type="matrix" result="dispR"
             values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
           <feColorMatrix in="disp" type="matrix" result="dispG"
             values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
           <feColorMatrix in="disp" type="matrix" result="dispB"
             values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
-
           <feComposite in="dispR" in2="strength" operator="in" result="maskR"/>
           <feComposite in="dispG" in2="strength" operator="in" result="maskG"/>
           <feComposite in="dispB" in2="strength" operator="in" result="maskB"/>
-
-          <!-- Offsets (animated in JS) -->
           <feOffset in="maskR" dx="0" dy="0" result="prismR" id="offR"/>
           <feOffset in="maskG" dx="0" dy="0" result="prismG" id="offG"/>
           <feOffset in="maskB" dx="0" dy="0" result="prismB" id="offB"/>
-
           <feMerge>
             <feMergeNode in="prismR"/>
             <feMergeNode in="prismG"/>
@@ -231,7 +226,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...????</text>
       </g>
     </svg>
 
@@ -278,7 +273,7 @@
       </div>
     </div>
     <aside class="panel">
-      <h2 class="pill-title pill--peach">about</h2>
+      <h2 class="pill-title pill--peach pill--flush">about</h2>
       <p class="sub">something should be here as well</p>
       <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:16px 0">
       <p><a class="tab" href="mailto:koningdelinyah@gmail.com">koningdelinyah@gmail.com</a></p>
