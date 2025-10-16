@@ -6,11 +6,7 @@
 <title>Delinyah Koning — Home</title>
 <meta name="description" content="Portfolio — 3D, 2D, Design, Photos." />
 <style>
-  :root{
-    --bg:#0a0b0f; --ink:#ffffff; --muted:#9aa0b3; --panel:#10121a; --accent:#9bd4ff;
-    --radius:18px; --max:1200px; --content-indent:14px;
-    --mint:#a8ffd3; --peach:#ffd6a5; --lilac:#c8a6ff; --rose:#ffb3c6; --sky:#9bd4ff; --mist:#dfe7f1;
-  }
+  :root{--bg:#0a0b0f;--ink:#ffffff;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px}
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
   .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
@@ -56,15 +52,14 @@
   .hero-center{text-align:left}
   .hero-svg{display:block;width:min(92vw,1100px);height:auto}
 
-  /* Poetic line */
+  /* Poetic line: lowercase, airy spacing, deep indents — now in Century/Times */
   .hero-sub.poetic-note{
     font-size:0.9em;
-    line-height:2.2;
+    line-height:2.2;            /* more vertical space */
     margin-left:60px;
     margin-top:-10px;
-    margin-bottom:40px;
     color:var(--ink);
-    font-family:"Century Schoolbook", Century, "Times New Roman", Times, Georgia, serif;
+    font-family: "Century Schoolbook", Century, "Times New Roman", Times, Georgia, serif;
   }
   .poetic-note span{ display:block; }
   .poetic-note .line2{ margin-left:12ch; }
@@ -72,46 +67,43 @@
 
   .panel .sub{ margin:6px 0; line-height:1.4 }
 
-  /* Pill-style headers */
-  .pill-title{
-    display:inline-block;
-    padding:6px 14px;
-    border-radius:999px;
-    font-size:.9rem;
-    font-weight:500;
-    text-transform:lowercase;
-    margin:0 0 20px var(--content-indent);
-    border:1px solid currentColor;
-    line-height:1;
-  }
-  .pill--mint{  color:var(--mint);  }
-  .pill--peach{ color:var(--peach); }
-  /* Align the 'about' pill flush with its column text */
-  aside.panel .pill-title{ margin-left:0; }
-
   /* ===== LIGHTBOX (centered, smaller) with UNIFORM BLURRED/DIMMED overlay ===== */
   .lightbox{
     position:fixed; inset:0; z-index:9998;
-    display:none; align-items:center; justify-content:center;
-    background:transparent;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:transparent; /* all blur/dim handled by ::before */
   }
   .lightbox.open{ display:flex; }
+
+  /* Full-screen overlay to avoid any unblurred halo */
   .lightbox::before{
-    content:""; position:fixed; inset:0;
-    background: rgba(7,8,12,.32);
-    backdrop-filter: blur(8px) saturate(130%);
+    content:"";
+    position:fixed; inset:0;
+    background: rgba(7,8,12,.32);                 /* dim */
+    backdrop-filter: blur(8px) saturate(130%);     /* blur */
     -webkit-backdrop-filter: blur(8px) saturate(130%);
-    pointer-events:none; z-index:0;
+    pointer-events:none;                           /* don't block clicks */
+    z-index:0;
   }
+
   .lightbox__frame{
-    position:relative; z-index:1;
+    position:relative; z-index:1;                  /* above overlay */
     display:flex; align-items:center; justify-content:center;
-    border:none; border-radius:14px; padding:0; background:transparent;
-    max-width:min(1000px,84vw); max-height:84vh;
+    border:none; border-radius:14px;
+    padding:0;                                     /* remove padding to kill halo */
+    background:transparent;
+    max-width:min(1000px,84vw);
+    max-height:84vh;
     box-shadow:0 12px 40px rgba(0,0,0,.45);
   }
   .lightbox__media{
-    display:block; max-width:84vw; max-height:84vh; border-radius:12px; background:#000;
+    display:block;
+    max-width:84vw;
+    max-height:84vh;
+    border-radius:12px;
+    background:#000;                               /* nice for letterboxed videos */
   }
   .lightbox__close{
     position:absolute; top:6px; right:6px;
@@ -124,7 +116,7 @@
   /* Hide native cursor so only the custom one shows */
   * { cursor:none !important; }
 
-  /* Minimal cosmic cursor + themeable colors */
+  /* Minimal cosmic cursor: solid planet + white moon */
   .cursor{
     position:fixed; top:0; left:0;
     width:28px; height:28px;
@@ -135,8 +127,7 @@
     position:absolute; left:50%; top:50%;
     width:16px; height:16px; border-radius:50%;
     transform:translate(-50%,-50%);
-    background: var(--accent); /* default */
-    transition: background .15s ease;
+    background: var(--accent);
   }
   .cursor__orbit{
     position:absolute; left:50%; top:50%;
@@ -148,26 +139,18 @@
     position:absolute; left:50%; top:50%;
     width:6px; height:6px; border-radius:50%;
     transform: translate(11px,-50%);
-    background: var(--ink); /* default */
-    transition: background .15s ease;
+    background: var(--ink);
   }
   .cursor--hover .cursor__planet{ transform:translate(-50%,-50%) scale(1.12); }
   .cursor--hover .cursor__orbit{ width:34px; height:34px; }
   .cursor--hover .cursor__satellite{ transform: translate(15px,-50%); }
   .cursor--down .cursor__planet{ transform:translate(-50%,-50%) scale(1.0); }
 
-  /* Theme classes for hover over specific cards */
-  .cursor--skymist     .cursor__planet{ background: var(--sky); }
-  .cursor--skymist     .cursor__satellite{ background: var(--mist); }
-
-  .cursor--lilacrose   .cursor__planet{ background: var(--lilac); }
-  .cursor--lilacrose   .cursor__satellite{ background: var(--rose); }
-
-  .cursor--mintapricot .cursor__planet{ background: var(--mint); }
-  .cursor--mintapricot .cursor__satellite{ background: var(--peach); }
-
   @keyframes cursor-spin{ to { transform: translate(-50%,-50%) rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce){ .cursor__orbit{ animation:none; } }
+
+  @media (prefers-reduced-motion: reduce){
+    .cursor__orbit{ animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -193,19 +176,30 @@
           <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
           <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
+
+          <!-- Strength mask -->
           <feFlood flood-color="rgb(128,128,0)" result="neutral"/>
           <feBlend in="blur" in2="neutral" mode="difference" result="diff"/>
           <feColorMatrix in="diff" type="saturate" values="0" result="strengthLum"/>
           <feGaussianBlur in="strengthLum" stdDeviation="3" result="strength"/>
+
+          <!-- Channel separation -->
           <feColorMatrix in="disp" type="matrix" result="dispR"
             values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
           <feColorMatrix in="disp" type="matrix" result="dispG"
             values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
           <feColorMatrix in="disp" type="matrix" result="dispB"
             values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+
           <feComposite in="dispR" in2="strength" operator="in" result="maskR"/>
           <feComposite in="dispG" in2="strength" operator="in" result="maskG"/>
           <feComposite in="dispB" in2="strength" operator="in" result="maskB"/>
+
+          <!-- Offsets (animated in JS) -->
+          <feOffset in="maskR" dx="0" dy="0" result="prismR" id="offR"/>
+          <feOffset in="maskG" dx="0" dy="0" result="prismG" id="offG"/>
+          <feOffset in="maskB" dx="0" dy="0" result="prismB" id="offB"/>
+
           <feMerge>
             <feMergeNode in="prismR"/>
             <feMergeNode in="prismG"/>
@@ -221,6 +215,7 @@
       </g>
     </svg>
 
+    <!-- Poetic line: big vertical space + deep indents -->
     <p class="hero-sub poetic-note">
       <span class="line1">just leaving traces</span>
       <span class="line2">of progress</span>
@@ -232,10 +227,10 @@
 <section style="padding-top:28px">
   <div class="wrap" style="display:grid;gap:20px;grid-template-columns:1.2fr .8fr">
     <div class="panel">
-      <h2 class="pill-title pill--mint">stuff i made</h2>
+      <h2 style="margin-top:0">some of the cool stuff</h2>
       <div class="grid cards" style="margin-top:12px">
         <article class="card">
-          <div class="thumb" data-lightbox data-cursor="skymist">
+          <div class="thumb" data-lightbox>
             <button class="fs-btn" type="button" aria-label="Open">⤢</button>
             <video src="assets/greenplanet.mp4" autoplay muted loop playsinline></video>
           </div>
@@ -244,7 +239,7 @@
         </article>
 
         <article class="card">
-          <div class="thumb" data-lightbox data-cursor="lilacrose">
+          <div class="thumb" data-lightbox>
             <button class="fs-btn" type="button" aria-label="Open">⤢</button>
             <video src="assets/spiderwaving.mp4" autoplay muted loop playsinline></video>
           </div>
@@ -253,7 +248,7 @@
         </article>
 
         <article class="card">
-          <div class="thumb" data-lightbox data-cursor="mintapricot">
+          <div class="thumb" data-lightbox>
             <button class="fs-btn" type="button" aria-label="Open">⤢</button>
             <video src="assets/md.mp4" autoplay muted loop playsinline></video>
           </div>
@@ -262,9 +257,8 @@
         </article>
       </div>
     </div>
-
     <aside class="panel">
-      <h2 class="pill-title pill--peach">about</h2>
+      <h2 style="margin-top:0">About</h2>
       <p class="sub">something should be here as well</p>
       <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:16px 0">
       <p><a class="tab" href="mailto:koningdelinyah@gmail.com">koningdelinyah@gmail.com</a></p>
@@ -510,21 +504,6 @@
       requestAnimationFrame(animate);
     }
     animate();
-  })();
-
-  // Cursor theme switching for each card
-  (function(){
-    const cursor = document.querySelector('.cursor');
-    document.querySelectorAll('.thumb[data-cursor]').forEach(thumb=>{
-      const theme = thumb.getAttribute('data-cursor'); // skymist / lilacrose / mintapricot
-      thumb.addEventListener('mouseenter', ()=> {
-        cursor.classList.remove('cursor--skymist','cursor--lilacrose','cursor--mintapricot');
-        cursor.classList.add('cursor--' + theme);
-      });
-      thumb.addEventListener('mouseleave', ()=> {
-        cursor.classList.remove('cursor--skymist','cursor--lilacrose','cursor--mintapricot');
-      });
-    });
   })();
 </script>
 </body>
