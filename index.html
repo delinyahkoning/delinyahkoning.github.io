@@ -14,11 +14,16 @@
   .nav{display:flex;align-items:center;gap:16px;padding:14px 0}.brand{font-weight:700}.spacer{flex:1}
   .tabs{display:flex;gap:10px;flex-wrap:wrap}.tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
   .tab:hover{background:#131623}.tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
-  .hero{min-height:58vh;display:grid;place-items:center;background:
-    radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
-    radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
-    var(--bg);
-    padding-bottom:16px; /* tighter bottom on hero to reduce the gap */
+  .hero{
+    /* less vertical space above the text */
+    min-height:46vh;
+    display:grid;
+    place-items:start;          /* align content to the top-left */
+    background:
+      radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
+      radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
+      var(--bg);
+    padding:20px 0 16px;        /* add small top padding, keep tighter bottom */
   }
   section{padding:60px 0}
   .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
@@ -57,10 +62,11 @@
   /* Tighter spacing between lines in About */
   .panel .sub{ margin:6px 0; line-height:1.4 }
 
+  /* Custom cursor — switched to semi-transparent white */
   .cursor{
     position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
-    pointer-events:none;background:rgba(155,212,255,.15);
-    border:1px solid rgba(155,212,255,.4);transform:translate(-50%,-50%);
+    pointer-events:none;background:rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.35);transform:translate(-50%,-50%);
     transition:width .15s,height .15s,background .2s;z-index:9999;
   }
 </style>
@@ -184,7 +190,7 @@
     </div>
     <aside class="panel">
       <h2 style="margin-top:0">About</h2>
-      <p class="sub">[...]</p>
+      <p class="sub">:)</p>
       <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:16px 0">
       <p><a class="tab" href="mailto:koningdelinyah@gmail.com">koningdelinyah@gmail.com</a></p>
       <p style="margin-top:10px">
@@ -205,8 +211,18 @@
   const cursor=document.querySelector(".cursor");
   document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
   document.querySelectorAll("a,button").forEach(el=>{
-    el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(155,212,255,.25)";});
-    el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
+    el.addEventListener("mouseenter",()=>{
+      cursor.style.width="36px";
+      cursor.style.height="36px";
+      // white-ish hover
+      cursor.style.background="rgba(255,255,255,.25)";
+    });
+    el.addEventListener("mouseleave",()=>{
+      cursor.style.width="22px";
+      cursor.style.height="22px";
+      // white-ish default
+      cursor.style.background="rgba(255,255,255,.15)";
+    });
   });
 
   // ================== Fullscreen controls for each thumb ==================
