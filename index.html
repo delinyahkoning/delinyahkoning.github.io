@@ -55,34 +55,27 @@
 
   .panel .sub{ margin:6px 0; line-height:1.4 }
 
-  /* Custom cursor (kept) */
-  .cursor{
-    position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
-    pointer-events:none;background:rgba(255,255,255,.15);
-    border:1px solid rgba(255,255,255,.35);transform:translate(-50%,-50%);
-    transition:width .15s,height .15s,background .2s;z-index:9999;
-  }
-
-  /* ========== LIGHTBOX: Centered panel with just a border ========== */
+  /* ========== LIGHTBOX: Centered popup panel (no border) ========== */
   .lightbox{
     position:fixed; inset:0; z-index:9998;
-    display:none;            /* hidden by default */
+    display:none;
     align-items:center;      /* vertical centering */
     justify-content:center;  /* horizontal centering */
     background:transparent;  /* keep page visible; no dim */
   }
-  .lightbox.open{ display:flex; } /* show & center */
+  .lightbox.open{ display:flex; }
 
   .lightbox__frame{
     position:relative;
     display:flex; align-items:center; justify-content:center;
-    border:1px solid rgba(255,255,255,.35);
+    /* border removed as requested */
+    border:none;
     border-radius:14px;
-    padding:8px;
+    padding:8px;             /* small breathing room around media */
     background:transparent;
     max-width:min(1100px,92vw);
     max-height:92vh;
-    box-shadow:0 12px 40px rgba(0,0,0,.35);
+    box-shadow:0 12px 40px rgba(0,0,0,.35); /* subtle lift; say the word to remove */
   }
   .lightbox__media{
     display:block;
@@ -97,6 +90,52 @@
     cursor:pointer;
   }
   .lightbox__sr{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+  /* === Cosmic cursor: planet + orbiting satellite === */
+  .cursor{
+    position:fixed; top:0; left:0;
+    width:28px; height:28px;
+    transform:translate(-50%,-50%);
+    pointer-events:none; z-index:9999;
+    will-change: transform;
+  }
+  .cursor__planet{
+    position:absolute; left:50%; top:50%;
+    width:16px; height:16px; border-radius:50%;
+    transform:translate(-50%,-50%);
+    background:
+      radial-gradient(35% 35% at 30% 30%, rgba(255,255,255,.9), rgba(155,212,255,.8) 40%, rgba(155,212,255,.25) 70%, rgba(155,212,255,0) 100%),
+      radial-gradient(65% 65% at 70% 70%, rgba(0,0,0,.35), rgba(0,0,0,0) 70%);
+    border:1px solid rgba(255,255,255,.3);
+    box-shadow:0 0 16px rgba(155,212,255,.25);
+    transition: transform .18s ease;
+  }
+  .cursor__orbit{
+    position:absolute; left:50%; top:50%;
+    width:26px; height:26px; border-radius:50%;
+    transform:translate(-50%,-50%);
+    animation: cursor-spin 2.25s linear infinite;
+    transition: width .18s ease, height .18s ease;
+  }
+  .cursor__satellite{
+    position:absolute; left:50%; top:50%;
+    width:6px; height:6px; border-radius:50%;
+    transform: translate(11px,-50%); /* orbit radius */
+    background: var(--ink);
+    box-shadow: 0 0 8px rgba(155,212,255,.6), 0 0 2px rgba(255,255,255,.9) inset;
+  }
+  .cursor--hover .cursor__planet{ transform:translate(-50%,-50%) scale(1.18); }
+  .cursor--hover .cursor__orbit{ width:36px; height:36px; }
+  .cursor--hover .cursor__satellite{ transform: translate(16px,-50%); }
+  .cursor--down .cursor__planet{ animation: cursor-pulse .22s ease; }
+
+  @keyframes cursor-spin{ to { transform: translate(-50%,-50%) rotate(360deg); } }
+  @keyframes cursor-pulse{
+    0% { transform:translate(-50%,-50%) scale(1); }
+    50%{ transform:translate(-50%,-50%) scale(1.28); }
+    100%{transform:translate(-50%,-50%) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce){ .cursor__orbit{ animation: none; } }
 </style>
 </head>
 <body>
@@ -157,7 +196,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
       </g>
     </svg>
 
@@ -224,17 +263,31 @@
   </div>
 </div>
 
-<div class="cursor"></div>
+<!-- Cosmic cursor -->
+<div class="cursor" aria-hidden="true">
+  <span class="cursor__orbit">
+    <span class="cursor__satellite"></span>
+  </span>
+  <span class="cursor__planet"></span>
+</div>
 
 <script>
-  // Year + cursor
+  // Year
   document.getElementById('y').textContent = new Date().getFullYear();
-  const cursor=document.querySelector(".cursor");
-  document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
-  document.querySelectorAll("a,button").forEach(el=>{
-    el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(255,255,255,.25)";});
-    el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(255,255,255,.15)";});
+
+  // === Cosmic cursor follow + states ===
+  const cursorEl = document.querySelector('.cursor');
+  document.addEventListener('mousemove', (e)=>{
+    cursorEl.style.top  = e.clientY + 'px';
+    cursorEl.style.left = e.clientX + 'px';
   });
+  const interactive = document.querySelectorAll('a,button,[data-lightbox],.tab');
+  interactive.forEach(el=>{
+    el.addEventListener('mouseenter', ()=> cursorEl.classList.add('cursor--hover'));
+    el.addEventListener('mouseleave', ()=> cursorEl.classList.remove('cursor--hover'));
+  });
+  document.addEventListener('mousedown', ()=> cursorEl.classList.add('cursor--down'));
+  document.addEventListener('mouseup',   ()=> cursorEl.classList.remove('cursor--down'));
 
   // ===== LIGHTBOX (centered + autoplay from start) =====
   (function(){
@@ -244,30 +297,25 @@
     const slot = document.getElementById('lightboxMediaSlot');
 
     function openWithMedia(mediaEl){
-      // Clear previous
       slot.innerHTML = '';
       const tag = mediaEl.tagName.toLowerCase();
       const isVideo = tag === 'video';
 
-      // Clone the media
       const clone = mediaEl.cloneNode(true);
       clone.classList.add('lightbox__media');
 
       if (isVideo){
-        // Ensure it starts at 0 and plays automatically
-        clone.removeAttribute('loop');          // keep one play unless you want loop
-        clone.removeAttribute('muted');         // play with sound; click counts as gesture
+        // Autoplay from start (with sound)
+        clone.removeAttribute('loop');
+        clone.removeAttribute('muted');
         clone.controls = true;
         clone.autoplay = true;
-
-        // Make sure currentTime resets after metadata is available
         const startAndPlay = () => {
           try { clone.currentTime = 0; } catch {}
           const p = clone.play();
-          if (p && typeof p.then === 'function') p.catch(()=>{}); // avoid console noise
+          if (p && typeof p.then === 'function') p.catch(()=>{});
         };
         clone.addEventListener('loadedmetadata', startAndPlay, { once:true });
-        // Fallback if metadata already loaded on clone
         requestAnimationFrame(startAndPlay);
       }
 
@@ -286,13 +334,7 @@
     // Open from thumbs
     document.querySelectorAll('.thumb[data-lightbox]').forEach(thumb=>{
       const media = thumb.querySelector('video, img') || thumb;
-
-      function handleOpen(e){
-        openWithMedia(media);
-        e.stopPropagation();
-        e.preventDefault();
-      }
-
+      const handleOpen = (e)=>{ openWithMedia(media); e.stopPropagation(); e.preventDefault(); };
       thumb.addEventListener('click', handleOpen);
       const btn = thumb.querySelector('.fs-btn');
       if (btn){ btn.addEventListener('click', handleOpen); }
@@ -441,10 +483,8 @@
       const amt = smoothAmt;
       offR.setAttribute('dx', (-amt * 1.30 * dirX).toFixed(2));
       offR.setAttribute('dy', (-amt * 1.30 * dirY).toFixed(2));
-
       offG.setAttribute('dx', ( amt * 0.95 * dirX).toFixed(2));
       offG.setAttribute('dy', ( amt * 0.95 * dirY).toFixed(2));
-
       offB.setAttribute('dx', ( amt * 1.45 * (-dirY)).toFixed(2));
       offB.setAttribute('dy', ( amt * 1.45 * ( dirX)).toFixed(2));
 
