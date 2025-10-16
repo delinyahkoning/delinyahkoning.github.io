@@ -149,7 +149,7 @@
 <section style="padding-top:28px">
   <div class="wrap" style="display:grid;gap:20px;grid-template-columns:1.2fr .8fr">
     <div class="panel">
-      <h2 style="margin-top:0">Some cool stuff</h2>
+      <h2 style="margin-top:0">some of the cool stuff</h2>
       <div class="grid cards" style="margin-top:12px">
 
         <!-- 1) Space-themed Blender project (image) -->
@@ -375,8 +375,8 @@
     let prevTarget = 0;
 
     // Tune: bigger ATTACK_MS = slower fade-in; RELEASE_MS = fade-out speed
-    const ATTACK_MS  = 3000;
-    const RELEASE_MS = 400;
+    const ATTACK_MS  = 5000;
+    const RELEASE_MS = 1100;
 
     function animate(){
       drawNormalMap();
@@ -384,7 +384,7 @@
       // Raw target strength driven by motion + trail activity
       const vMag   = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const target = 4.0 * vMag * active; // base amount
+      const target = 6.0 * vMag * active; // base amount
 
       // Exponential smoothing toward target (slower attack, faster release)
       const now = performance.now();
