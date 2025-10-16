@@ -90,44 +90,104 @@
   }
   .lightbox__sr{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 
-  /* === Minimal cosmic cursor: solid planet + white moon === */
+  /* === Cinematic cursor: planet (terminator + atmosphere + rotating clouds) + orbiting moon === */
   .cursor{
     position:fixed; top:0; left:0;
     width:28px; height:28px;
     transform:translate(-50%,-50%);
     pointer-events:none; z-index:9999;
+    will-change: transform;
   }
-  /* solid planet in light blue (accent) */
+
+  /* Planet body */
   .cursor__planet{
     position:absolute; left:50%; top:50%;
     width:16px; height:16px; border-radius:50%;
     transform:translate(-50%,-50%);
-    background: var(--accent);
+    /* body + shading (day → night) */
+    background:
+      radial-gradient(60% 60% at 36% 34%, rgba(255,255,255,.95), rgba(168,216,255,.70) 38%, rgba(122,170,220,.38) 62%, rgba(95,140,200,.18) 78%, rgba(95,140,200,0) 100%),
+      radial-gradient(84% 84% at 78% 76%, rgba(0,0,0,.50), rgba(0,0,0,0) 66%);
+    border:1px solid rgba(200,230,255,.33);
+    box-shadow:
+      inset 0 0 4px rgba(255,255,255,.22),
+      0 0 12px rgba(155,212,255,.26);
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
   }
-  /* orbit path container (invisible, just rotates the moon) */
+  /* specular highlight */
+  .cursor__planet::before{
+    content:"";
+    position:absolute; left:50%; top:50%;
+    width:8px; height:8px; border-radius:50%;
+    transform:translate(-58%,-58%) rotate(-12deg);
+    background: radial-gradient(50% 50% at 48% 48%, rgba(255,255,255,.95), rgba(255,255,255,.35) 55%, rgba(255,255,255,0) 70%);
+    filter: blur(.2px);
+    pointer-events:none;
+  }
+  /* atmospheric rim on dark edge */
+  .cursor__planet::after{
+    content:"";
+    position:absolute; inset:-1px; border-radius:inherit;
+    background:
+      radial-gradient(92% 92% at 80% 80%, rgba(0,0,0,.45), rgba(0,0,0,0) 60%),
+      radial-gradient(100% 100% at 30% 30%, rgba(155,212,255,.18), rgba(155,212,255,0) 65%);
+    pointer-events:none;
+  }
+
+  /* Rotating cloud bands */
+  .cursor__clouds{
+    position:absolute; left:50%; top:50%;
+    width:15px; height:15px; border-radius:50%;
+    transform:translate(-50%,-50%);
+    background:
+      repeating-conic-gradient(
+        from 0deg,
+        rgba(255,255,255,.12) 0 6deg,
+        rgba(255,255,255,0) 6deg 18deg
+      );
+    mix-blend-mode:screen;
+    opacity:.32;
+    filter: blur(.4px);
+    animation: cursor-clouds-rotate 12s linear infinite;
+    /* fade near limb */
+    -webkit-mask: radial-gradient(60% 60% at 50% 50%, #000 60%, transparent 78%);
+            mask: radial-gradient(60% 60% at 50% 50%, #000 60%, transparent 78%);
+  }
+  @keyframes cursor-clouds-rotate { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+  /* Orbit + moon */
   .cursor__orbit{
     position:absolute; left:50%; top:50%;
     width:26px; height:26px; border-radius:50%;
     transform:translate(-50%,-50%);
     animation: cursor-spin 2.25s linear infinite;
+    transition: width .18s ease, height .18s ease;
   }
-  /* small white moon */
   .cursor__satellite{
     position:absolute; left:50%; top:50%;
     width:6px; height:6px; border-radius:50%;
-    transform: translate(11px,-50%);
+    transform: translate(11px,-50%); /* orbit radius */
     background: var(--ink);
+    box-shadow: 0 0 8px rgba(155,212,255,.6), 0 0 2px rgba(255,255,255,.9) inset;
   }
-  /* optional: tiny feedback on hover/press (kept subtle) */
-  .cursor--hover .cursor__planet{ transform:translate(-50%,-50%) scale(1.12); }
-  .cursor--hover .cursor__orbit{ width:34px; height:34px; }
-  .cursor--hover .cursor__satellite{ transform: translate(15px,-50%); }
-  .cursor--down .cursor__planet{ transform:translate(-50%,-50%) scale(1.0); }
+
+  /* Hover/press states */
+  .cursor--hover .cursor__planet{
+    transform:translate(-50%,-50%) scale(1.18);
+    box-shadow:
+      inset 0 0 5px rgba(255,255,255,.28),
+      0 0 16px rgba(155,212,255,.36);
+  }
+  .cursor--hover .cursor__clouds{ opacity:.38; }
+  .cursor--hover .cursor__orbit{ width:36px; height:36px; }
+  .cursor--hover .cursor__satellite{ transform: translate(16px,-50%); }
+  .cursor--down  .cursor__planet{ filter: brightness(1.06) saturate(1.05); }
 
   @keyframes cursor-spin{ to { transform: translate(-50%,-50%) rotate(360deg); } }
 
   @media (prefers-reduced-motion: reduce){
     .cursor__orbit{ animation: none; }
+    .cursor__clouds{ animation: none; }
   }
 </style>
 </head>
@@ -189,7 +249,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...????</text>
       </g>
     </svg>
 
@@ -256,11 +316,12 @@
   </div>
 </div>
 
-<!-- Minimal cosmic cursor -->
+<!-- Cinematic cosmic cursor -->
 <div class="cursor" aria-hidden="true">
   <span class="cursor__orbit">
     <span class="cursor__satellite"></span>
   </span>
+  <span class="cursor__clouds"></span>
   <span class="cursor__planet"></span>
 </div>
 
@@ -268,7 +329,7 @@
   // Year
   document.getElementById('y').textContent = new Date().getFullYear();
 
-  // === Cursor follow + simple states ===
+  // === Cursor follow + states ===
   const cursorEl = document.querySelector('.cursor');
   document.addEventListener('mousemove', (e)=>{
     cursorEl.style.top  = e.clientY + 'px';
@@ -340,7 +401,7 @@
     lb.addEventListener('click', (e)=>{ if(!frame.contains(e.target)) close(); });
   })();
 
-  // ===== Liquify + PRISM — (unchanged logic) =====
+  // ===== Liquify + PRISM — prism fades out with the trail (same timing) =====
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
@@ -353,6 +414,7 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
+    // Text warp
     const MAX_IMPRINTS = 150;
     const LIFE = 9000;
     const BASE = 128;
@@ -365,6 +427,7 @@
     let last = {x: vb.width/2, y: vb.height/2};
     let vX = 0, vY = 0;
 
+    // Keep last direction for prism even after mouse leaves
     let lastDirX = 1, lastDirY = 0;
 
     function toVB(e){
