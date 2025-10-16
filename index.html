@@ -52,7 +52,7 @@
   .hero-center{text-align:left}
   .hero-svg{display:block;width:min(92vw,1100px);height:auto}
 
-  /* Poetic line: lowercase, airy spacing, deep indents (like your example) */
+  /* Poetic line: lowercase, airy spacing, deep indents */
   .hero-sub.poetic-note{
     font-size:0.9em;
     line-height:2.2;            /* more vertical space */
@@ -61,29 +61,41 @@
     color:var(--ink);
   }
   .poetic-note span{ display:block; }
-  .poetic-note .line2{ margin-left:12ch; }  /* ~like your middle line indent */
-  .poetic-note .line3{ margin-left:19ch; }  /* ~like your deepest indent */
+  .poetic-note .line2{ margin-left:12ch; }
+  .poetic-note .line3{ margin-left:19ch; }
 
   .panel .sub{ margin:6px 0; line-height:1.4 }
 
-  /* LIGHTBOX (centered, no border) */
+  /* ===== LIGHTBOX (centered, a bit smaller) + blurred/dimmed background ===== */
   .lightbox{
     position:fixed; inset:0; z-index:9998;
     display:none;
     align-items:center;
     justify-content:center;
-    background:transparent;
+    background:transparent; /* default */
   }
-  .lightbox.open{ display:flex; }
+  .lightbox.open{
+    display:flex;
+    /* subtle dim + blur behind */
+    background: rgba(7,8,12,.28);                  /* dim */
+    backdrop-filter: blur(6px) saturate(130%);      /* blur */
+    -webkit-backdrop-filter: blur(6px) saturate(130%);
+  }
+
   .lightbox__frame{
     position:relative;
     display:flex; align-items:center; justify-content:center;
     border:none; border-radius:14px; padding:8px; background:transparent;
-    max-width:min(1100px,92vw); max-height:92vh;
+    max-width:min(1000px,84vw);  /* smaller than before (was 1100/92vw) */
+    max-height:84vh;             /* smaller than before (was 92vh) */
     box-shadow:0 12px 40px rgba(0,0,0,.35);
   }
   .lightbox__media{
-    display:block; max-width:calc(92vw - 16px); max-height:calc(92vh - 16px); border-radius:10px;
+    display:block;
+    max-width:calc(84vw - 16px);
+    max-height:calc(84vh - 16px);
+    border-radius:10px;
+    background:#000; /* helpful for letterboxed videos */
   }
   .lightbox__close{
     position:absolute; top:6px; right:6px;
