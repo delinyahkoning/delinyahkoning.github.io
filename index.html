@@ -66,36 +66,43 @@
 
   .panel .sub{ margin:6px 0; line-height:1.4 }
 
-  /* ===== LIGHTBOX (centered, a bit smaller) + blurred/dimmed background ===== */
+  /* ===== LIGHTBOX (centered, smaller) with UNIFORM BLURRED/DIMMED overlay ===== */
   .lightbox{
     position:fixed; inset:0; z-index:9998;
     display:none;
     align-items:center;
     justify-content:center;
-    background:transparent; /* default */
+    background:transparent; /* all blur/dim handled by ::before */
   }
-  .lightbox.open{
-    display:flex;
-    /* subtle dim + blur behind */
-    background: rgba(7,8,12,.28);                  /* dim */
-    backdrop-filter: blur(6px) saturate(130%);      /* blur */
-    -webkit-backdrop-filter: blur(6px) saturate(130%);
+  .lightbox.open{ display:flex; }
+
+  /* Full-screen overlay to avoid any unblurred halo */
+  .lightbox::before{
+    content:"";
+    position:fixed; inset:0;
+    background: rgba(7,8,12,.32);                 /* dim */
+    backdrop-filter: blur(8px) saturate(130%);     /* blur */
+    -webkit-backdrop-filter: blur(8px) saturate(130%);
+    pointer-events:none;                           /* don't block clicks */
+    z-index:0;
   }
 
   .lightbox__frame{
-    position:relative;
+    position:relative; z-index:1;                  /* above overlay */
     display:flex; align-items:center; justify-content:center;
-    border:none; border-radius:14px; padding:8px; background:transparent;
-    max-width:min(1000px,84vw);  /* smaller than before (was 1100/92vw) */
-    max-height:84vh;             /* smaller than before (was 92vh) */
-    box-shadow:0 12px 40px rgba(0,0,0,.35);
+    border:none; border-radius:14px;
+    padding:0;                                     /* remove padding to kill halo */
+    background:transparent;
+    max-width:min(1000px,84vw);
+    max-height:84vh;
+    box-shadow:0 12px 40px rgba(0,0,0,.45);
   }
   .lightbox__media{
     display:block;
-    max-width:calc(84vw - 16px);
-    max-height:calc(84vh - 16px);
-    border-radius:10px;
-    background:#000; /* helpful for letterboxed videos */
+    max-width:84vw;
+    max-height:84vh;
+    border-radius:12px;
+    background:#000;                               /* nice for letterboxed videos */
   }
   .lightbox__close{
     position:absolute; top:6px; right:6px;
@@ -203,7 +210,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
       </g>
     </svg>
 
