@@ -27,7 +27,7 @@
   }
   section{padding:60px 0}
 
-  /* FLAT PANELS/CARDS (Option A) */
+  /* FLAT PANELS/CARDS */
   .panel{background:none;border:none;padding:24px}
   .grid{display:grid;gap:16px}
   .cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
@@ -52,18 +52,21 @@
   .hero-center{text-align:left}
   .hero-svg{display:block;width:min(92vw,1100px);height:auto}
 
-  /* Poetic line: smaller + offset indents */
+  /* Poetic line: lowercase, airy spacing, deep indents (like your example) */
   .hero-sub.poetic-note{
     font-size:0.9em;
-    line-height:1.5;
+    line-height:2.2;            /* more vertical space */
     margin-left:60px;
     margin-top:-10px;
     color:var(--ink);
   }
+  .poetic-note span{ display:block; }
+  .poetic-note .line2{ margin-left:12ch; }  /* ~like your middle line indent */
+  .poetic-note .line3{ margin-left:26ch; }  /* ~like your deepest indent */
 
   .panel .sub{ margin:6px 0; line-height:1.4 }
 
-  /* ========== LIGHTBOX: Centered popup panel (no border) ========== */
+  /* LIGHTBOX (centered, no border) */
   .lightbox{
     position:fixed; inset:0; z-index:9998;
     display:none;
@@ -72,23 +75,15 @@
     background:transparent;
   }
   .lightbox.open{ display:flex; }
-
   .lightbox__frame{
     position:relative;
     display:flex; align-items:center; justify-content:center;
-    border:none;                 /* no border */
-    border-radius:14px;
-    padding:8px;
-    background:transparent;
-    max-width:min(1100px,92vw);
-    max-height:92vh;
-    box-shadow:0 12px 40px rgba(0,0,0,.35); /* remove if you want zero lift */
+    border:none; border-radius:14px; padding:8px; background:transparent;
+    max-width:min(1100px,92vw); max-height:92vh;
+    box-shadow:0 12px 40px rgba(0,0,0,.35);
   }
   .lightbox__media{
-    display:block;
-    max-width:calc(92vw - 16px);
-    max-height:calc(92vh - 16px);
-    border-radius:10px;
+    display:block; max-width:calc(92vw - 16px); max-height:calc(92vh - 16px); border-radius:10px;
   }
   .lightbox__close{
     position:absolute; top:6px; right:6px;
@@ -101,7 +96,7 @@
   /* Hide native cursor so only the custom one shows */
   * { cursor:none !important; }
 
-  /* === Minimal cosmic cursor: solid planet + white moon === */
+  /* Minimal cosmic cursor: solid planet + white moon */
   .cursor{
     position:fixed; top:0; left:0;
     width:28px; height:28px;
@@ -196,15 +191,15 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...????</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
       </g>
     </svg>
 
-    <!-- Poetic line (offset like a mumble, slightly smaller) -->
+    <!-- Poetic line: big vertical space + deep indents -->
     <p class="hero-sub poetic-note">
-      just leaving traces<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of progress<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;here.
+      <span class="line1">just leaving traces</span>
+      <span class="line2">of progress</span>
+      <span class="line3">here.</span>
     </p>
   </div>
 </section>
@@ -256,7 +251,7 @@
 
 <footer>© <span id="y"></span>something should be here</footer>
 
-<!-- ===== Lightbox Markup ===== -->
+<!-- Lightbox -->
 <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="lightbox__frame" role="document">
     <button class="lightbox__close" type="button" aria-label="Close">
@@ -278,7 +273,7 @@
   // Year
   document.getElementById('y').textContent = new Date().getFullYear();
 
-  // === Cursor follow + simple states ===
+  // Cursor follow + simple states
   const cursorEl = document.querySelector('.cursor');
   document.addEventListener('mousemove', (e)=>{
     cursorEl.style.top  = e.clientY + 'px';
@@ -292,7 +287,7 @@
   document.addEventListener('mousedown', ()=> cursorEl.classList.add('cursor--down'));
   document.addEventListener('mouseup',   ()=> cursorEl.classList.remove('cursor--down'));
 
-  // ===== LIGHTBOX (centered + autoplay from start) =====
+  // LIGHTBOX (centered + autoplay from start)
   (function(){
     const lb = document.getElementById('lightbox');
     const frame = lb.querySelector('.lightbox__frame');
@@ -308,7 +303,6 @@
       clone.classList.add('lightbox__media');
 
       if (isVideo){
-        // start from 0 and autoplay with sound
         clone.removeAttribute('loop');
         clone.removeAttribute('muted');
         clone.controls = true;
@@ -334,7 +328,6 @@
       slot.innerHTML = '';
     }
 
-    // Open from thumbs
     document.querySelectorAll('.thumb[data-lightbox]').forEach(thumb=>{
       const media = thumb.querySelector('video, img') || thumb;
       const handleOpen = (e)=>{ openWithMedia(media); e.stopPropagation(); e.preventDefault(); };
@@ -344,13 +337,12 @@
       media.addEventListener('dblclick', handleOpen);
     });
 
-    // Close interactions
     closeBtn.addEventListener('click', close);
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
     lb.addEventListener('click', (e)=>{ if(!frame.contains(e.target)) close(); });
   })();
 
-  // ===== Liquify + PRISM — prism fades out with the trail (same timing) =====
+  // Liquify + PRISM
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
@@ -363,7 +355,6 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    // Text warp
     const MAX_IMPRINTS = 150;
     const LIFE = 9000;
     const BASE = 128;
@@ -376,7 +367,6 @@
     let last = {x: vb.width/2, y: vb.height/2};
     let vX = 0, vY = 0;
 
-    // Keep last direction for prism even after mouse leaves
     let lastDirX = 1, lastDirY = 0;
 
     function toVB(e){
@@ -402,7 +392,7 @@
       if (imprints.length > MAX_IMPRINTS) imprints.pop();
     });
 
-    svg.addEventListener('mouseleave', ()=>{ /* let it fade on its own */ });
+    svg.addEventListener('mouseleave', ()=>{ /* let it fade */ });
 
     function clamp(v){ return Math.max(0, Math.min(255, v)); }
     function mix(a,b,t){ return a*(1-t)+b*t; }
@@ -456,7 +446,7 @@
       nmEl.setAttributeNS('http://www.w3.org/1999/xlink','href', url);
     }
 
-    // Animate + RGB prism offsets — strength follows trail activity
+    // Animate + RGB prism offsets
     let smoothAmt = 0;
     let lastTime  = performance.now();
     let prevTarget = 0;
