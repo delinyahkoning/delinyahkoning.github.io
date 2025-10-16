@@ -122,7 +122,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
       </g>
     </svg>
 
@@ -333,7 +333,7 @@
 
       // Activity from the trail (0..1) — makes prism fade with the same timing as the warp
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const target = 1.5 * active; // gain unchanged, now independent of instantaneous velocity
+      const target = 2.5 * active; // gain unchanged, now independent of instantaneous velocity
 
       const now = performance.now();
       const dt  = now - lastTime;
