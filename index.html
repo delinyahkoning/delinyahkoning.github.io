@@ -101,10 +101,10 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          This is
+          This issssss
         </text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-        test #2.
+        a lil test
         </text>
       </g>
     </svg>
@@ -161,13 +161,13 @@
     c.width = vb.width; c.height = vb.height;
 
     // === Tweaks for stronger + longer trail ===
-    const MAX_IMPRINTS = 32;      // was 22
-    const LIFE = 1200;            // was 520 (ms)
-    const BASE = 128;
-    const BASE_RADIUS = 110;
-    const STRETCH = 2.6;
-    const TWIRL = 0.9;
-    const POWER = 1.0;
+    const MAX_IMPRINTS = 40;
+    const LIFE = 10000;
+    const BASE = 118;
+    const BASE_RADIUS = 100;
+    const STRETCH = 4;
+    const TWIRL = 2.0;
+    const POWER = 2.0;
 
     const imprints = []; // {x,y,vx,vy,t}
     let last = {x: vb.width/2, y: vb.height/2};
