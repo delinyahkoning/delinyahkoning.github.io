@@ -134,8 +134,8 @@
       </defs>
 
       <g filter="url(#liquify)">
-        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">this is</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">a lil test</text>
+        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">this isssss</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">a test</text>
       </g>
     </svg>
 
@@ -288,13 +288,13 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    const MAX_IMPRINTS = 150;   // long, smooth trail
-    const LIFE = 10000;         // 10s lifespan per imprint
+    const MAX_IMPRINTS = 30;
+    const LIFE = 5000;
     const BASE = 128;
-    const BASE_RADIUS = 110;
+    const BASE_RADIUS = 75;
     const STRETCH = 3.0;
     const TWIRL = 1.25;
-    const POWER = 1.25;
+    const POWER = 1.0;
 
     const imprints = []; // {x,y,vx,vy,t}
     let last = {x: vb.width/2, y: vb.height/2};
@@ -375,7 +375,7 @@
     let prevTarget = 0;
 
     // Tune: bigger ATTACK_MS = slower fade-in; RELEASE_MS = fade-out speed
-    const ATTACK_MS  = 1000;
+    const ATTACK_MS  = 600;
     const RELEASE_MS = 400;
 
     function animate(){
