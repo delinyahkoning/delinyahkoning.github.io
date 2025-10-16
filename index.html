@@ -121,8 +121,8 @@
       </defs>
 
       <g filter="url(#liquify)">
-        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">this is</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">a lil test</text>
+        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">are u...</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test?</text>
       </g>
     </svg>
 
@@ -212,7 +212,7 @@
     });
   })();
 
-  // ===== Liquify + PRISM — smoother decay + Safari-safe feImage updates =====
+  // ===== Liquify + PRISM — prism fades out with the trail (same timing) =====
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
@@ -225,9 +225,9 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    // --- Tuned for smoothness (no snap) ---
-    const MAX_IMPRINTS = 150;   // larger trail buffer
-    const LIFE = 9000;          // ~9s fade per imprint
+    // Text warp (unchanged)
+    const MAX_IMPRINTS = 150;
+    const LIFE = 9000;
     const BASE = 128;
     const BASE_RADIUS = 110;
     const STRETCH = 3.0;
@@ -237,6 +237,9 @@
     const imprints = []; // {x,y,vx,vy,t}
     let last = {x: vb.width/2, y: vb.height/2};
     let vX = 0, vY = 0;
+
+    // Keep last direction for prism even after mouse leaves
+    let lastDirX = 1, lastDirY = 0;
 
     function toVB(e){
       const r = svg.getBoundingClientRect();
@@ -250,10 +253,20 @@
       const p = toVB(e);
       vX = p.x - last.x; vY = p.y - last.y;
       last = p;
+
+      // update last non-zero direction
+      const vlen = Math.hypot(vX, vY);
+      if (vlen > 0.001) {
+        lastDirX = vX / vlen;
+        lastDirY = vY / vlen;
+      }
+
       imprints.unshift({x:p.x, y:p.y, vx:vX, vy:vY, t: performance.now()});
       if (imprints.length > MAX_IMPRINTS) imprints.pop();
     });
-    svg.addEventListener('mouseleave', ()=>{ vX = vY = 0; });
+
+    // Do not zero direction on mouseleave; let the trail drive the fade
+    svg.addEventListener('mouseleave', ()=>{ /* let it fade on its own */ });
 
     function clamp(v){ return Math.max(0, Math.min(255, v)); }
     function mix(a,b,t){ return a*(1-t)+b*t; }
@@ -270,7 +283,7 @@
         if (age > LIFE){ imprints.splice(i,1); continue; }
 
         const t = age / LIFE;
-        const ease = Math.pow(1 - t, 1.6); // a touch more easing near end
+        const ease = Math.pow(1 - t, 1.6);
         const grow = 1 + 0.9*t;
 
         const vlen = Math.hypot(it.vx, it.vy) || 1;
@@ -303,27 +316,24 @@
       }
 
       const url = c.toDataURL('image/png');
-
-      // Safari/WebKit sometimes ignores plain 'href' on feImage; set both:
       nmEl.setAttribute('href', url);
       nmEl.setAttributeNS('http://www.w3.org/1999/xlink','href', url);
     }
 
-    // === Animate + RGB prism offsets (balanced smoothing) ===
+    // === Animate + RGB prism offsets — strength follows trail activity ===
     let smoothAmt = 0;
     let lastTime  = performance.now();
     let prevTarget = 0;
 
-    const ATTACK_MS  = 700;   // speed ramp-in
-    const RELEASE_MS = 500;   // speed ramp-out
+    const ATTACK_MS  = 700;
+    const RELEASE_MS = 500; // short smoothing; overall decay is driven by trail LIFE
 
     function animate(){
       drawNormalMap();
 
-      // Strength from motion + trail activity
-      const vMag   = Math.min(1, Math.hypot(vX, vY) / 24);
+      // Activity from the trail (0..1) — makes prism fade with the same timing as the warp
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const target = 10.0 * vMag * active;
+      const target = 5.0 * active; // gain unchanged, now independent of instantaneous velocity
 
       const now = performance.now();
       const dt  = now - lastTime;
@@ -336,8 +346,8 @@
       smoothAmt += (target - smoothAmt) * alpha;
       prevTarget = target;
 
-      const dirLen = Math.hypot(vX, vY) || 1;
-      const dirX = vX / dirLen, dirY = vY / dirLen;
+      // Use last known direction so the prism doesn't snap on mouseleave
+      const dirX = lastDirX, dirY = lastDirY;
 
       const amt = smoothAmt;
       offR.setAttribute('dx', (-amt * 1.30 * dirX).toFixed(2));
