@@ -176,12 +176,12 @@
 
     // Stronger + longer trail (from our last tweak)
     const MAX_IMPRINTS = 100; // was 32
-    const LIFE = 7500; // was 1200 and then 5000
+    const LIFE = 10000; // was 1200 originally
     const BASE = 128;
     const BASE_RADIUS = 110;
     const STRETCH = 3; // was 2.6
     const TWIRL = 0.9;
-    const POWER = 1.0;
+    const POWER = 1.5; // was 1.0
 
     const imprints = []; // {x,y,vx,vy,t}
     let last = {x: vb.width/2, y: vb.height/2};
@@ -262,7 +262,7 @@
 
       const vMag = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const amt = 2.0 * vMag * active; // was 5.0
+      const amt = 3.5 * vMag * active; // was 5.0
 
       const dirLen = Math.hypot(vX, vY) || 1;
       const dirX = vX / dirLen, dirY = vY / dirLen;
