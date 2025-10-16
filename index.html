@@ -30,6 +30,15 @@
   .hero-svg{display:block;width:min(92vw,1100px);height:auto}
   .hero-sub{color:var(--muted);max-width:760px;margin:12px 0 0 40px;text-align:left}
 
+  /* Make images/videos fill the thumbnail nicely */
+  .thumb{ position:relative; overflow:hidden }
+  .thumb img, .thumb video{
+    width:100%; height:100%;
+    object-fit:cover;
+    border-radius:12px;
+    display:block;
+  }
+
   .cursor{
     position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
     pointer-events:none;background:rgba(155,212,255,.15);
@@ -117,21 +126,38 @@
     <div class="panel">
       <h2 style="margin-top:0">Featured Work</h2>
       <div class="grid cards" style="margin-top:12px">
+
+        <!-- 1) Space-themed Blender project (image) -->
         <article class="card">
-          <div class="thumb">Placeholder — Space-themed Blender project</div>
+          <div class="thumb">
+            <img src="assets/greenplanet.png"
+                 alt="Space-themed Blender render of a green planet"
+                 loading="lazy">
+          </div>
           <strong>Space Scene (Blender)</strong>
-          <div class="sub" style="font-size:13px">Placeholder</div>
+          <div class="sub" style="font-size:13px">Still image</div>
         </article>
+
+        <!-- 2) Spider modeled from scratch (video) -->
         <article class="card">
-          <div class="thumb">Placeholder — Spider modeled from scratch</div>
+          <div class="thumb">
+            <video src="assets/spiderwaving.mp4"
+                   autoplay muted loop playsinline></video>
+          </div>
           <strong>Spider Model (Blender)</strong>
-          <div class="sub" style="font-size:13px">Placeholder</div>
+          <div class="sub" style="font-size:13px">Turntable (video)</div>
         </article>
+
+        <!-- 3) Protein via Molecular Nodes (video) -->
         <article class="card">
-          <div class="thumb">Placeholder — Protein via Molecular Nodes</div>
+          <div class="thumb">
+            <video src="assets/md.mp4"
+                   autoplay muted loop playsinline></video>
+          </div>
           <strong>Protein Visualization (Blender)</strong>
-          <div class="sub" style="font-size:13px">Placeholder</div>
+          <div class="sub" style="font-size:13px">Molecular Nodes (video)</div>
         </article>
+
       </div>
     </div>
     <aside class="panel">
@@ -174,14 +200,14 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    // Stronger + longer trail (from our last tweak)
-    const MAX_IMPRINTS = 150; // was 32 and then 100
-    const LIFE = 10000; // was 1200 originally
+    // Your current tuned settings
+    const MAX_IMPRINTS = 150;
+    const LIFE = 10000;
     const BASE = 128;
     const BASE_RADIUS = 110;
-    const STRETCH = 3.0; // was 2.6
-    const TWIRL = 1.25; // was 0.9
-    const POWER = 1.25; // was 1.0
+    const STRETCH = 3.0;
+    const TWIRL = 1.25;
+    const POWER = 1.25;
 
     const imprints = []; // {x,y,vx,vy,t}
     let last = {x: vb.width/2, y: vb.height/2};
@@ -221,7 +247,7 @@
         if (age > LIFE){ imprints.splice(i,1); continue; }
 
         const t = age / LIFE;
-        const ease = Math.pow(1 - t, 1.5);
+        const ease = Math.pow(1 - t, 1.5); // slower fade near the end
         const grow = 1 + 0.9*t;
 
         const vlen = Math.hypot(it.vx, it.vy) || 1;
@@ -262,12 +288,12 @@
 
       const vMag = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const amt = 4.0 * vMag * active; // was 5.0
+      const amt = 4.0 * vMag * active;
 
       const dirLen = Math.hypot(vX, vY) || 1;
       const dirX = vX / dirLen, dirY = vY / dirLen;
 
-      // R opposite motion, G with motion, B perpendicular (stronger)
+      // R opposite motion, G with motion, B perpendicular
       offR.setAttribute('dx', (-amt * 1.25 * dirX).toFixed(2));
       offR.setAttribute('dy', (-amt * 1.25 * dirY).toFixed(2));
 
