@@ -15,15 +15,14 @@
   .tabs{display:flex;gap:10px;flex-wrap:wrap}.tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
   .tab:hover{background:#131623}.tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
   .hero{
-    /* less vertical space above the text */
     min-height:46vh;
     display:grid;
-    place-items:start;          /* align content to the top-left */
+    place-items:start;
     background:
       radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
       radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
       var(--bg);
-    padding:20px 0 16px;        /* add small top padding, keep tighter bottom */
+    padding:20px 0 16px;
   }
   section{padding:60px 0}
   .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
@@ -31,17 +30,14 @@
   .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#9aa0b3;font-size:14px;letter-spacing:.3px}
 
-  /* Left align hero content + subtitle under text at the same left start (x=40) */
   .hero-center{text-align:left}
   .hero-svg{display:block;width:min(92vw,1100px);height:auto}
   .hero-sub{color:var(--muted);max-width:760px;margin:12px 0 0 60px;text-align:left}
 
-  /* Thumb media fill + hover grow */
   .thumb{ position:relative; overflow:hidden; cursor:pointer; transition:transform .25s ease, box-shadow .25s ease }
   .thumb img, .thumb video{ width:100%; height:100%; object-fit:cover; border-radius:12px; display:block }
   .thumb:hover{ transform:scale(1.03); box-shadow:0 10px 24px rgba(0,0,0,.35) }
 
-  /* Fullscreen button overlay inside each thumb */
   .fs-btn{
     position:absolute; top:8px; right:8px; z-index:2;
     padding:6px 8px; font-size:14px; line-height:1; border-radius:8px;
@@ -50,7 +46,6 @@
   }
   .thumb:hover .fs-btn{ opacity:1 }
 
-  /* Global exit fullscreen button (appears while in FS) */
   #fs-exit{
     position:fixed; top:16px; right:16px; z-index:99999;
     padding:10px 12px; border-radius:10px;
@@ -59,10 +54,8 @@
   }
   body.fs-active #fs-exit{ display:block }
 
-  /* Tighter spacing between lines in About */
   .panel .sub{ margin:6px 0; line-height:1.4 }
 
-  /* Custom cursor — switched to semi-transparent white */
   .cursor{
     position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
     pointer-events:none;background:rgba(255,255,255,.15);
@@ -87,26 +80,21 @@
 
 <section class="hero">
   <div class="wrap hero-center">
-    <!-- Text inside SVG so we can apply paint-only displacement (no layout shift) -->
     <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <!-- Big filter region so nothing clips when displaced -->
         <filter id="liquify" x="-70%" y="-260%" width="240%" height="640%" filterUnits="objectBoundingBox">
-          <!-- Normal map from offscreen canvas -->
           <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
           <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
-
-          <!-- Base displacement -->
           <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68"
                              xChannelSelector="R" yChannelSelector="G" result="disp"/>
 
-          <!-- ===== Prism mask: strength of displacement (|map - neutral|) ===== -->
+          <!-- Strength mask -->
           <feFlood flood-color="rgb(128,128,0)" result="neutral"/>
-          <feBlend in="blur" in2="neutral" mode="difference" result="diff"/>          <!-- abs deviation -->
-          <feColorMatrix in="diff" type="saturate" values="0" result="strengthLum"/>  <!-- luminance -->
-          <feGaussianBlur in="strengthLum" stdDeviation="3" result="strength"/>       <!-- soften -->
+          <feBlend in="blur" in2="neutral" mode="difference" result="diff"/>
+          <feColorMatrix in="diff" type="saturate" values="0" result="strengthLum"/>
+          <feGaussianBlur in="strengthLum" stdDeviation="3" result="strength"/>
 
-          <!-- Isolate channels of displaced text, mask by strength, then offset -->
+          <!-- Channel separation -->
           <feColorMatrix in="disp" type="matrix" result="dispR"
             values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
           <feColorMatrix in="disp" type="matrix" result="dispG"
@@ -123,18 +111,17 @@
           <feOffset in="maskG" dx="0" dy="0" result="prismG" id="offG"/>
           <feOffset in="maskB" dx="0" dy="0" result="prismB" id="offB"/>
 
-          <!-- Merge RGB fringes behind, white text on top -->
           <feMerge>
             <feMergeNode in="prismR"/>
             <feMergeNode in="prismG"/>
             <feMergeNode in="prismB"/>
-            <feMergeNode in="disp"/> <!-- text stays on top -->
+            <feMergeNode in="disp"/>
           </feMerge>
         </filter>
       </defs>
 
       <g filter="url(#liquify)">
-        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">this isssss</text>
+        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">this issssss</text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">a test</text>
       </g>
     </svg>
@@ -145,46 +132,37 @@
   </div>
 </section>
 
-<!-- Tighter top padding for the first content section after hero -->
 <section style="padding-top:28px">
   <div class="wrap" style="display:grid;gap:20px;grid-template-columns:1.2fr .8fr">
     <div class="panel">
       <h2 style="margin-top:0">some of the cool stuff</h2>
       <div class="grid cards" style="margin-top:12px">
-
-        <!-- 1) Space-themed Blender project (video) -->
         <article class="card">
           <div class="thumb" data-fullscreen>
             <button class="fs-btn" type="button" aria-label="Fullscreen">⤢</button>
-            <video src="assets/greenplanet.mp4"
-                   autoplay muted loop playsinline></video>
+            <video src="assets/greenplanet.mp4" autoplay muted loop playsinline></video>
           </div>
           <strong>Imaginary planet</strong>
           <div class="sub" style="font-size:13px">Procedurally made in Blender</div>
         </article>
 
-        <!-- 2) Spider modeled from scratch (video) -->
         <article class="card">
           <div class="thumb" data-fullscreen>
             <button class="fs-btn" type="button" aria-label="Fullscreen">⤢</button>
-            <video src="assets/spiderwaving.mp4"
-                   autoplay muted loop playsinline></video>
+            <video src="assets/spiderwaving.mp4" autoplay muted loop playsinline></video>
           </div>
           <strong>Spider</strong>
           <div class="sub" style="font-size:13px">Procedurally made in Blender</div>
         </article>
 
-        <!-- 3) Protein via Molecular Nodes (video) -->
         <article class="card">
           <div class="thumb" data-fullscreen>
             <button class="fs-btn" type="button" aria-label="Fullscreen">⤢</button>
-            <video src="assets/md.mp4"
-                   autoplay muted loop playsinline></video>
+            <video src="assets/md.mp4" autoplay muted loop playsinline></video>
           </div>
           <strong>Protein Visualization</strong>
           <div class="sub" style="font-size:13px">MD trajectory in Blender</div>
         </article>
-
       </div>
     </div>
     <aside class="panel">
@@ -205,79 +183,39 @@
 <div class="cursor"></div>
 
 <script>
-  // Year + your cursor
+  // Year + cursor
   document.getElementById('y').textContent = new Date().getFullYear();
   const cursor=document.querySelector(".cursor");
   document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
   document.querySelectorAll("a,button").forEach(el=>{
-    el.addEventListener("mouseenter",()=>{
-      cursor.style.width="36px";
-      cursor.style.height="36px";
-      // white-ish hover
-      cursor.style.background="rgba(255,255,255,.25)";
-    });
-    el.addEventListener("mouseleave",()=>{
-      cursor.style.width="22px";
-      cursor.style.height="22px";
-      // white-ish default
-      cursor.style.background="rgba(255,255,255,.15)";
-    });
+    el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(255,255,255,.25)";});
+    el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(255,255,255,.15)";});
   });
 
-  // ================== Fullscreen controls for each thumb ==================
+  // Fullscreen controls
   (function(){
     const fsExitBtn = document.getElementById('fs-exit');
+    function requestFS(el){ (el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen||el.mozRequestFullScreen)?.call(el); }
+    function exitFS(){ (document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen||document.mozCancelFullScreen)?.call(document); }
+    function isFS(){ return document.fullscreenElement||document.webkitFullscreenElement||document.msFullscreenElement||document.mozFullScreenElement; }
 
-    function requestFS(el){
-      const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen;
-      if (rfs) rfs.call(el);
-    }
-    function exitFS(){
-      const efs = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen || document.mozCancelFullScreen;
-      if (efs) efs.call(document);
-    }
-    function isFS(){
-      return document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement || document.mozFullScreenElement;
-    }
-
-    // Enable click to fullscreen on each thumb, and button too
     document.querySelectorAll('.thumb[data-fullscreen]').forEach(thumb=>{
       const media = thumb.querySelector('video, img') || thumb;
-      // Click anywhere on the thumb enters fullscreen
-      thumb.addEventListener('click', (e)=>{
-        // avoid double-trigger when clicking the button (it will also bubble)
-        if (e.target.classList.contains('fs-btn')) return;
-        requestFS(media);
-      });
-      // Click on overlay button enters fullscreen
-      const btn = thumb.querySelector('.fs-btn');
-      if (btn){
-        btn.addEventListener('click', (e)=>{
-          e.stopPropagation();
-          requestFS(media);
-        });
-      }
-      // Optional: double-click media for fullscreen
+      thumb.addEventListener('click', (e)=>{ if (e.target.classList.contains('fs-btn')) return; requestFS(media); });
+      const btn = thumb.querySelector('.fs-btn'); if (btn){ btn.addEventListener('click',(e)=>{ e.stopPropagation(); requestFS(media); }); }
       media.addEventListener('dblclick', (e)=>{ e.stopPropagation(); requestFS(media); });
     });
 
-    // Exit button
     fsExitBtn.addEventListener('click', exitFS);
-
-    // Toggle UI state based on fullscreen changes
     ['fullscreenchange','webkitfullscreenchange','msfullscreenchange','mozfullscreenchange'].forEach(ev=>{
-      document.addEventListener(ev, ()=>{
-        if (isFS()){ document.body.classList.add('fs-active'); }
-        else { document.body.classList.remove('fs-active'); }
-      });
+      document.addEventListener(ev, ()=>{ document.body.classList.toggle('fs-active', !!isFS()); });
     });
   })();
 
-  // ================== Liquify-like local warp (no alpha change) + PRISM (tuned) ==================
+  // ===== Liquify + PRISM — smoother decay + Safari-safe feImage updates =====
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
-    const dm   = document.getElementById('dm');
     const offR = document.getElementById('offR');
     const offG = document.getElementById('offG');
     const offB = document.getElementById('offB');
@@ -287,17 +225,18 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    const MAX_IMPRINTS = 100;
-    const LIFE = 1000;
-    const BASE = 65;
-    const BASE_RADIUS = 65;
-    const STRETCH = 3;
-    const TWIRL = 1.75;
-    const POWER = 0.9;
+    // --- Tuned for smoothness (no snap) ---
+    const MAX_IMPRINTS = 150;   // larger trail buffer
+    const LIFE = 9000;          // ~9s fade per imprint
+    const BASE = 128;
+    const BASE_RADIUS = 110;
+    const STRETCH = 3.0;
+    const TWIRL = 1.25;
+    const POWER = 1.25;
 
     const imprints = []; // {x,y,vx,vy,t}
     let last = {x: vb.width/2, y: vb.height/2};
-    let vX = 0, vY = 0; // current mouse velocity (for prism direction)
+    let vX = 0, vY = 0;
 
     function toVB(e){
       const r = svg.getBoundingClientRect();
@@ -311,11 +250,9 @@
       const p = toVB(e);
       vX = p.x - last.x; vY = p.y - last.y;
       last = p;
-
       imprints.unshift({x:p.x, y:p.y, vx:vX, vy:vY, t: performance.now()});
       if (imprints.length > MAX_IMPRINTS) imprints.pop();
     });
-
     svg.addEventListener('mouseleave', ()=>{ vX = vY = 0; });
 
     function clamp(v){ return Math.max(0, Math.min(255, v)); }
@@ -333,7 +270,7 @@
         if (age > LIFE){ imprints.splice(i,1); continue; }
 
         const t = age / LIFE;
-        const ease = Math.pow(1 - t, 1.5); // slower fade near the end
+        const ease = Math.pow(1 - t, 1.6); // a touch more easing near end
         const grow = 1 + 0.9*t;
 
         const vlen = Math.hypot(it.vx, it.vy) || 1;
@@ -365,34 +302,36 @@
         ctx.restore();
       }
 
-      nmEl.setAttribute('href', c.toDataURL('image/png'));
+      const url = c.toDataURL('image/png');
+
+      // Safari/WebKit sometimes ignores plain 'href' on feImage; set both:
+      nmEl.setAttribute('href', url);
+      nmEl.setAttributeNS('http://www.w3.org/1999/xlink','href', url);
     }
 
-    // ==== Animate + RGB prism offsets (with slower attack smoothing) ====
-    let smoothAmt = 0;                    // smoothed prism strength
+    // === Animate + RGB prism offsets (balanced smoothing) ===
+    let smoothAmt = 0;
     let lastTime  = performance.now();
     let prevTarget = 0;
 
-    // Tune: bigger ATTACK_MS = slower fade-in; RELEASE_MS = fade-out speed
-    const ATTACK_MS  = 10000;
-    const RELEASE_MS = 10000;
+    const ATTACK_MS  = 700;   // speed ramp-in
+    const RELEASE_MS = 500;   // speed ramp-out
 
     function animate(){
       drawNormalMap();
 
-      // Raw target strength driven by motion + trail activity
+      // Strength from motion + trail activity
       const vMag   = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const target = 7.0 * vMag * active; // base amount
+      const target = 4.0 * vMag * active;
 
-      // Exponential smoothing toward target (slower attack, faster release)
       const now = performance.now();
       const dt  = now - lastTime;
       lastTime  = now;
 
       const rising = target > prevTarget;
       const tauMs  = rising ? ATTACK_MS : RELEASE_MS;
-      const alpha  = 1 - Math.exp(-dt / Math.max(1, tauMs)); // 0..1
+      const alpha  = 1 - Math.exp(-dt / Math.max(1, tauMs));
 
       smoothAmt += (target - smoothAmt) * alpha;
       prevTarget = target;
@@ -400,16 +339,15 @@
       const dirLen = Math.hypot(vX, vY) || 1;
       const dirX = vX / dirLen, dirY = vY / dirLen;
 
-      // Apply smoothed strength to channel offsets
       const amt = smoothAmt;
-      offR.setAttribute('dx', (-amt * 1.25 * dirX).toFixed(2));
-      offR.setAttribute('dy', (-amt * 1.25 * dirY).toFixed(2));
+      offR.setAttribute('dx', (-amt * 1.30 * dirX).toFixed(2));
+      offR.setAttribute('dy', (-amt * 1.30 * dirY).toFixed(2));
 
-      offG.setAttribute('dx', ( amt * 0.90 * dirX).toFixed(2));
-      offG.setAttribute('dy', ( amt * 0.90 * dirY).toFixed(2));
+      offG.setAttribute('dx', ( amt * 0.95 * dirX).toFixed(2));
+      offG.setAttribute('dy', ( amt * 0.95 * dirY).toFixed(2));
 
-      offB.setAttribute('dx', ( amt * 1.40 * (-dirY)).toFixed(2)); // 90° turn
-      offB.setAttribute('dy', ( amt * 1.40 * ( dirX)).toFixed(2));
+      offB.setAttribute('dx', ( amt * 1.45 * (-dirY)).toFixed(2));
+      offB.setAttribute('dy', ( amt * 1.45 * ( dirX)).toFixed(2));
 
       requestAnimationFrame(animate);
     }
