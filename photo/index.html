@@ -131,12 +131,8 @@
     thumb.appendChild(btn);
     thumb.appendChild(img);
 
-    const cap = document.createElement('figcaption');
-    cap.className = 'caption';
-    cap.textContent = name;
+    item.appendChild(thumb); // no caption
 
-    item.appendChild(thumb);
-    item.appendChild(cap);
     gallery.appendChild(item);
   });
 
