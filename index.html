@@ -9,7 +9,7 @@
   :root{
     --bg:#0a0b0f; --ink:#ffffff; --muted:#9aa0b3; --panel:#10121a; --accent:#9bd4ff;
     --radius:18px; --max:1200px; --content-indent:14px;
-    --mint:#a8ffd3; --peach:#ffd6a5;
+    --mint:#a8ffd3; --peach:#ffd6a5; --lilac:#c8a6ff; --rose:#ffb3c6; --sky:#9bd4ff; --mist:#dfe7f1;
   }
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
@@ -56,16 +56,15 @@
   .hero-center{text-align:left}
   .hero-svg{display:block;width:min(92vw,1100px);height:auto}
 
-  /* Poetic line: lowercase, airy spacing, deep indents — Century/Times */
+  /* Poetic line */
   .hero-sub.poetic-note{
     font-size:0.9em;
     line-height:2.2;
     margin-left:60px;
     margin-top:-10px;
+    margin-bottom:40px;
     color:var(--ink);
     font-family:"Century Schoolbook", Century, "Times New Roman", Times, Georgia, serif;
-    /* optional extra breathing room; tweak if desired */
-    margin-bottom:40px;
   }
   .poetic-note span{ display:block; }
   .poetic-note .line2{ margin-left:12ch; }
@@ -73,7 +72,7 @@
 
   .panel .sub{ margin:6px 0; line-height:1.4 }
 
-  /* Pill-style section headers (lowercase outline tags) */
+  /* Pill-style headers */
   .pill-title{
     display:inline-block;
     padding:6px 14px;
@@ -82,17 +81,19 @@
     font-weight:500;
     text-transform:lowercase;
     margin:0 0 20px var(--content-indent);
-    border:1px solid currentColor;       /* outline takes the element color */
-    line-height:1;                        /* keep the pill tight */
+    border:1px solid currentColor;
+    line-height:1;
   }
   .pill--mint{  color:var(--mint);  }
   .pill--peach{ color:var(--peach); }
+  /* Align the 'about' pill flush with its column text */
+  aside.panel .pill-title{ margin-left:0; }
 
   /* ===== LIGHTBOX (centered, smaller) with UNIFORM BLURRED/DIMMED overlay ===== */
   .lightbox{
     position:fixed; inset:0; z-index:9998;
     display:none; align-items:center; justify-content:center;
-    background:transparent; /* all blur/dim handled by ::before */
+    background:transparent;
   }
   .lightbox.open{ display:flex; }
   .lightbox::before{
@@ -123,7 +124,7 @@
   /* Hide native cursor so only the custom one shows */
   * { cursor:none !important; }
 
-  /* Minimal cosmic cursor: solid planet + white moon */
+  /* Minimal cosmic cursor + themeable colors */
   .cursor{
     position:fixed; top:0; left:0;
     width:28px; height:28px;
@@ -134,7 +135,8 @@
     position:absolute; left:50%; top:50%;
     width:16px; height:16px; border-radius:50%;
     transform:translate(-50%,-50%);
-    background: var(--accent);
+    background: var(--accent); /* default */
+    transition: background .15s ease;
   }
   .cursor__orbit{
     position:absolute; left:50%; top:50%;
@@ -146,12 +148,23 @@
     position:absolute; left:50%; top:50%;
     width:6px; height:6px; border-radius:50%;
     transform: translate(11px,-50%);
-    background: var(--ink);
+    background: var(--ink); /* default */
+    transition: background .15s ease;
   }
   .cursor--hover .cursor__planet{ transform:translate(-50%,-50%) scale(1.12); }
   .cursor--hover .cursor__orbit{ width:34px; height:34px; }
   .cursor--hover .cursor__satellite{ transform: translate(15px,-50%); }
   .cursor--down .cursor__planet{ transform:translate(-50%,-50%) scale(1.0); }
+
+  /* Theme classes for hover over specific cards */
+  .cursor--skymist     .cursor__planet{ background: var(--sky); }
+  .cursor--skymist     .cursor__satellite{ background: var(--mist); }
+
+  .cursor--lilacrose   .cursor__planet{ background: var(--lilac); }
+  .cursor--lilacrose   .cursor__satellite{ background: var(--rose); }
+
+  .cursor--mintapricot .cursor__planet{ background: var(--mint); }
+  .cursor--mintapricot .cursor__satellite{ background: var(--peach); }
 
   @keyframes cursor-spin{ to { transform: translate(-50%,-50%) rotate(360deg); } }
   @media (prefers-reduced-motion: reduce){ .cursor__orbit{ animation:none; } }
@@ -208,7 +221,6 @@
       </g>
     </svg>
 
-    <!-- Poetic line -->
     <p class="hero-sub poetic-note">
       <span class="line1">just leaving traces</span>
       <span class="line2">of progress</span>
@@ -223,7 +235,7 @@
       <h2 class="pill-title pill--mint">stuff i made</h2>
       <div class="grid cards" style="margin-top:12px">
         <article class="card">
-          <div class="thumb" data-lightbox>
+          <div class="thumb" data-lightbox data-cursor="skymist">
             <button class="fs-btn" type="button" aria-label="Open">⤢</button>
             <video src="assets/greenplanet.mp4" autoplay muted loop playsinline></video>
           </div>
@@ -232,7 +244,7 @@
         </article>
 
         <article class="card">
-          <div class="thumb" data-lightbox>
+          <div class="thumb" data-lightbox data-cursor="lilacrose">
             <button class="fs-btn" type="button" aria-label="Open">⤢</button>
             <video src="assets/spiderwaving.mp4" autoplay muted loop playsinline></video>
           </div>
@@ -241,7 +253,7 @@
         </article>
 
         <article class="card">
-          <div class="thumb" data-lightbox>
+          <div class="thumb" data-lightbox data-cursor="mintapricot">
             <button class="fs-btn" type="button" aria-label="Open">⤢</button>
             <video src="assets/md.mp4" autoplay muted loop playsinline></video>
           </div>
@@ -250,6 +262,7 @@
         </article>
       </div>
     </div>
+
     <aside class="panel">
       <h2 class="pill-title pill--peach">about</h2>
       <p class="sub">something should be here as well</p>
@@ -497,6 +510,21 @@
       requestAnimationFrame(animate);
     }
     animate();
+  })();
+
+  // Cursor theme switching for each card
+  (function(){
+    const cursor = document.querySelector('.cursor');
+    document.querySelectorAll('.thumb[data-cursor]').forEach(thumb=>{
+      const theme = thumb.getAttribute('data-cursor'); // skymist / lilacrose / mintapricot
+      thumb.addEventListener('mouseenter', ()=> {
+        cursor.classList.remove('cursor--skymist','cursor--lilacrose','cursor--mintapricot');
+        cursor.classList.add('cursor--' + theme);
+      });
+      thumb.addEventListener('mouseleave', ()=> {
+        cursor.classList.remove('cursor--skymist','cursor--lilacrose','cursor--mintapricot');
+      });
+    });
   })();
 </script>
 </body>
