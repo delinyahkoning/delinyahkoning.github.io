@@ -101,8 +101,8 @@
       </defs>
 
       <g filter="url(#liquify)">
-        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">This issss</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">a teeny tiny test</text>
+        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">This is</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">a lil test :)</text>
       </g>
     </svg>
 
@@ -175,12 +175,12 @@
     c.width = vb.width; c.height = vb.height;
 
     // Stronger + longer trail (from our last tweak)
-    const MAX_IMPRINTS = 100; // was 32
+    const MAX_IMPRINTS = 150; // was 32 and then 100
     const LIFE = 10000; // was 1200 originally
     const BASE = 128;
     const BASE_RADIUS = 110;
-    const STRETCH = 3; // was 2.6
-    const TWIRL = 0.9;
+    const STRETCH = 3.0; // was 2.6
+    const TWIRL = 2.0; // was 0.9
     const POWER = 1.5; // was 1.0
 
     const imprints = []; // {x,y,vx,vy,t}
@@ -262,7 +262,7 @@
 
       const vMag = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const amt = 3.5 * vMag * active; // was 5.0
+      const amt = 4.0 * vMag * active; // was 5.0
 
       const dirLen = Math.hypot(vX, vY) || 1;
       const dirX = vX / dirLen, dirY = vY / dirLen;
