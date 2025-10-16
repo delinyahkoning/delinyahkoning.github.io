@@ -15,13 +15,25 @@
   .hero{padding:60px 0 30px;text-align:center}
   h1{font-size:clamp(32px,5vw,54px);margin:0}.sub{color:var(--muted)}
   section{padding:50px 0}
-  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
-  .thumb{position:relative;aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;overflow:hidden;cursor:pointer;transition:transform .25s ease, box-shadow .25s ease}
-  .thumb:hover{ transform:scale(1.03); box-shadow:0 10px 24px rgba(0,0,0,.35) }
-  .thumb img{width:100%;height:100%;object-fit:cover;display:block;border-radius:12px}
 
-  /* Fullscreen overlay button per item */
+  /* Masonry columns: keep full images (no crop) */
+  .gallery{column-gap:16px}
+  @media (min-width:480px){ .gallery{column-count:2} }
+  @media (min-width:860px){ .gallery{column-count:3} }
+  @media (min-width:1180px){ .gallery{column-count:4} }
+
+  .item{
+    break-inside:avoid; -webkit-column-break-inside:avoid; margin:0 0 16px;
+    background:#0d0f16; border:1px solid #232634; border-radius:14px; overflow:hidden;
+  }
+  .thumb{position:relative; cursor:pointer}
+  .thumb img{
+    display:block; width:100%; height:auto; object-fit:contain; /* show whole picture */
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .thumb:hover img{ transform:scale(1.03) }
+
+  /* Small overlay button (appears on hover) */
   .fs-btn{
     position:absolute; top:8px; right:8px; z-index:2;
     padding:6px 8px; font-size:14px; line-height:1; border-radius:8px;
@@ -29,6 +41,9 @@
     opacity:0; transition:opacity .2s ease; user-select:none;
   }
   .thumb:hover .fs-btn{ opacity:1 }
+
+  /* Title under image */
+  .caption{display:block; padding:10px 12px 12px; font-weight:600}
 
   /* Global exit fullscreen button */
   #fs-exit{
@@ -39,7 +54,7 @@
   }
   body.fs-active #fs-exit{ display:block }
 
-  /* === Custom Cursor (keeps native pointer) === */
+  /* Custom cursor (keeps native pointer) */
   .cursor{
     position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
     pointer-events:none;background:rgba(155,212,255,.15);
@@ -65,19 +80,21 @@
 <section class="hero">
   <div class="wrap">
     <h1>Photo</h1>
-    <p class="sub">[...]</p>
+    <p class="sub">Stills, grading, directing, short-form edits.</p>
   </div>
 </section>
 
 <section>
-  <div class="wrap grid" id="gallery"></div>
+  <div class="wrap">
+    <div id="gallery" class="gallery"></div>
+  </div>
 </section>
 
 <button id="fs-exit" type="button" aria-label="Exit fullscreen">Exit fullscreen (Esc)</button>
 <div class="cursor"></div>
 
 <script>
-  // ---- Custom cursor (keeps system cursor) ----
+  // Custom cursor
   const cursor=document.querySelector(".cursor");
   document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
   document.querySelectorAll("a,button").forEach(el=>{
@@ -85,7 +102,7 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // ---- Gallery filenames (exactly as in /assets) ----
+  // Filenames from /assets (exact case)
   const files = [
     "IMG_0243.JPG","IMG_7454.jpg","IMG_7453.jpg","IMG_7624.jpg","IMG_7640.jpg",
     "IMG_8062.jpg","IMG_8098.jpg","IMG_8074.jpg","IMG_6604.jpg","IMG_6595.jpg",
@@ -93,89 +110,53 @@
     "IMG_2179.JPG","IMG_1963.png","melkweg.png"
   ];
 
-  // Fisher–Yates shuffle each load
-  function shuffle(arr){
-    const a = arr.slice();
-    for(let i=a.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*(i+1));
-      [a[i],a[j]] = [a[j],a[i]];
-    }
-    return a;
-  }
+  // Shuffle on each load
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
-  // Build cards
   const gallery = document.getElementById('gallery');
-  const shuffled = shuffle(files);
-  shuffled.forEach(name=>{
-    const article = document.createElement('article');
-    article.className = 'card';
+  shuffle(files).forEach(name=>{
+    const item = document.createElement('figure');
+    item.className = 'item';
 
     const thumb = document.createElement('div');
     thumb.className = 'thumb';
     thumb.setAttribute('data-fullscreen','');
 
     const btn = document.createElement('button');
-    btn.className = 'fs-btn';
-    btn.type = 'button';
-    btn.setAttribute('aria-label','Fullscreen');
-    btn.textContent = '⤢';
+    btn.className = 'fs-btn'; btn.type='button'; btn.setAttribute('aria-label','Fullscreen'); btn.textContent='⤢';
 
     const img = document.createElement('img');
-    img.loading = 'lazy';
-    img.src = `/assets/${name}`;
-    img.alt = name;
+    img.loading='lazy'; img.src=`/assets/${name}`; img.alt=name;
 
     thumb.appendChild(btn);
     thumb.appendChild(img);
 
-    const title = document.createElement('strong');
-    title.textContent = name;
+    const cap = document.createElement('figcaption');
+    cap.className = 'caption';
+    cap.textContent = name;
 
-    article.appendChild(thumb);
-    article.appendChild(title);
-
-    gallery.appendChild(article);
+    item.appendChild(thumb);
+    item.appendChild(cap);
+    gallery.appendChild(item);
   });
 
-  // ---- Fullscreen controls (like Home) ----
+  // Fullscreen controls
   (function(){
     const fsExitBtn = document.getElementById('fs-exit');
+    function requestFS(el){ (el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen||el.mozRequestFullScreen)?.call(el); }
+    function exitFS(){ (document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen||document.mozCancelFullScreen)?.call(document); }
+    function isFS(){ return document.fullscreenElement||document.webkitFullscreenElement||document.msFullscreenElement||document.mozFullScreenElement; }
 
-    function requestFS(el){
-      const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen;
-      if (rfs) rfs.call(el);
-    }
-    function exitFS(){
-      const efs = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen || document.mozCancelFullScreen;
-      if (efs) efs.call(document);
-    }
-    function isFS(){
-      return document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement || document.mozFullScreenElement;
-    }
-
-    // Enable click-to-FS on each thumb and on the small overlay button
     document.querySelectorAll('.thumb[data-fullscreen]').forEach(thumb=>{
       const media = thumb.querySelector('img');
-
-      thumb.addEventListener('click',(e)=>{
-        if (e.target.classList.contains('fs-btn')) return; // button handler does its own call
-        requestFS(media);
-      });
-
-      const btn = thumb.querySelector('.fs-btn');
-      btn.addEventListener('click',(e)=>{ e.stopPropagation(); requestFS(media); });
-
-      // Optional double-click
+      thumb.addEventListener('click',(e)=>{ if(e.target.classList.contains('fs-btn')) return; requestFS(media); });
+      thumb.querySelector('.fs-btn').addEventListener('click',(e)=>{ e.stopPropagation(); requestFS(media); });
       media.addEventListener('dblclick',(e)=>{ e.stopPropagation(); requestFS(media); });
     });
 
     fsExitBtn.addEventListener('click', exitFS);
-
     ['fullscreenchange','webkitfullscreenchange','msfullscreenchange','mozfullscreenchange'].forEach(ev=>{
-      document.addEventListener(ev, ()=>{
-        if (isFS()){ document.body.classList.add('fs-active'); }
-        else { document.body.classList.remove('fs-active'); }
-      });
+      document.addEventListener(ev, ()=>{ document.body.classList.toggle('fs-active', !!isFS()); });
     });
   })();
 </script>
