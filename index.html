@@ -122,12 +122,12 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
       </g>
     </svg>
 
     <p class="hero-sub" style="margin-left:60px; margin-top:-10px; color:var(--ink);">
-      Here I drop cool stuff to keep track of my own progress/
+      Here I drop cool stuff to keep track of my own progress
     </p>
   </div>
 </section>
@@ -231,7 +231,7 @@
     const BASE = 128;
     const BASE_RADIUS = 110;
     const STRETCH = 3.0;
-    const TWIRL = 2.0;
+    const TWIRL = 1.8;
     const POWER = 1.5;
 
     const imprints = []; // {x,y,vx,vy,t}
@@ -333,7 +333,7 @@
 
       // Activity from the trail (0..1) — makes prism fade with the same timing as the warp
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const target = 3.0 * active; // gain unchanged, now independent of instantaneous velocity
+      const target = 1.5 * active; // gain unchanged, now independent of instantaneous velocity
 
       const now = performance.now();
       const dt  = now - lastTime;
