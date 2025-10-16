@@ -134,7 +134,7 @@
       </defs>
 
       <g filter="url(#liquify)">
-        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">this isssss</text>
+        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">this is</text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">a test</text>
       </g>
     </svg>
@@ -291,9 +291,9 @@
     const MAX_IMPRINTS = 30;
     const LIFE = 5000;
     const BASE = 128;
-    const BASE_RADIUS = 75;
+    const BASE_RADIUS = 100;
     const STRETCH = 3.0;
-    const TWIRL = 1.25;
+    const TWIRL = 1.45;
     const POWER = 1.0;
 
     const imprints = []; // {x,y,vx,vy,t}
@@ -384,7 +384,7 @@
       // Raw target strength driven by motion + trail activity
       const vMag   = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const target = 6.0 * vMag * active; // base amount
+      const target = 4.0 * vMag * active; // base amount
 
       // Exponential smoothing toward target (slower attack, faster release)
       const now = performance.now();
