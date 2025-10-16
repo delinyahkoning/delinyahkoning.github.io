@@ -122,7 +122,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
       </g>
     </svg>
 
@@ -212,11 +212,10 @@
     });
   })();
 
-  // ===== Liquify + PRISM — both warp and prism use the same symmetric fade =====
+  // ===== Liquify + PRISM — prism fades out with the trail (same timing) =====
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
-    const dm   = document.getElementById('dm');  // <feDisplacementMap>
     const offR = document.getElementById('offR');
     const offG = document.getElementById('offG');
     const offB = document.getElementById('offB');
@@ -226,7 +225,7 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    // Trail / warp settings
+    // Text warp (unchanged)
     const MAX_IMPRINTS = 150;
     const LIFE = 9000;
     const BASE = 128;
@@ -235,15 +234,11 @@
     const TWIRL = 1.8;
     const POWER = 1.5;
 
-    // Displacement base scale and a tiny baseline to avoid a hard snap to 0
-    const BASE_DM_SCALE = 68;
-    const BASELINE = 0.06; // 6% residual when activity is near 0
-
     const imprints = []; // {x,y,vx,vy,t}
     let last = {x: vb.width/2, y: vb.height/2};
     let vX = 0, vY = 0;
 
-    // Keep last direction so prism doesn't snap on mouseleave
+    // Keep last direction for prism even after mouse leaves
     let lastDirX = 1, lastDirY = 0;
 
     function toVB(e){
@@ -259,6 +254,7 @@
       vX = p.x - last.x; vY = p.y - last.y;
       last = p;
 
+      // update last non-zero direction
       const vlen = Math.hypot(vX, vY);
       if (vlen > 0.001) {
         lastDirX = vX / vlen;
@@ -269,8 +265,8 @@
       if (imprints.length > MAX_IMPRINTS) imprints.pop();
     });
 
-    // Let the trail fade on its own after mouse leaves
-    svg.addEventListener('mouseleave', ()=>{ /* no zeroing; keep lastDir */ });
+    // Do not zero direction on mouseleave; let the trail drive the fade
+    svg.addEventListener('mouseleave', ()=>{ /* let it fade on its own */ });
 
     function clamp(v){ return Math.max(0, Math.min(255, v)); }
     function mix(a,b,t){ return a*(1-t)+b*t; }
@@ -324,30 +320,25 @@
       nmEl.setAttributeNS('http://www.w3.org/1999/xlink','href', url);
     }
 
-    // === Animate — one symmetric envelope drives BOTH warp and prism ===
-    let smoothAmt = 0;             // 0..1 smoothed activity
+    // === Animate + RGB prism offsets — strength follows trail activity ===
+    let smoothAmt = 0;
     let lastTime  = performance.now();
     let prevTarget = 0;
 
-    // Symmetric timing (fade-in = fade-out)
     const ATTACK_MS  = 700;
-    const RELEASE_MS = 700;
-
-    // Prism gain (keeps visual intensity similar to what you liked)
-    const PRISM_GAIN = 2.5;
+    const RELEASE_MS = 500; // short smoothing; overall decay is driven by trail LIFE
 
     function animate(){
       drawNormalMap();
 
-      // Activity from current trail occupancy (0..1)
+      // Activity from the trail (0..1) — makes prism fade with the same timing as the warp
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const target = active;
+      const target = 2.5 * active; // gain unchanged, now independent of instantaneous velocity
 
       const now = performance.now();
       const dt  = now - lastTime;
       lastTime  = now;
 
-      // Symmetric smoothing
       const rising = target > prevTarget;
       const tauMs  = rising ? ATTACK_MS : RELEASE_MS;
       const alpha  = 1 - Math.exp(-dt / Math.max(1, tauMs));
@@ -355,22 +346,18 @@
       smoothAmt += (target - smoothAmt) * alpha;
       prevTarget = target;
 
-      // --- Apply to warp (displacement) ---
-      const warpAmt = BASELINE + (1 - BASELINE) * smoothAmt; // keep tiny baseline
-      dm.setAttribute('scale', (BASE_DM_SCALE * warpAmt).toFixed(2));
-
-      // --- Apply to prism (RGB offsets) ---
+      // Use last known direction so the prism doesn't snap on mouseleave
       const dirX = lastDirX, dirY = lastDirY;
-      const prismAmt = PRISM_GAIN * smoothAmt;
 
-      offR.setAttribute('dx', (-prismAmt * 1.30 * dirX).toFixed(2));
-      offR.setAttribute('dy', (-prismAmt * 1.30 * dirY).toFixed(2));
+      const amt = smoothAmt;
+      offR.setAttribute('dx', (-amt * 1.30 * dirX).toFixed(2));
+      offR.setAttribute('dy', (-amt * 1.30 * dirY).toFixed(2));
 
-      offG.setAttribute('dx', ( prismAmt * 0.95 * dirX).toFixed(2));
-      offG.setAttribute('dy', ( prismAmt * 0.95 * dirY).toFixed(2));
+      offG.setAttribute('dx', ( amt * 0.95 * dirX).toFixed(2));
+      offG.setAttribute('dy', ( amt * 0.95 * dirY).toFixed(2));
 
-      offB.setAttribute('dx', ( prismAmt * 1.45 * (-dirY)).toFixed(2));
-      offB.setAttribute('dy', ( prismAmt * 1.45 * ( dirX)).toFixed(2));
+      offB.setAttribute('dx', ( amt * 1.45 * (-dirY)).toFixed(2));
+      offB.setAttribute('dy', ( amt * 1.45 * ( dirX)).toFixed(2));
 
       requestAnimationFrame(animate);
     }
