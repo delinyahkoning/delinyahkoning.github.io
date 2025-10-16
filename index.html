@@ -63,22 +63,26 @@
     transition:width .15s,height .15s,background .2s;z-index:9999;
   }
 
-  /* ========== LIGHTBOX (Centered panel with just a border) ========== */
+  /* ========== LIGHTBOX: Centered panel with just a border ========== */
   .lightbox{
     position:fixed; inset:0; z-index:9998;
-    display:none; justify-content:center; align-items:center;
-    background:transparent;               /* no dimming — page remains visible */
+    display:none;            /* hidden by default */
+    align-items:center;      /* vertical centering */
+    justify-content:center;  /* horizontal centering */
+    background:transparent;  /* keep page visible; no dim */
   }
-  .lightbox.open{ display:flex }
+  .lightbox.open{ display:flex; } /* show & center */
+
   .lightbox__frame{
     position:relative;
+    display:flex; align-items:center; justify-content:center;
     border:1px solid rgba(255,255,255,.35);
     border-radius:14px;
-    padding:8px;                          /* creates a tiny gap between border & media */
+    padding:8px;
     background:transparent;
     max-width:min(1100px,92vw);
     max-height:92vh;
-    box-shadow:0 12px 40px rgba(0,0,0,.35); /* subtle lift; remove if you want zero depth */
+    box-shadow:0 12px 40px rgba(0,0,0,.35);
   }
   .lightbox__media{
     display:block;
@@ -153,7 +157,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
       </g>
     </svg>
 
@@ -232,7 +236,7 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(255,255,255,.15)";});
   });
 
-  // ===== LIGHTBOX (replaces Fullscreen) =====
+  // ===== LIGHTBOX (centered + autoplay from start) =====
   (function(){
     const lb = document.getElementById('lightbox');
     const frame = lb.querySelector('.lightbox__frame');
@@ -242,16 +246,30 @@
     function openWithMedia(mediaEl){
       // Clear previous
       slot.innerHTML = '';
-      const isVideo = mediaEl.tagName.toLowerCase() === 'video';
+      const tag = mediaEl.tagName.toLowerCase();
+      const isVideo = tag === 'video';
+
+      // Clone the media
       const clone = mediaEl.cloneNode(true);
-      clone.removeAttribute('autoplay');    // let user control in popup
-      clone.removeAttribute('loop');
-      clone.muted = false;
-      if (isVideo){
-        clone.controls = true;
-        clone.playsInline = true;
-      }
       clone.classList.add('lightbox__media');
+
+      if (isVideo){
+        // Ensure it starts at 0 and plays automatically
+        clone.removeAttribute('loop');          // keep one play unless you want loop
+        clone.removeAttribute('muted');         // play with sound; click counts as gesture
+        clone.controls = true;
+        clone.autoplay = true;
+
+        // Make sure currentTime resets after metadata is available
+        const startAndPlay = () => {
+          try { clone.currentTime = 0; } catch {}
+          const p = clone.play();
+          if (p && typeof p.then === 'function') p.catch(()=>{}); // avoid console noise
+        };
+        clone.addEventListener('loadedmetadata', startAndPlay, { once:true });
+        // Fallback if metadata already loaded on clone
+        requestAnimationFrame(startAndPlay);
+      }
 
       slot.appendChild(clone);
       lb.classList.add('open');
@@ -265,17 +283,20 @@
       slot.innerHTML = '';
     }
 
-    // Open from thumbs (click anywhere except the small button still works)
+    // Open from thumbs
     document.querySelectorAll('.thumb[data-lightbox]').forEach(thumb=>{
       const media = thumb.querySelector('video, img') || thumb;
-      thumb.addEventListener('click', (e)=>{
-        // ignore if already clicked the button; but both open anyway
+
+      function handleOpen(e){
         openWithMedia(media);
         e.stopPropagation();
-      });
+        e.preventDefault();
+      }
+
+      thumb.addEventListener('click', handleOpen);
       const btn = thumb.querySelector('.fs-btn');
-      if (btn){ btn.addEventListener('click', (e)=>{ e.stopPropagation(); openWithMedia(media); }); }
-      media.addEventListener('dblclick', (e)=>{ e.stopPropagation(); openWithMedia(media); });
+      if (btn){ btn.addEventListener('click', handleOpen); }
+      media.addEventListener('dblclick', handleOpen);
     });
 
     // Close interactions
