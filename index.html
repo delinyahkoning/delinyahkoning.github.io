@@ -6,7 +6,10 @@
 <title>Delinyah Koning — Home</title>
 <meta name="description" content="Portfolio — 3D, 2D, Design, Photos." />
 <style>
-  :root{--bg:#0a0b0f;--ink:#ffffff;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px}
+  :root{
+    --bg:#0a0b0f;--ink:#ffffff;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px;
+    --mint:#a8ffd3;--peach:#ffd6a5;
+  }
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
   .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
@@ -66,6 +69,23 @@
   .poetic-note .line3{ margin-left:19ch; }
 
   .panel .sub{ margin:6px 0; line-height:1.4 }
+
+  /* --- Pill section headers (mint / peach), aligned to card inner edge --- */
+  .pill-title{
+    display:inline-block;
+    margin:0 0 12px 14px; /* aligns with .card padding (14px) */
+    padding:6px 16px;
+    border-radius:999px;
+    border:1.5px solid currentColor;
+    background:transparent;
+    color:#fff;
+    text-transform:lowercase;
+    font-weight:600;
+    letter-spacing:.02em;
+    line-height:1;
+  }
+  .pill--mint{ color:var(--mint); }
+  .pill--peach{ color:var(--peach); }
 
   /* ===== LIGHTBOX (centered, smaller) with UNIFORM BLURRED/DIMMED overlay ===== */
   .lightbox{
@@ -227,7 +247,7 @@
 <section style="padding-top:28px">
   <div class="wrap" style="display:grid;gap:20px;grid-template-columns:1.2fr .8fr">
     <div class="panel">
-      <h2 style="margin-top:0">some of the cool stuff</h2>
+      <h2 class="pill-title pill--mint">some of the cool stuff</h2>
       <div class="grid cards" style="margin-top:12px">
         <article class="card">
           <div class="thumb" data-lightbox>
@@ -258,7 +278,7 @@
       </div>
     </div>
     <aside class="panel">
-      <h2 style="margin-top:0">About</h2>
+      <h2 class="pill-title pill--peach">about</h2>
       <p class="sub">something should be here as well</p>
       <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:16px 0">
       <p><a class="tab" href="mailto:koningdelinyah@gmail.com">koningdelinyah@gmail.com</a></p>
