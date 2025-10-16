@@ -22,12 +22,13 @@
   .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
   .grid{display:grid;gap:16px}.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
   .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
-  .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
+  .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#9aa0b3;font-size:14px;letter-spacing:.3px}
   footer{padding:50px 0;color:var(--muted);text-align:center}
 
-  .hero-center{text-align:center}
-  .hero-sub{color:var(--muted);max-width:760px;margin:12px auto 0}
-  .hero-svg{display:inline-block;width:min(92vw,1100px);height:auto}
+  /* Left align hero content + subtitle under text at the same left start (x=40) */
+  .hero-center{text-align:left}
+  .hero-svg{display:block;width:min(92vw,1100px);height:auto}
+  .hero-sub{color:var(--muted);max-width:760px;margin:12px 0 0 40px;text-align:left}
 
   .cursor{
     position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
@@ -100,16 +101,12 @@
       </defs>
 
       <g filter="url(#liquify)">
-        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-          This issssss
-        </text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">
-        a lil test
-        </text>
+        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">This is</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">a lil test.</text>
       </g>
     </svg>
 
-    <p class="hero-sub">3D scenes, 2D motion & illustration, identity systems, photography.</p>
+    <p class="hero-sub">Here I drop all cool stuff to keep track of my own progress</p>
   </div>
 </section>
 
@@ -118,16 +115,31 @@
     <div class="panel">
       <h2 style="margin-top:0">Featured Work</h2>
       <div class="grid cards" style="margin-top:12px">
-        <article class="card"><div class="thumb">assets/feat-1.mp4</div><strong>Lookdev Shot</strong><div class="sub" style="font-size:13px">Blender · 2025</div></article>
-        <article class="card"><div class="thumb">assets/feat-2.jpg</div><strong>Science Illustration</strong><div class="sub" style="font-size:13px">Vectors · 2025</div></article>
-        <article class="card"><div class="thumb">assets/feat-3.mp4</div><strong>Explainer Motion</strong><div class="sub" style="font-size:13px">AE · 30s</div></article>
+        <article class="card">
+          <div class="thumb">Placeholder — Space-themed Blender project</div>
+          <strong>Space Scene (Blender)</strong>
+          <div class="sub" style="font-size:13px">Placeholder</div>
+        </article>
+        <article class="card">
+          <div class="thumb">Placeholder — Spider modeled from scratch</div>
+          <strong>Spider Model (Blender)</strong>
+          <div class="sub" style="font-size:13px">Placeholder</div>
+        </article>
+        <article class="card">
+          <div class="thumb">Placeholder — Protein via Molecular Nodes</div>
+          <strong>Protein Visualization (Blender)</strong>
+          <div class="sub" style="font-size:13px">Placeholder</div>
+        </article>
       </div>
     </div>
     <aside class="panel">
       <h2 style="margin-top:0">About</h2>
-      <p class="sub">Biomedical research background × creative direction. I build clear, cinematic visuals for science, culture, and brands.</p>
-      <p><a class="tab" href="assets/Delinyah-Koning-Resume.pdf" target="_blank" style="display:inline-block">Resume (PDF)</a></p>
-      <p><a class="tab" href="mailto:you@example.com">you@example.com</a></p>
+      <p class="sub">Scientific research background × a creative mind</p>
+      <p class="sub">I like 2D, 3D, artsy stuff, photography, you name it</p>
+      <p class="sub">Current obsession: planet cinematics and cute illustration</p>
+      <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:16px 0">
+      <p><a class="tab" href="mailto:koningdelinyah@gmail.com">koningdelinyah@gmail.com</a></p>
+      <p class="sub" style="margin-top:8px">Resume coming soon.</p>
     </aside>
   </div>
 </section>
@@ -146,7 +158,7 @@
     el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
   });
 
-  // ================== Liquify-like local warp (no alpha change) + PRISM ==================
+  // ================== Liquify-like local warp (no alpha change) + PRISM (stronger + longer) ==================
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
@@ -160,14 +172,14 @@
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    // === Tweaks for stronger + longer trail ===
-    const MAX_IMPRINTS = 40;
-    const LIFE = 10000;
-    const BASE = 118;
-    const BASE_RADIUS = 100;
-    const STRETCH = 4;
-    const TWIRL = 2.0;
-    const POWER = 2.0;
+    // Stronger + longer trail (from our last tweak)
+    const MAX_IMPRINTS = 32;
+    const LIFE = 1200;
+    const BASE = 128;
+    const BASE_RADIUS = 110;
+    const STRETCH = 2.6;
+    const TWIRL = 0.9;
+    const POWER = 1.0;
 
     const imprints = []; // {x,y,vx,vy,t}
     let last = {x: vb.width/2, y: vb.height/2};
@@ -207,7 +219,7 @@
         if (age > LIFE){ imprints.splice(i,1); continue; }
 
         const t = age / LIFE;
-        const ease = 1 - (t*t*(3 - 2*t)); // smoothstep-down
+        const ease = 1 - (t*t*(3 - 2*t));
         const grow = 1 + 0.9*t;
 
         const vlen = Math.hypot(it.vx, it.vy) || 1;
@@ -246,15 +258,14 @@
     function animate(){
       drawNormalMap();
 
-      // stronger prism + longer persistence via higher LIFE and more imprints
       const vMag = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const amt = 5.0 * vMag * active; // was 4.0
+      const amt = 5.0 * vMag * active;
 
       const dirLen = Math.hypot(vX, vY) || 1;
       const dirX = vX / dirLen, dirY = vY / dirLen;
 
-      // R opposite motion, G with motion, B perpendicular (all slightly stronger)
+      // R opposite motion, G with motion, B perpendicular (stronger)
       offR.setAttribute('dx', (-amt * 1.25 * dirX).toFixed(2));
       offR.setAttribute('dy', (-amt * 1.25 * dirY).toFixed(2));
 
