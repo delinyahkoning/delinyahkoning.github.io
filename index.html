@@ -199,7 +199,7 @@
   </div>
 </section>
 
-<footer>© <span id="y"></span> Delinyah Koning</footer>
+<footer>© <span id="y"></span>something should be here</footer>
 
 <button id="fs-exit" type="button" aria-label="Exit fullscreen">Exit fullscreen (Esc)</button>
 <div class="cursor"></div>
@@ -383,7 +383,7 @@
       // Raw target strength driven by motion + trail activity
       const vMag   = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const target = 5.0 * vMag * active; // base amount
+      const target = 7.0 * vMag * active; // base amount
 
       // Exponential smoothing toward target (slower attack, faster release)
       const now = performance.now();
