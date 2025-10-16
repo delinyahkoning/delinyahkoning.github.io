@@ -25,9 +25,20 @@
     padding:20px 0 16px;
   }
   section{padding:60px 0}
-  .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:24px}
+
+  /* PANEL & CARD STRIPPED DOWN (Option A) */
+  .panel{
+    background:none;
+    border:none;
+    padding:24px;
+  }
   .grid{display:grid;gap:16px}.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
+  .card{
+    background:none;
+    border:none;
+    padding:14px;
+  }
+
   .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#9aa0b3;font-size:14px;letter-spacing:.3px}
 
   .hero-center{text-align:left}
