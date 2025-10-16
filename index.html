@@ -103,7 +103,7 @@
           <!-- Isolate channels of displaced text, mask by strength, then offset -->
           <feColorMatrix in="disp" type="matrix" result="dispR"
             values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
-          <feColorMatrix in "disp" type="matrix" result="dispG"
+          <feColorMatrix in="disp" type="matrix" result="dispG"
             values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
           <feColorMatrix in="disp" type="matrix" result="dispB"
             values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
@@ -128,14 +128,14 @@
       </defs>
 
       <g filter="url(#liquify)">
-        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">Hi this is</text>
+        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">this is</text>
         <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">a lil test</text>
       </g>
     </svg>
 
     <p class="hero-sub" style="margin-left:60px; margin-top:-10px; color:var(--ink);">
-  Here I drop cool stuff to keep track of my own progress
-</p>
+      Here I drop cool stuff to keep track of my own progress
+    </p>
   </div>
 </section>
 
@@ -260,7 +260,7 @@
     });
   })();
 
-  // ================== Liquify-like local warp (no alpha change) + PRISM (your tuned settings) ==================
+  // ================== Liquify-like local warp (no alpha change) + PRISM (tuned) ==================
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
@@ -355,18 +355,40 @@
       nmEl.setAttribute('href', c.toDataURL('image/png'));
     }
 
-    // Animate + RGB prism offsets
+    // ==== Animate + RGB prism offsets (with slower attack smoothing) ====
+    let smoothAmt = 0;                    // smoothed prism strength
+    let lastTime  = performance.now();
+    let prevTarget = 0;
+
+    // Tune: bigger ATTACK_MS = slower fade-in; RELEASE_MS = fade-out speed
+    const ATTACK_MS  = 300;   // ~0.3s to ramp up
+    const RELEASE_MS = 140;   // ~0.14s to ramp down
+
     function animate(){
       drawNormalMap();
 
-      const vMag = Math.min(1, Math.hypot(vX, vY) / 24);
+      // Raw target strength driven by motion + trail activity
+      const vMag   = Math.min(1, Math.hypot(vX, vY) / 24);
       const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const amt = 4.0 * vMag * active;
+      const target = 4.0 * vMag * active; // base amount
+
+      // Exponential smoothing toward target (slower attack, faster release)
+      const now = performance.now();
+      const dt  = now - lastTime;
+      lastTime  = now;
+
+      const rising = target > prevTarget;
+      const tauMs  = rising ? ATTACK_MS : RELEASE_MS;
+      const alpha  = 1 - Math.exp(-dt / Math.max(1, tauMs)); // 0..1
+
+      smoothAmt += (target - smoothAmt) * alpha;
+      prevTarget = target;
 
       const dirLen = Math.hypot(vX, vY) || 1;
       const dirX = vX / dirLen, dirY = vY / dirLen;
 
-      // R opposite motion, G with motion, B perpendicular
+      // Apply smoothed strength to channel offsets
+      const amt = smoothAmt;
       offR.setAttribute('dx', (-amt * 1.25 * dirX).toFixed(2));
       offR.setAttribute('dy', (-amt * 1.25 * dirY).toFixed(2));
 
