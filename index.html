@@ -112,7 +112,7 @@
     position:absolute; left:50%; top:50%;
     width:14px; height:14px; border-radius:50%;
     transform:translate(-50%,-50%);
-    background:#ffffff; /* no shadow/glow */
+    background:#ffffff; /* flat white */
   }
   .cursor--dot.cursor--hover .dot{ transform:translate(-50%,-50%) scale(1.06); }
   .cursor--dot.cursor--down  .dot{ transform:translate(-50%,-50%) scale(1.00); }
@@ -216,12 +216,22 @@
     font-size:12px; letter-spacing:.02em; color:#9aa0b3;
   }
   .tri-switch__labels span{ text-align:center; opacity:.6; }
+
+  /* ✨ FIXED: perfectly centered knob */
   .tri-switch__knob{
-    position:absolute; top:var(--pad); width:var(--knob); height:calc(var(--h) - var(--pad)*2);
-    border-radius:999px; background:#10131d; border:1px solid rgba(255,255,255,.14);
+    position:absolute;
+    left: var(--pad);                  /* overridden by state rules */
+    top: 50%;                          /* vertical center */
+    transform: translateY(-50%);       /* actual centering */
+    width: var(--knob);
+    height: calc(var(--h) - var(--pad)*2);
+    box-sizing: border-box;            /* include border in height */
+    border-radius:999px; background:#10131d;
+    border:1px solid rgba(255,255,255,.14);
     box-shadow:0 6px 16px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.06);
     transition:left .28s cubic-bezier(.22,.61,.36,1);
   }
+
   /* knob positions */
   .tri-switch[data-state="dot"]    .tri-switch__knob{ left:var(--pad); }
   .tri-switch[data-state="solar"]  .tri-switch__knob{ left:calc(50% - var(--knob)/2); }
@@ -232,7 +242,6 @@
   .tri-switch[data-state="solar"]  .tri-switch__labels span:nth-child(2),
   .tri-switch[data-state="native"] .tri-switch__labels span:nth-child(3){ color:#fff; opacity:1; font-weight:600; }
 
-  /* make it feel like a control in the tab bar */
   .tri-switch-wrap{ display:flex; align-items:center; }
 </style>
 </head>
@@ -301,7 +310,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
       </g>
     </svg>
 
