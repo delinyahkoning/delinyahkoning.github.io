@@ -13,47 +13,52 @@
   <link rel="stylesheet" href="/css/cursor.css" />
   <link rel="stylesheet" href="/css/switch.css" />
 
-  <!-- Masonry + OVERRIDES to neutralize global .thumb rules -->
+  <!-- Masonry + Photo-only overrides -->
   <style>
-    /* Masonry columns (variable heights) */
+    /* Masonry layout */
     .gallery { column-gap: 16px; }
     @media (min-width:480px){ .gallery { column-count: 2; } }
     @media (min-width:860px){ .gallery { column-count: 3; } }
     @media (min-width:1180px){ .gallery { column-count: 4; } }
 
-    .item{
+    /* REMOVE tile styling — just images */
+    .gallery .item{
       break-inside: avoid;
       -webkit-column-break-inside: avoid;
       margin: 0 0 16px;
-      background: #0d0f16;
-      border: 1px solid #232634;
-      border-radius: 14px;
-      overflow: hidden;
+      background: transparent !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      overflow: visible !important;
     }
 
-    /* === CRITICAL OVERRIDES FOR PHOTOS ===
-       Kill the global 16:9 & height:100% so images use natural height.
-       Also remove inner rounding to avoid the visible dark strip. */
     .gallery .thumb{
       position: relative;
       cursor: pointer;
-      padding: 0;
-      background: transparent;
+      padding: 0 !important;
+      background: transparent !important;
       aspect-ratio: auto !important;
       height: auto !important;
     }
-    .gallery .thumb img,
-    .gallery .thumb video{
+
+    .gallery .thumb img{
       display: block;
       width: 100%;
       height: auto !important;
-      object-fit: contain !important; /* show whole photo */
-      border-radius: 0 !important;    /* no inner curve gap */
-      transition: transform .25s ease, box-shadow .25s ease;
+      object-fit: contain !important;
+      border-radius: 0 !important; /* or 12px if you want rounded images */
+      transition: transform .25s ease;
+      box-shadow: none !important;
+      position: relative;
+      z-index: 0;
     }
-    .gallery .thumb:hover img{ transform: scale(1.03); }
 
-    /* Hover action button (kept for consistency; opens lightbox) */
+    .gallery .thumb:hover img{
+      transform: scale(1.02);
+      z-index: 1;
+    }
+
+    /* Hover fullscreen button */
     .gallery .fs-btn{
       position: absolute; top: 8px; right: 8px; z-index: 2;
       padding: 6px 8px; font-size: 14px; line-height: 1; border-radius: 8px;
@@ -74,7 +79,7 @@
         <a class="tab" href="/tabs/design/">Design</a>
         <a class="tab active" href="/tabs/photos/">Photos</a>
 
-        <!-- Tri-position cursor switch -->
+        <!-- Cursor switch -->
         <div class="tri-switch-wrap">
           <button id="cursorSwitch"
                   class="tri-switch"
@@ -99,7 +104,7 @@
   <section class="hero" style="padding:60px 0 30px; text-align:center;">
     <div class="wrap">
       <h1 style="font-size:clamp(32px,5vw,54px);margin:0;">Photos</h1>
-      <p class="sub" style="color:var(--muted);">Fragments, stories, reflections.</p>
+      <p class="sub" style="color:var(--muted);">Photography - Canon EOS 77D.</p>
     </div>
   </section>
 
@@ -109,7 +114,7 @@
     </div>
   </section>
 
-  <!-- Lightbox (same component as homepage) -->
+  <!-- Lightbox -->
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="lightbox__frame" role="document">
       <button class="lightbox__close" type="button" aria-label="Close">
@@ -133,16 +138,15 @@
     <span class="orbit orbit--neptune"><span class="track"><span class="planet"></span></span></span>
   </div>
 
-  <!-- Shared Scripts -->
+  <!-- Scripts -->
   <script type="module" src="/js/config.js"></script>
   <script type="module" src="/js/lightbox.js"></script>
   <script type="module" src="/js/cursor.js"></script>
   <script type="module" src="/js/switch.js"></script>
   <script type="module" src="/js/main.js"></script>
 
-  <!-- Build the randomized masonry gallery; thumbs open in lightbox -->
+  <!-- Gallery population -->
   <script>
-    // Image list (case-sensitive)
     const files = [
       "IMG_0243.JPG","IMG_7454.jpg","IMG_7453.jpg","IMG_7624.jpg","IMG_7640.jpg",
       "IMG_8062.jpg","IMG_8098.jpg","IMG_8074.jpg","IMG_6604.jpg","IMG_6595.jpg",
@@ -150,7 +154,6 @@
       "IMG_2179.JPG","IMG_1963.png","melkweg.png"
     ];
 
-    // Shuffle (Fisher–Yates)
     for (let i = files.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [files[i], files[j]] = [files[j], files[i]];
@@ -164,15 +167,15 @@
 
       const thumb = document.createElement('div');
       thumb.className = 'thumb';
-      thumb.setAttribute('data-lightbox', ''); // enable homepage lightbox
+      thumb.setAttribute('data-lightbox', '');
 
       const btn = document.createElement('button');
       btn.className = 'fs-btn';
-      btn.type='button';
-      btn.textContent='⤢';
+      btn.type = 'button';
+      btn.textContent = '⤢';
 
       const img = document.createElement('img');
-      img.loading='lazy';
+      img.loading = 'lazy';
       img.src = `/assets/${name}`;
       img.alt = name;
 
