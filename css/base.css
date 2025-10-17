@@ -35,11 +35,11 @@ a{color:inherit}
   font-family: inherit !important;
 }
 
-/* Brand only → use Orbitron (space-age) */
+/* Brand — clean Courier regular (not bold) */
 .brand {
-  font-family: "Orbitron", Arial, Helvetica, sans-serif !important;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  font-family: "Courier New", Courier, monospace !important;
+  font-weight: 400;     /* Not bold */
+  letter-spacing: 0.02em;
 }
 
 /* === Global title font (space-age Orbitron) === */
