@@ -129,10 +129,10 @@
   * { cursor:none !important; }
 
   /* =======================
-     SOLAR-SYSTEM CURSOR
-     Center: sun at pointer
-     8 planets with rough proportional size/color, varied radii/speeds
-     Earth has a tiny moon that orbits the Earth (nested)
+     SOLAR-SYSTEM CURSOR — FIXED
+     - Planets are children of the rotating track (so they actually orbit)
+     - Slower, readable orbital periods
+     - Angle-aware keyframes (no jumps)
      ======================= */
   .cursor{
     position:fixed; top:0; left:0;
@@ -148,64 +148,94 @@
     transform:translate(-50%,-50%);
     background: radial-gradient(circle at 35% 35%, #fff7c7, #ffd36b 45%, #ff9f2c 70%, #ff7a00 100%);
     box-shadow:
-      0 0 14px rgba(255,210,90,.75),
-      0 0 30px rgba(255,160,60,.55),
+      0 0 14px rgba(255,210,90,.7),
+      0 0 28px rgba(255,160,60,.5),
       inset 0 0 10px rgba(255,255,255,.35);
   }
 
-  /* Orbit container */
+  /* Orbit container stays centered on pointer */
   .orbit{
     position:absolute; left:50%; top:50%;
     transform:translate(-50%,-50%);
     pointer-events:none;
   }
 
-  /* The rotating ring (we rotate this around the sun) */
+  /* Rotating ring (this rotates around the sun) */
   .track{
     --r: 14px;          /* radius from sun */
     --theta: 0deg;      /* starting angle */
-    --duration: 3s;     /* orbital period (visual) */
+    --duration: 10s;    /* orbital period (visual) */
     position:absolute; left:50%; top:50%;
     width: calc(var(--r) * 2); height: calc(var(--r) * 2);
     margin-left: calc(var(--r) * -1); margin-top: calc(var(--r) * -1);
     transform-origin: 50% 50%;
+    will-change: transform;
     animation: orbit-spin var(--duration) linear infinite;
-    /* faint path */
     border: 1px dotted rgba(255,255,255,.06);
     border-radius:50%;
   }
 
-  /* The planet itself sits on the ring's rightmost point */
+  /* Planet sits ON the rotating track, so it orbits with it */
   .planet{
-    --size:6px;
-    --color:#fff;
+    --size:6px; --color:#fff;
     position:absolute; left:50%; top:50%;
     width: var(--size); height: var(--size);
-    border-radius:50%;
-    background: var(--color);
-    transform: translate(var(--r), -50%);
+    border-radius:50%; background: var(--color);
+    transform: translate(var(--r), -50%); /* rightmost point of track */
     box-shadow: 0 0 6px rgba(255,255,255,.25);
   }
 
-  /* —— Planet presets (rough colors/sizes/radii/speeds/start angles) —— */
-  /* Mercury */
-  .orbit--mercury .track{ --r:12px; --theta: 10deg; --duration: 1.2s; }
-  .orbit--mercury .planet{ --size:3px; --color:#b7b7b7; }
+  /* —— Planet presets (rough sizes/colors/radii/speeds/start angles) —— */
+  /* Inner planets */
+  .orbit--mercury .track{ --r:12px; --theta: 10deg;  --duration: 6s;  }
+  .orbit--mercury .planet{ --size:3px;  --color:#b7b7b7; }
 
-  /* Venus */
-  .orbit--venus .track{ --r:16px; --theta: 60deg; --duration: 1.8s; }
-  .orbit--venus .planet{ --size:5px; --color:#e8d28b; }
+  .orbit--venus   .track{ --r:18px; --theta: 60deg;  --duration: 9s;  }
+  .orbit--venus   .planet{ --size:5px;  --color:#e8d28b; }
 
-  /* Earth (+ Moon nested) */
-  .orbit--earth .track{ --r:22px; --theta: 130deg; --duration: 2.2s; }
-  .orbit--earth .planet{ --size:5px; --color:#6fb7ff; box-shadow:0 0 8px rgba(120,180,255,.45); position:absolute; }
-  /* Moon container is positioned INSIDE the Earth (so it orbits the Earth) */
+  .orbit--earth   .track{ --r:24px; --theta: 130deg; --duration: 12s; }
+  .orbit--earth   .planet{ --size:5px;  --color:#6fb7ff; box-shadow:0 0 8px rgba(120,180,255,.45); }
+
+  .orbit--mars    .track{ --r:30px; --theta: 200deg; --duration: 15s; }
+  .orbit--mars    .planet{ --size:4px;  --color:#ff7b6b; }
+
+  /* Gas/ice giants */
+  .orbit--jupiter .track{ --r:40px; --theta: 15deg;  --duration: 20s; }
+  .orbit--jupiter .planet{
+    --size:9px; --color:#e8cf9b;
+    background: radial-gradient(circle at 40% 35%, #f6e8c4, #e8cf9b 60%, #c6a677 100%);
+    box-shadow:0 0 10px rgba(240,210,150,.35);
+  }
+
+  .orbit--saturn  .track{ --r:52px; --theta: 80deg;  --duration: 25s; }
+  .orbit--saturn  .planet{
+    --size:8px; --color:#f1df9a;
+    background: radial-gradient(circle at 40% 40%, #fff3c2, #f1df9a 60%, #cdbd86 100%);
+  }
+  .orbit--saturn  .planet::after{
+    content:""; position:absolute; left:50%; top:50%;
+    width: 14px; height: 6px; border-radius: 50%;
+    transform: translate(-50%,-50%) rotate(18deg);
+    border: 1px solid rgba(255,255,255,.25);
+    border-left-color: transparent; border-right-color: transparent;
+    opacity:.85; pointer-events:none;
+    filter: drop-shadow(0 0 3px rgba(255,255,255,.2));
+  }
+
+  .orbit--uranus  .track{ --r:64px; --theta: 140deg; --duration: 32s; }
+  .orbit--uranus  .planet{ --size:7px; --color:#a8f1ff; }
+
+  .orbit--neptune .track{ --r:76px; --theta: 300deg; --duration: 40s; }
+  .orbit--neptune .planet{ --size:7px; --color:#7aa8ff; }
+
+  /* Earth’s Moon — nested orbit inside the (orbiting) Earth */
   .orbit--earth .planet .moon-track{
-    --r:7px; --duration:0.9s; --theta: 200deg;
+    --r:7px; --duration:2.5s; --theta: 200deg;
     position:absolute; left:50%; top:50%;
     width: calc(var(--r) * 2); height: calc(var(--r) * 2);
     margin-left: calc(var(--r) * -1); margin-top: calc(var(--r) * -1);
     transform-origin: 50% 50%;
+    will-change: transform;
     animation: orbit-spin var(--duration) linear infinite;
     border: 1px dotted rgba(255,255,255,.05);
     border-radius:50%;
@@ -217,49 +247,12 @@
     box-shadow:0 0 4px rgba(220,230,255,.35);
   }
 
-  /* Mars */
-  .orbit--mars .track{ --r:28px; --theta: 200deg; --duration: 2.8s; }
-  .orbit--mars .planet{ --size:4px; --color:#ff7b6b; }
-
-  /* Jupiter */
-  .orbit--jupiter .track{ --r:38px; --theta: 15deg; --duration: 4.6s; }
-  .orbit--jupiter .planet{
-    --size:9px; --color:#e8cf9b;
-    background: radial-gradient(circle at 40% 35%, #f6e8c4, #e8cf9b 60%, #c6a677 100%);
-    box-shadow:0 0 10px rgba(240,210,150,.35);
-  }
-
-  /* Saturn (with ring) */
-  .orbit--saturn .track{ --r:48px; --theta: 80deg; --duration: 5.6s; }
-  .orbit--saturn .planet{
-    --size:8px; --color:#f1df9a;
-    background: radial-gradient(circle at 40% 40%, #fff3c2, #f1df9a 60%, #cdbd86 100%);
-    position:absolute;
-  }
-  .orbit--saturn .planet::after{
-    content:""; position:absolute; left:50%; top:50%;
-    width: 14px; height: 6px; border-radius: 50%;
-    transform: translate(-50%,-50%) rotate(18deg);
-    border: 1px solid rgba(255,255,255,.25);
-    border-left-color: transparent; border-right-color: transparent;
-    opacity:.85; pointer-events:none;
-    filter: drop-shadow(0 0 3px rgba(255,255,255,.2));
-  }
-
-  /* Uranus */
-  .orbit--uranus .track{ --r:58px; --theta: 140deg; --duration: 6.6s; }
-  .orbit--uranus .planet{ --size:7px; --color:#a8f1ff; }
-
-  /* Neptune */
-  .orbit--neptune .track{ --r:68px; --theta: 300deg; --duration: 7.6s; }
-  .orbit--neptune .planet{ --size:7px; --color:#7aa8ff; }
-
-  /* Hover/click micro-interactions */
+  /* Cursor states */
   .cursor--hover .track{ animation-duration: calc(var(--duration) * .85); }
   .cursor--hover .cursor__sun{ transform:translate(-50%,-50%) scale(1.05); }
   .cursor--down  .cursor__sun{ transform:translate(-50%,-50%) scale(1.0); }
 
-  /* Smooth, angle-aware orbit (prevents jumps) */
+  /* Smooth, angle-aware orbit */
   @keyframes orbit-spin{
     from { transform: rotate(var(--theta)); }
     to   { transform: rotate(calc(var(--theta) + 360deg)); }
@@ -320,7 +313,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
       </g>
     </svg>
 
@@ -389,50 +382,58 @@
   </div>
 </div>
 
-<!-- Solar System Cursor -->
+<!-- Solar System Cursor (fixed) -->
 <div class="cursor" aria-hidden="true">
   <span class="cursor__sun"></span>
 
   <span class="orbit orbit--mercury">
-    <span class="track"></span>
-    <span class="planet"></span>
+    <span class="track">
+      <span class="planet"></span>
+    </span>
   </span>
 
   <span class="orbit orbit--venus">
-    <span class="track"></span>
-    <span class="planet"></span>
+    <span class="track">
+      <span class="planet"></span>
+    </span>
   </span>
 
   <span class="orbit orbit--earth">
-    <span class="track"></span>
-    <span class="planet">
-      <span class="moon-track"><span class="moon"></span></span>
+    <span class="track">
+      <span class="planet">
+        <span class="moon-track"><span class="moon"></span></span>
+      </span>
     </span>
   </span>
 
   <span class="orbit orbit--mars">
-    <span class="track"></span>
-    <span class="planet"></span>
+    <span class="track">
+      <span class="planet"></span>
+    </span>
   </span>
 
   <span class="orbit orbit--jupiter">
-    <span class="track"></span>
-    <span class="planet"></span>
+    <span class="track">
+      <span class="planet"></span>
+    </span>
   </span>
 
   <span class="orbit orbit--saturn">
-    <span class="track"></span>
-    <span class="planet"></span>
+    <span class="track">
+      <span class="planet"></span>
+    </span>
   </span>
 
   <span class="orbit orbit--uranus">
-    <span class="track"></span>
-    <span class="planet"></span>
+    <span class="track">
+      <span class="planet"></span>
+    </span>
   </span>
 
   <span class="orbit orbit--neptune">
-    <span class="track"></span>
-    <span class="planet"></span>
+    <span class="track">
+      <span class="planet"></span>
+    </span>
   </span>
 </div>
 
@@ -507,7 +508,7 @@
     lb.addEventListener('click', (e)=>{ if(!frame.contains(e.target)) close(); });
   })();
 
-  // Liquify + PRISM
+  // Liquify + PRISM (unchanged)
   (function(){
     const svg  = document.getElementById('heroSVG');
     const nmEl = document.getElementById('nm');
@@ -596,8 +597,8 @@
         const spinY = BASE + (( ux) * disp * TWIRL * 0.6);
 
         const g = ctx.createRadialGradient(0,0,0, 0,0,1);
-        g.addColorStop(0.00, `rgb(${clamp(pushX)},${clamp(pushY)},0)`);
-        g.addColorStop(0.45, `rgb(${clamp(mix(pushX,spinX,0.5))},${clamp(mix(pushY,spinY,0.5))},0)`);
+        g.addColorStop(0.00, `rgb(${Math.max(0, Math.min(255, pushX))},${Math.max(0, Math.min(255, pushY))},0)`);
+        g.addColorStop(0.45, `rgb(${Math.max(0, Math.min(255, (pushX+spinX)/2))},${Math.max(0, Math.min(255, (pushY+spinY)/2))},0)`);
         g.addColorStop(0.85, `rgb(128,128,0)`);
         g.addColorStop(1.00, `rgb(128,128,0)`);
 
