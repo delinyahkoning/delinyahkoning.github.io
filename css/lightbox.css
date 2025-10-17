@@ -1,43 +1,44 @@
+/* === Lightbox Overlay === */
 .lightbox {
   position: fixed;
   inset: 0;
   z-index: 9998;
   display: none;
   align-items: center;
-  justify-content: center;
+  justify-content: center; /* Center the frame container */
   background: transparent;
 }
 
-.lightbox.open { display: flex; }
+.lightbox.open {
+  display: flex;
+}
 
 .lightbox::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: rgba(7,8,12,.32);
+  background: rgba(7, 8, 12, 0.32);
   backdrop-filter: blur(8px) saturate(130%);
   -webkit-backdrop-filter: blur(8px) saturate(130%);
   pointer-events: none;
   z-index: 0;
 }
 
-/* The popup container */
+/* Shrink-wrap frame around media instead of full flex container */
 .lightbox__frame {
-  position: relative; /* anchor for the close button */
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  display: inline-block; /* WAS flex — now it fits tightly */
   border: none;
   border-radius: 14px;
   padding: 0;
   background: transparent;
   max-width: min(1000px, 84vw);
   max-height: 84vh;
-  box-shadow: 0 12px 40px rgba(0,0,0,.45);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
   overflow: visible;
 }
 
+/* Media inside popup */
 .lightbox__media {
   display: block;
   max-width: 84vw;
@@ -46,12 +47,11 @@
   background: #000;
 }
 
-/* >>> Close button EXACTLY at the popup's top-right corner <<< */
+/* ✅ Perfectly pinned close button */
 .lightbox__close {
-  position: absolute !important; /* ensure we anchor to the frame */
-  top: 8px !important;           /* tuck just inside the corner */
-  right: 8px !important;
-  transform: none !important;    /* kill any previous translate() */
+  position: absolute;
+  top: 8px;
+  right: 8px;
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 14px;
@@ -64,65 +64,31 @@
   box-shadow: 0 4px 14px rgba(0,0,0,.35);
 }
 
-/* Screen-reader text helper */
 .lightbox__sr {
   position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0 0 0 0);
-  white-space: nowrap; border: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* === Fix sub-pixel seam on media thumbnails === */
-.thumb { position: relative; overflow: hidden; }
+.thumb {
+  position: relative;
+  overflow: hidden; /* ensure bleed is clipped cleanly */
+}
 
 .thumb > img,
 .thumb > video {
   position: absolute;
-  inset: -1px;
+  inset: -1px;                  /* bleed 1px past edges */
   width: calc(100% + 2px);
   height: calc(100% + 2px);
   object-fit: cover;
   display: block;
-  transform: translateZ(0);
+  transform: translateZ(0);     /* avoids anti-aliasing glitches */
 }
-
-// --- Precise close-button placement ---
-(function () {
-  const lb = document.getElementById('lightbox');
-  if (!lb) return;
-
-  const frame = lb.querySelector('.lightbox__frame');
-  const btn   = lb.querySelector('.lightbox__close');
-  if (!frame || !btn) return;
-
-  const PADDING = 8; // distance from the popup's inner corner
-
-  function positionClose() {
-    const r = frame.getBoundingClientRect();
-    // Pin to the popup's top-right corner with a small inset
-    btn.style.top  = `${Math.round(r.top  + PADDING)}px`;
-    btn.style.left = `${Math.round(r.right - btn.offsetWidth - PADDING)}px`;
-  }
-
-  // Reposition whenever the lightbox opens/closes or layout changes
-  const mo = new MutationObserver(() => {
-    if (lb.classList.contains('open')) {
-      // Wait a frame so media loads/sizes, then measure
-      requestAnimationFrame(() => {
-        positionClose();
-        // In case video/image resizes after load:
-        setTimeout(positionClose, 50);
-        setTimeout(positionClose, 250);
-      });
-    }
-  });
-  mo.observe(lb, { attributes: true, attributeFilter: ['class'] });
-
-  // Also keep it correct on window resizes/rotations
-  window.addEventListener('resize', positionClose);
-
-  // If media inside the frame changes size, adjust (covers videos/images)
-  const ro = new ResizeObserver(positionClose);
-  ro.observe(frame);
-})();
