@@ -86,3 +86,43 @@
   display: block;
   transform: translateZ(0);
 }
+
+// --- Precise close-button placement ---
+(function () {
+  const lb = document.getElementById('lightbox');
+  if (!lb) return;
+
+  const frame = lb.querySelector('.lightbox__frame');
+  const btn   = lb.querySelector('.lightbox__close');
+  if (!frame || !btn) return;
+
+  const PADDING = 8; // distance from the popup's inner corner
+
+  function positionClose() {
+    const r = frame.getBoundingClientRect();
+    // Pin to the popup's top-right corner with a small inset
+    btn.style.top  = `${Math.round(r.top  + PADDING)}px`;
+    btn.style.left = `${Math.round(r.right - btn.offsetWidth - PADDING)}px`;
+  }
+
+  // Reposition whenever the lightbox opens/closes or layout changes
+  const mo = new MutationObserver(() => {
+    if (lb.classList.contains('open')) {
+      // Wait a frame so media loads/sizes, then measure
+      requestAnimationFrame(() => {
+        positionClose();
+        // In case video/image resizes after load:
+        setTimeout(positionClose, 50);
+        setTimeout(positionClose, 250);
+      });
+    }
+  });
+  mo.observe(lb, { attributes: true, attributeFilter: ['class'] });
+
+  // Also keep it correct on window resizes/rotations
+  window.addEventListener('resize', positionClose);
+
+  // If media inside the frame changes size, adjust (covers videos/images)
+  const ro = new ResizeObserver(positionClose);
+  ro.observe(frame);
+})();
