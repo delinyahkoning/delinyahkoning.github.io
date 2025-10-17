@@ -2,11 +2,32 @@
   --bg:#0a0b0f; --ink:#ffffff; --muted:#9aa0b3; --panel:#10121a; --accent:#9bd4ff;
   --radius:18px; --max:1200px; --mint:#a8ffd3; --peach:#ffd6a5;
 }
+
 html{scroll-behavior:smooth}
+
 body{
-  margin:0; background:var(--bg); color:var(--ink);
-  font:16px/1.6 Arial,Helvetica,sans-serif;
+  margin:0; 
+  background:var(--bg); 
+  color:var(--ink);
+  font:16px/1.6 "Courier New", Courier, monospace; /* switched to typewriter */
 }
-.wrap{max-width:var(--max); margin:0 auto; padding:0 24px}
+
+.wrap{
+  max-width:var(--max); 
+  margin:0 auto; 
+  padding:0 24px
+}
+
 .spacer{flex:1}
+
 a{color:inherit}
+
+/* Headings stay sans-serif */
+h1, h2, h3, h4, h5, h6 {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Hero liquified SVG headline stays sans-serif */
+.hero-svg text {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
