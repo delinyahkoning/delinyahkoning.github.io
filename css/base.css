@@ -30,9 +30,13 @@ a{color:inherit}
   font-style: normal !important;
 }
 
-/* Brand + tabs use Orbitron (space-age), lighter than hero title */
-.brand,
+/* Tabs stay Courier (inherit from body) */
 .tabs .tab {
+  font-family: inherit !important;
+}
+
+/* Brand only → use Orbitron (space-age) */
+.brand {
   font-family: "Orbitron", Arial, Helvetica, sans-serif !important;
   font-weight: 500;
   letter-spacing: 0.04em;
