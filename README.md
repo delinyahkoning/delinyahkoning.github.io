@@ -4,11 +4,11 @@ This is my personal portfolio playground, built entirely with **vanilla HTML / C
 
 Key features:
 
-- ✨ **Animated Liquify / Prism Hero Effect** — mouse-responsive distortion using a custom normal map
-- 🎥 **Lightbox with video autoplay + loop**
-- 🪐 **Tri-Position Cursor Switch** — dot / solar system orbit / native system cursor
-- 🧱 **CSS and JS modularized** — visuals and logic separated for clarity
-- 🚀 **GitHub Pages-ready** — no build step required, just push to `main`
+- **Animated Liquify / Prism Hero Effect** — mouse-responsive distortion using a custom normal map
+- **Lightbox with video autoplay + loop**
+- **Tri-Position Cursor Switch** — dot / solar system orbit / native system cursor
+- **CSS and JS modularized** — visuals and logic separated for clarity
+- **GitHub Pages-ready** — no build step required, just push to `main`
 
 ---
 
@@ -58,6 +58,8 @@ These are the main tuning spots.
 }
 ```
 
+---
+
 ### 🪐 Cursor Modes (`js/config.js`)
 
 ```js
@@ -67,6 +69,8 @@ window.APP = {
   ...
 };
 ```
+
+---
 
 ### Hero Liquify Effect — Full Parameter Breakdown
 
@@ -92,6 +96,8 @@ Parameter meanings:
 - TWIRL → Rotational force applied to the ripples. 0.0 = straight motion, 3.0+ = spirals.
 - POWER → How strong the displacement is overall. Master intensity control.
 
+---
+
 ### Prism Effect (RGB Separation)
 
 The RGB split happens inside `js/hero-liquify.js` when offsets are applied:
@@ -111,6 +117,8 @@ To INCREASE color separation:
 
 To DISABLE prism effect entirely:
 - Set all dx and dy to "0".
+
+---
 
 ### Solar Cursor Customization
 
@@ -156,6 +164,8 @@ In `.cursor__sun`, edit the box-shadow. Increase the blur values or add more lay
 To DISABLE solar cursor entirely:
 
 Remove `"solar"` from `cursorModes` in `config.js`.
+
+---
 
 ### Lightbox Customization (Video & Image Popups)
 
@@ -216,6 +226,8 @@ Place as many cards as needed inside:
 <div class="grid cards"> ... </div>
 
 Optional: If you want cards to be clickable without the ⤢ button, remove the button entirely and rely on the click listener already attached to the `.thumb`.
+
+---
 
 ### Deployment (GitHub Pages)
 
