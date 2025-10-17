@@ -9,7 +9,7 @@ body{
   margin:0; 
   background:var(--bg); 
   color:var(--ink);
-  font:16px/1.6 "Courier New", Courier, monospace; /* switched to typewriter */
+  font:16px/1.6 "Courier New", Courier, monospace; /* Global typewriter font */
 }
 
 .wrap{
@@ -22,29 +22,29 @@ body{
 
 a{color:inherit}
 
-/* Headings stay sans-serif */
-h1, h2, h3, h4, h5, h6 {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Hero liquified SVG headline stays sans-serif */
-.hero-svg text {
-  font-family: Arial, Helvetica, sans-serif !important;
-}
-
 /* Pills (section labels) */
 .pill-title {
   font-family: "Courier New", Courier, monospace !important;
   font-style: normal !important;
 }
 
-/* Tabs + brand (in case they set their own font) */
+/* Tabs + brand (inherit body font unless overridden) */
 .tabs .tab,
 .brand {
   font-family: inherit !important;
 }
 
-/* Poetic lines under the hero — switch to Courier, not italic */
+/* === Global title font (space-age Orbitron) === */
+h1, h2, h3, h4, h5, h6,
+.page-title,
+.section-title,
+.hero-svg text {
+  font-family: "Orbitron", Arial, Helvetica, sans-serif !important;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+/* Poetic lines under the hero — use Courier, not italic */
 .poetic-note,
 .poetic-note .line1,
 .poetic-note .line2,
@@ -61,4 +61,3 @@ footer,
 .lightbox__close {
   font-family: inherit !important;
 }
-
