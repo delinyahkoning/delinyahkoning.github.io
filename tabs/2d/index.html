@@ -1,70 +1,132 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Delinyah Koning — 2D</title>
-<meta name="description" content="2D work — animation and illustration." />
-<style>
-  :root{--bg:#0a0b0f;--ink:#e9ecf5;--muted:#9aa0b3;--panel:#10121a;--radius:18px;--max:1200px}
-  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
-  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
-  header{position:sticky;top:0;z-index:50;background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
-  .nav{display:flex;align-items:center;gap:16px;padding:14px 0}.brand{font-weight:700}.spacer{flex:1}
-  .tabs{display:flex;gap:10px;flex-wrap:wrap}.tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
-  .tab:hover{background:#131623}.tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
-  .hero{padding:60px 0 30px;text-align:center}
-  h1{font-size:clamp(32px,5vw,54px);margin:0}.sub{color:var(--muted)}
-  section{padding:50px 0}.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  .card{border-radius:14px;background:#0d0f16;border:1px solid #232634;padding:14px}
-  .thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#556}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Delinyah Koning — 2D</title>
+  <meta name="description" content="2D work — animation and illustration." />
 
-  /* === Custom Cursor (keeps native pointer) === */
-  .cursor{
-    position:fixed;top:0;left:0;width:22px;height:22px;border-radius:50%;
-    pointer-events:none;background:rgba(155,212,255,.15);
-    border:1px solid rgba(155,212,255,.4);transform:translate(-50%,-50%);
-    transition:width .15s,height .15s,background .2s;z-index:9999;
-  }
-</style>
+  <!-- Shared Styles -->
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/lightbox.css">
+  <link rel="stylesheet" href="/css/cursor.css">
+  <link rel="stylesheet" href="/css/switch.css">
 </head>
 <body>
-<header>
-  <div class="wrap nav">
-    <div class="brand">Delinyah Koning</div><div class="spacer"></div>
-    <nav class="tabs">
-      <a class="tab" href="/">Home</a>
-      <a class="tab" href="/3d/">3D</a>
-      <a class="tab active" href="/2d/">2D</a>
-      <a class="tab" href="/design/">Design</a>
-      <a class="tab" href="/photo/">Photo</a>
-    </nav>
-  </div>
-</header>
+  <header>
+    <div class="wrap nav">
+      <div class="brand">Delinyah Koning</div><div class="spacer"></div>
+      <nav class="tabs">
+        <a class="tab" href="/">Home</a>
+        <a class="tab" href="/tabs/3d/">3D</a>
+        <a class="tab active" href="/tabs/2d/">2D</a>
+        <a class="tab" href="/tabs/design/">Design</a>
+        <a class="tab" href="/tabs/photos/">Photos</a>
 
-<section class="hero">
-  <div class="wrap">
-    <h1>2D</h1>
-    <p class="sub">Explainers, UI motion, editorial & science illustration.</p>
-  </div>
-</section>
+        <!-- Tri-position cursor switch -->
+        <div class="tri-switch-wrap">
+          <button id="cursorSwitch"
+                  class="tri-switch"
+                  type="button"
+                  role="switch"
+                  aria-label="Cursor mode"
+                  aria-live="polite"
+                  data-state="dot"
+                  title="Click or press ←/→ to change">
+            <div class="tri-switch__knob" aria-hidden="true"></div>
+            <div class="tri-switch__labels" aria-hidden="true">
+              <span>●</span>
+              <span>🪐</span>
+              <span>⌖</span>
+            </div>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
 
-<section>
-  <div class="wrap grid">
-    <article class="card"><div class="thumb">/assets/anim-1.mp4</div><strong>Explainer snippet</strong><div class="sub" style="font-size:13px">AE</div></article>
-    <article class="card"><div class="thumb">/assets/anim-2.mp4</div><strong>UI motion</strong><div class="sub" style="font-size:13px">Timing & easing</div></article>
-    <article class="card"><div class="thumb">/assets/ill-1.jpg</div><strong>Editorial illustration</strong><div class="sub" style="font-size:13px">Vector</div></article>
-    <article class="card"><div class="thumb">/assets/ill-2.jpg</div><strong>Science illustration</strong><div class="sub" style="font-size:13px">Organelle</div></article>
-  </div>
-</section>
+  <section class="hero" style="padding:60px 0 30px; text-align:center;">
+    <div class="wrap">
+      <h1 style="font-size:clamp(32px,5vw,54px);margin:0;">2D</h1>
+      <p class="sub" style="color:var(--muted);">Explainers, UI motion, editorial & science illustration.</p>
+    </div>
+  </section>
 
-<div class="cursor"></div>
-<script>
-  const cursor=document.querySelector(".cursor");
-  document.addEventListener("mousemove",e=>{cursor.style.top=e.clientY+"px";cursor.style.left=e.clientX+"px";});
-  document.querySelectorAll("a,button").forEach(el=>{
-    el.addEventListener("mouseenter",()=>{cursor.style.width="36px";cursor.style.height="36px";cursor.style.background="rgba(155,212,255,.25)";});
-    el.addEventListener("mouseleave",()=>{cursor.style.width="22px";cursor.style.height="22px";cursor.style.background="rgba(155,212,255,.15)";});
-  });
-</script>
+  <section>
+    <div class="wrap grid cards">
+      <!-- Card 1 -->
+      <article class="card">
+        <div class="thumb" data-lightbox>
+          <button class="fs-btn" type="button">⤢</button>
+          <video src="/assets/anim-1.mp4" autoplay muted loop playsinline></video>
+        </div>
+        <strong>Explainer snippet</strong>
+        <div class="sub" style="font-size:13px">AE</div>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="card">
+        <div class="thumb" data-lightbox>
+          <button class="fs-btn" type="button">⤢</button>
+          <video src="/assets/anim-2.mp4" autoplay muted loop playsinline></video>
+        </div>
+        <strong>UI motion</strong>
+        <div class="sub" style="font-size:13px">Timing & easing</div>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="card">
+        <div class="thumb" data-lightbox>
+          <button class="fs-btn" type="button">⤢</button>
+          <img src="/assets/ill-1.jpg" alt="Editorial illustration">
+        </div>
+        <strong>Editorial illustration</strong>
+        <div class="sub" style="font-size:13px">Vector</div>
+      </article>
+
+      <!-- Card 4 -->
+      <article class="card">
+        <div class="thumb" data-lightbox>
+          <button class="fs-btn" type="button">⤢</button>
+          <img src="/assets/ill-2.jpg" alt="Science illustration">
+        </div>
+        <strong>Science illustration</strong>
+        <div class="sub" style="font-size:13px">Organelle</div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="lightbox__frame" role="document">
+      <button class="lightbox__close" type="button" aria-label="Close">
+        <span aria-hidden="true">✕</span>
+        <span class="lightbox__sr">Close</span>
+      </button>
+      <div id="lightboxMediaSlot"></div>
+    </div>
+  </div>
+
+  <!-- Cursors -->
+  <div class="cursor cursor--dot" aria-hidden="true"><span class="dot"></span></div>
+  <div class="cursor cursor--solar" aria-hidden="true">
+    <span class="cursor__sun"></span>
+    <span class="orbit orbit--mercury"><span class="track"><span class="planet"></span></span></span>
+    <span class="orbit orbit--venus"><span class="track"><span class="planet"></span></span></span>
+    <span class="orbit orbit--earth"><span class="track"><span class="planet"><span class="moon-track"><span class="moon"></span></span></span></span></span>
+    <span class="orbit orbit--mars"><span class="track"><span class="planet"></span></span></span>
+    <span class="orbit orbit--jupiter"><span class="track"><span class="planet"></span></span></span>
+    <span class="orbit orbit--saturn"><span class="track"><span class="planet"></span></span></span>
+    <span class="orbit orbit--uranus"><span class="track"><span class="planet"></span></span></span>
+    <span class="orbit orbit--neptune"><span class="track"><span class="planet"></span></span></span>
+  </div>
+
+  <!-- Shared Scripts -->
+  <script type="module" src="/js/config.js"></script>
+  <script type="module" src="/js/lightbox.js"></script>
+  <script type="module" src="/js/cursor.js"></script>
+  <script type="module" src="/js/switch.js"></script>
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>
