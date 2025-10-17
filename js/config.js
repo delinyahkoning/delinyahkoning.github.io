@@ -11,6 +11,6 @@ window.APP = {
     BASE_RADIUS: 110,
     STRETCH: 3.0,
     TWIRL: 1.8,
-    POWER: 1.5
+    POWER: 1.75
   }
 };
