@@ -1,0 +1,32 @@
+{
+  "site": {
+    "title": "Delinyah Koning — Home",
+    "description": "Portfolio — 3D, 2D, Design, Photos.",
+    "footer_brand": "something should be here",
+    "email": "koningdelinyah@gmail.com",
+    "resume_url": "assets/resume.pdf"
+  },
+  "theme": {
+    "--bg": "#0a0b0f",
+    "--ink": "#ffffff",
+    "--muted": "#9aa0b3",
+    "--panel": "#10121a",
+    "--accent": "#9bd4ff",
+    "--radius": "18px",
+    "--max": "1200px",
+    "--mint": "#a8ffd3",
+    "--peach": "#ffd6a5"
+  },
+  "nav": [
+    { "label": "Home",   "href": "/",        "active": true },
+    { "label": "3D",     "href": "/3d/" },
+    { "label": "2D",     "href": "/2d/" },
+    { "label": "Design", "href": "/design/" },
+    { "label": "Photos", "href": "/photos/" }
+  ],
+  "cards": [
+    { "title": "Imaginary planet", "sub": "Procedurally made in Blender", "type": "video", "src": "assets/greenplanet.mp4" },
+    { "title": "Spider", "sub": "Procedurally made in Blender", "type": "video", "src": "assets/spiderwaving.mp4" },
+    { "title": "Protein Visualization", "sub": "MD trajectory in Blender", "type": "video", "src": "assets/md.mp4" }
+  ]
+}
