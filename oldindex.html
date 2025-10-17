@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Delinyah Koning — Home</title>
+<meta name="description" content="Portfolio — 3D, 2D, Design, Photos." />
+<style>
+  :root{
+    --bg:#0a0b0f;--ink:#ffffff;--muted:#9aa0b3;--panel:#10121a;--accent:#9bd4ff;--radius:18px;--max:1200px;
+    --mint:#a8ffd3;--peach:#ffd6a5;
+  }
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  header{position:sticky;top:0;z-index:50;background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
+  .nav{display:flex;align-items:center;gap:16px;padding:14px 0}.brand{font-weight:700}.spacer{flex:1}
+  .tabs{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
+  .tab:hover{background:#131623}.tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
+
+  .hero{
+    min-height:46vh;
+    display:grid;
+    place-items:start;
+    background:
+      radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
+      radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
+      var(--bg);
+    padding:20px 0 16px;
+  }
+  section{padding:60px 0}
+
+  /* FLAT PANELS/CARDS */
+  .panel{background:none;border:none;padding:24px}
+  .grid{display:grid;gap:16px}
+  .cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .card{background:none;border:none;padding:14px}
+
+  .thumb{
+    aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;
+    display:grid;place-items:center;color:#9aa0b3;font-size:14px;letter-spacing:.3px;
+    position:relative; overflow:hidden; cursor:pointer; transition:transform .25s ease, box-shadow .25s ease
+  }
+  .thumb img, .thumb video{ width:100%; height:100%; object-fit:cover; border-radius:12px; display:block }
+  .thumb:hover{ transform:scale(1.03); box-shadow:0 10px 24px rgba(0,0,0,.35) }
+
+  .fs-btn{
+    position:absolute; top:8px; right:8px; z-index:2;
+    padding:6px 8px; font-size:14px; line-height:1; border-radius:8px;
+    background:rgba(0,0,0,.45); color:#fff; border:1px solid rgba(255,255,255,.25);
+    opacity:0; transition:opacity .2s ease; user-select:none;
+  }
+  .thumb:hover .fs-btn{ opacity:1 }
+
+  .hero-center{text-align:left}
+  .hero-svg{display:block;width:min(92vw,1100px);height:auto}
+
+  /* Poetic line */
+  .hero-sub.poetic-note{
+    font-size:0.9em; line-height:2.2; margin-left:60px; margin-top:-10px; color:var(--ink);
+    font-family: "Century Schoolbook", Century, "Times New Roman", Times, Georgia, serif;
+  }
+  .poetic-note span{ display:block; }
+  .poetic-note .line2{ margin-left:12ch; }
+  .poetic-note .line3{ margin-left:19ch; }
+  .panel .sub{ margin:6px 0; line-height:1.4 }
+
+  /* --- Pill section headers --- */
+  .pill-title{
+    --pill-px: 15px; --pill-py: 5px; --pill-font: 15px;
+    display:inline-block; margin:0 0 12px 14px; padding:var(--pill-py) var(--pill-px);
+    border-radius:999px; border:1.5px solid currentColor; background:transparent; color:#fff;
+    text-transform:lowercase; font-weight:600; letter-spacing:.02em; line-height:1; font-size:var(--pill-font);
+  }
+  .pill--mint{ color:var(--mint); } .pill--peach{ color:var(--peach); } .pill--flush{ margin-left:0 !important; }
+
+  /* ===== LIGHTBOX ===== */
+  .lightbox{ position:fixed; inset:0; z-index:9998; display:none; align-items:center; justify-content:center; background:transparent; }
+  .lightbox.open{ display:flex; }
+  .lightbox::before{
+    content:""; position:fixed; inset:0; background: rgba(7,8,12,.32);
+    backdrop-filter: blur(8px) saturate(130%); -webkit-backdrop-filter: blur(8px) saturate(130%);
+    pointer-events:none; z-index:0;
+  }
+  .lightbox__frame{
+    position:relative; z-index:1; display:flex; align-items:center; justify-content:center;
+    border:none; border-radius:14px; padding:0; background:transparent;
+    max-width:min(1000px,84vw); max-height:84vh; box-shadow:0 12px 40px rgba(0,0,0,.45); overflow:visible;
+  }
+  .lightbox__media{ display:block; max-width:84vw; max-height:84vh; border-radius:12px; background:#000; }
+  .lightbox__close{
+    position:absolute; top:-10px; right:-10px; padding:6px 10px; border-radius:8px; font-size:14px; line-height:1;
+    background:rgba(0,0,0,.55); color:#fff; border:1px solid rgba(255,255,255,.25); cursor:pointer; z-index:3;
+    box-shadow:0 4px 14px rgba(0,0,0,.35);
+  }
+  .lightbox__sr{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+  /* ===== Cursor visibility control ===== */
+  body.cursor-hide * { cursor:none !important; }
+
+  /* ===== Cursor base ===== */
+  .cursor{
+    position:fixed; top:0; left:0; width:30px; height:30px; transform:translate(-50%,-50%);
+    pointer-events:none; z-index:9999; display:none;
+  }
+  body.cursor-mode-dot   .cursor--dot{display:block;}
+  body.cursor-mode-solar .cursor--solar{display:block;}
+
+  /* ==== Simple white dot cursor (bigger, no shine) ==== */
+  .cursor--dot .dot{
+    position:absolute; left:50%; top:50%;
+    width:14px; height:14px; border-radius:50%;
+    transform:translate(-50%,-50%);
+    background:#ffffff; /* flat white */
+  }
+  .cursor--dot.cursor--hover .dot{ transform:translate(-50%,-50%) scale(1.06); }
+  .cursor--dot.cursor--down  .dot{ transform:translate(-50%,-50%) scale(1.00); }
+
+  /* =======================
+     SOLAR-SYSTEM CURSOR — smooth, slower
+     ======================= */
+  .cursor--solar .cursor__sun{
+    position:absolute; left:50%; top:50%; width:18px; height:18px; border-radius:50%;
+    transform:translate(-50%,-50%);
+    background: radial-gradient(circle at 35% 35%, #fff7c7, #ffd36b 45%, #ff9f2c 70%, #ff7a00 100%);
+    box-shadow:0 0 14px rgba(255,210,90,.7), 0 0 28px rgba(255,160,60,.5), inset 0 0 10px rgba(255,255,255,.35);
+  }
+  .cursor--solar .orbit{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); pointer-events:none; }
+  .cursor--solar .track{
+    --r: 14px; --theta: 0deg; --duration: 10s;
+    position:absolute; left:50%; top:50%;
+    width: calc(var(--r) * 2); height: calc(var(--r) * 2);
+    margin-left: calc(var(--r) * -1); margin-top: calc(var(--r) * -1);
+    transform-origin: 50% 50%;
+    will-change: transform;
+    animation: orbit-spin var(--duration) linear infinite;
+    border: 1px dotted rgba(255,255,255,.06); border-radius:50%;
+  }
+  .cursor--solar .planet{
+    --size:6px; --color:#fff;
+    position:absolute; left:50%; top:50%; width: var(--size); height: var(--size);
+    border-radius:50%; background: var(--color);
+    transform: translate(var(--r), -50%); box-shadow: 0 0 6px rgba(255,255,255,.25); z-index:1;
+  }
+  .cursor--solar .orbit--mercury .track{ --r:12px; --theta: 10deg;  --duration: 6s;  }
+  .cursor--solar .orbit--mercury .planet{ --size:3px;  --color:#b7b7b7; }
+  .cursor--solar .orbit--venus   .track{ --r:18px; --theta: 60deg;  --duration: 9s;  }
+  .cursor--solar .orbit--venus   .planet{ --size:5px;  --color:#e8d28b; }
+  .cursor--solar .orbit--earth   .track{ --r:24px; --theta: 130deg; --duration: 12s; }
+  .cursor--solar .orbit--earth   .planet{ --size:5px;  --color:#6fb7ff; box-shadow:0 0 8px rgba(120,180,255,.45); }
+  .cursor--solar .orbit--mars    .track{ --r:30px; --theta: 200deg; --duration: 15s; }
+  .cursor--solar .orbit--mars    .planet{ --size:4px;  --color:#ff7b6b; }
+  .cursor--solar .orbit--jupiter .track{ --r:40px; --theta: 15deg;  --duration: 20s; }
+  .cursor--solar .orbit--jupiter .planet{
+    --size:9px; --color:#e8cf9b;
+    background: radial-gradient(circle at 40% 35%, #f6e8c4, #e8cf9b 60%, #c6a677 100%);
+    box-shadow:0 0 10px rgba(240,210,150,.35);
+  }
+  .cursor--solar .orbit--saturn  .track{ --r:52px; --theta: 80deg;  --duration: 25s; }
+  .cursor--solar .orbit--saturn  .planet{
+    --size:8px; --color:#f1df9a;
+    background: radial-gradient(circle at 40% 40%, #fff3c2, #f1df9a 60%, #cdbd86 100%);
+    position:absolute;
+  }
+  .cursor--solar .orbit--saturn .planet::before,
+  .cursor--solar .orbit--saturn .planet::after{
+    content:""; position:absolute; left:50%; top:50%;
+    width: 26px; height: 9px; transform: translate(-50%,-50%) rotate(24deg); border-radius:50%;
+    background:
+      radial-gradient(closest-side, transparent 58%, rgba(255,255,255,.35) 59% 63%, rgba(255,230,190,.25) 64% 68%, rgba(255,255,255,.18) 69% 74%, transparent 75%),
+      radial-gradient(closest-side, transparent 60%, rgba(255,255,255,.15) 61% 72%, transparent 73%);
+    filter: drop-shadow(0 0 2px rgba(255,255,255,.25)) drop-shadow(0 0 4px rgba(255,210,130,.15));
+    pointer-events:none;
+  }
+  .cursor--solar .orbit--saturn .planet::before{ z-index:0; clip-path: inset(50% 0 0 0); opacity:.9; }
+  .cursor--solar .orbit--saturn .planet::after { z-index:2; clip-path: inset(0 0 50% 0); opacity:.95; }
+  .cursor--solar .orbit--uranus  .track{ --r:64px; --theta: 140deg; --duration: 32s; }
+  .cursor--solar .orbit--uranus  .planet{ --size:7px; --color:#a8f1ff; }
+  .cursor--solar .orbit--neptune .track{ --r:76px; --theta: 300deg; --duration: 40s; }
+  .cursor--solar .orbit--neptune .planet{ --size:7px; --color:#7aa8ff; }
+  .cursor--solar .orbit--earth .planet .moon-track{
+    --r:7px; --duration:2.5s; --theta: 200deg;
+    position:absolute; left:50%; top:50%; width: calc(var(--r) * 2); height: calc(var(--r) * 2);
+    margin-left: calc(var(--r) * -1); margin-top: calc(var(--r) * -1);
+    transform-origin: 50% 50%; will-change: transform;
+    animation: orbit-spin var(--duration) linear infinite; border: 1px dotted rgba(255,255,255,.05); border-radius:50%;
+  }
+  .cursor--solar .orbit--earth .planet .moon{
+    position:absolute; left:50%; top:50%; width:2.5px; height:2.5px; border-radius:50%;
+    background:#dfe7ff; transform: translate(var(--r), -50%); box-shadow:0 0 4px rgba(220,230,255,.35);
+  }
+  .cursor--solar.cursor--hover .track{ animation-duration: calc(var(--duration) * .85); }
+  .cursor--solar.cursor--hover .cursor__sun{ transform:translate(-50%,-50%) scale(1.05); }
+  .cursor--solar.cursor--down  .cursor__sun{ transform:translate(-50%,-50%) scale(1.0); }
+
+  /* Keyframes */
+  @keyframes orbit-spin{ from{transform: rotate(var(--theta));} to{transform: rotate(calc(var(--theta) + 360deg));} }
+  @media (prefers-reduced-motion: reduce){ .cursor--solar .track{ animation:none; } }
+
+  /* ========== Tri-Position Switch (menu bar) ========== */
+  .tri-switch{
+    --w: 132px; --h: 34px; --pad: 4px; --knob: 38px;
+    position:relative; width:var(--w); height:var(--h);
+    border-radius:999px;
+    background:
+      radial-gradient(120px 60px at 30% -40%, rgba(155,212,255,.18), transparent 60%),
+      rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    display:inline-flex; align-items:center; justify-content:space-between;
+    padding:var(--pad); gap:0; color:#cfd6ec;
+  }
+  .tri-switch:focus-visible{ outline:2px solid rgba(155,212,255,.6); outline-offset:2px; }
+  .tri-switch__labels{
+    position:absolute; inset:var(--pad); display:grid; grid-template-columns:1fr 1fr 1fr; align-items:center; pointer-events:none;
+    font-size:12px; letter-spacing:.02em; color:#9aa0b3;
+  }
+  .tri-switch__labels span{ text-align:center; opacity:.6; }
+
+  /* ✨ FIXED: perfectly centered knob */
+  .tri-switch__knob{
+    position:absolute;
+    left: var(--pad);                  /* overridden by state rules */
+    top: 50%;                          /* vertical center */
+    transform: translateY(-50%);       /* actual centering */
+    width: var(--knob);
+    height: calc(var(--h) - var(--pad)*2);
+    box-sizing: border-box;            /* include border in height */
+    border-radius:999px; background:#10131d;
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 6px 16px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.06);
+    transition:left .28s cubic-bezier(.22,.61,.36,1);
+  }
+
+  /* knob positions */
+  .tri-switch[data-state="dot"]    .tri-switch__knob{ left:var(--pad); }
+  .tri-switch[data-state="solar"]  .tri-switch__knob{ left:calc(50% - var(--knob)/2); }
+  .tri-switch[data-state="native"] .tri-switch__knob{ left:calc(100% - var(--pad) - var(--knob)); }
+
+  /* active label emphasis */
+  .tri-switch[data-state="dot"]    .tri-switch__labels span:nth-child(1),
+  .tri-switch[data-state="solar"]  .tri-switch__labels span:nth-child(2),
+  .tri-switch[data-state="native"] .tri-switch__labels span:nth-child(3){ color:#fff; opacity:1; font-weight:600; }
+
+  .tri-switch-wrap{ display:flex; align-items:center; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <div class="brand">something should be here</div><div class="spacer"></div>
+    <nav class="tabs">
+      <a class="tab active" href="/">Home</a>
+      <a class="tab" href="/3d/">3D</a>
+      <a class="tab" href="/2d/">2D</a>
+      <a class="tab" href="/design/">Design</a>
+      <a class="tab" href="/photos/">Photos</a>
+
+      <!-- Tri-position cursor switch -->
+      <div class="tri-switch-wrap">
+        <button id="cursorSwitch"
+                class="tri-switch"
+                type="button"
+                role="switch"
+                aria-label="Cursor mode"
+                aria-live="polite"
+                data-state="dot"
+                title="Click or press ←/→ to change">
+          <div class="tri-switch__knob" aria-hidden="true"></div>
+          <div class="tri-switch__labels" aria-hidden="true">
+            <span>●</span>
+            <span>🪐</span>
+            <span>⌖</span>
+          </div>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-center">
+    <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <filter id="liquify" x="-70%" y="-260%" width="240%" height="640%" filterUnits="objectBoundingBox">
+          <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
+          <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
+          <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68" xChannelSelector="R" yChannelSelector="G" result="disp"/>
+          <feFlood flood-color="rgb(128,128,0)" result="neutral"/>
+          <feBlend in="blur" in2="neutral" mode="difference" result="diff"/>
+          <feColorMatrix in="diff" type="saturate" values="0" result="strengthLum"/>
+          <feGaussianBlur in="strengthLum" stdDeviation="3" result="strength"/>
+          <feColorMatrix in="disp" type="matrix" result="dispR"
+            values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+          <feColorMatrix in="disp" type="matrix" result="dispG"
+            values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+          <feColorMatrix in="disp" type="matrix" result="dispB"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+          <feComposite in="dispR" in2="strength" operator="in" result="maskR"/>
+          <feComposite in="dispG" in2="strength" operator="in" result="maskG"/>
+          <feComposite in="dispB" in2="strength" operator="in" result="maskB"/>
+          <feOffset in="maskR" dx="0" dy="0" result="prismR" id="offR"/>
+          <feOffset in="maskG" dx="0" dy="0" result="prismG" id="offG"/>
+          <feOffset in="maskB" dx="0" dy="0" result="prismB" id="offB"/>
+          <feMerge>
+            <feMergeNode in="prismR"/><feMergeNode in="prismG"/><feMergeNode in="prismB"/><feMergeNode in="disp"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <g filter="url(#liquify)">
+        <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
+      </g>
+    </svg>
+
+    <p class="hero-sub poetic-note">
+      <span class="line1">just leaving traces</span>
+      <span class="line2">of progress</span>
+      <span class="line3">riiight here.</span>
+    </p>
+  </div>
+</section>
+
+<section style="padding-top:28px">
+  <div class="wrap" style="display:grid;gap:20px;grid-template-columns:1.2fr .8fr">
+    <div class="panel">
+      <h2 class="pill-title pill--mint">stuff i made</h2>
+      <div class="grid cards" style="margin-top:12px">
+        <article class="card">
+          <div class="thumb" data-lightbox>
+            <button class="fs-btn" type="button" aria-label="Open">⤢</button>
+            <video src="assets/greenplanet.mp4" autoplay muted loop playsinline></video>
+          </div>
+          <strong>Imaginary planet</strong>
+          <div class="sub" style="font-size:13px">Procedurally made in Blender</div>
+        </article>
+
+        <article class="card">
+          <div class="thumb" data-lightbox>
+            <button class="fs-btn" type="button" aria-label="Open">⤢</button>
+            <video src="assets/spiderwaving.mp4" autoplay muted loop playsinline></video>
+          </div>
+          <strong>Spider</strong>
+          <div class="sub" style="font-size:13px">Procedurally made in Blender</div>
+        </article>
+
+        <article class="card">
+          <div class="thumb" data-lightbox>
+            <button class="fs-btn" type="button" aria-label="Open">⤢</button>
+            <video src="assets/md.mp4" autoplay muted loop playsinline></video>
+          </div>
+          <strong>Protein Visualization</strong>
+          <div class="sub" style="font-size:13px">MD trajectory in Blender</div>
+        </article>
+      </div>
+    </div>
+    <aside class="panel">
+      <h2 class="pill-title pill--peach pill--flush">about</h2>
+      <p class="sub" style="margin-top:18px">something should be here as well</p>
+      <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:16px 0">
+      <p><a class="tab" href="mailto:koningdelinyah@gmail.com" style="font-size:13px">koningdelinyah@gmail.com</a></p>
+      <p style="margin-top:10px">
+        <a class="tab" href="assets/resume.pdf" target="_blank" style="display:inline-block; font-size:13px">resume</a>
+      </p>
+    </aside>
+  </div>
+</section>
+
+<footer>© <span id="y"></span>something should be here</footer>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="lightbox__frame" role="document">
+    <button class="lightbox__close" type="button" aria-label="Close">
+      <span aria-hidden="true">✕</span><span class="lightbox__sr">Close</span>
+    </button>
+    <div id="lightboxMediaSlot"></div>
+  </div>
+</div>
+
+<!-- Cursors -->
+<div class="cursor cursor--dot" aria-hidden="true">
+  <span class="dot"></span>
+</div>
+
+<div class="cursor cursor--solar" aria-hidden="true">
+  <span class="cursor__sun"></span>
+
+  <span class="orbit orbit--mercury"><span class="track"><span class="planet"></span></span></span>
+  <span class="orbit orbit--venus"><span class="track"><span class="planet"></span></span></span>
+
+  <span class="orbit orbit--earth">
+    <span class="track">
+      <span class="planet">
+        <span class="moon-track"><span class="moon"></span></span>
+      </span>
+    </span>
+  </span>
+
+  <span class="orbit orbit--mars"><span class="track"><span class="planet"></span></span></span>
+  <span class="orbit orbit--jupiter"><span class="track"><span class="planet"></span></span></span>
+  <span class="orbit orbit--saturn"><span class="track"><span class="planet"></span></span></span>
+  <span class="orbit orbit--uranus"><span class="track"><span class="planet"></span></span></span>
+  <span class="orbit orbit--neptune"><span class="track"><span class="planet"></span></span></span>
+</div>
+
+<script>
+  // Year
+  document.getElementById('y').textContent = new Date().getFullYear();
+
+  // Cursor follow + states (both cursors)
+  const dotCursor   = document.querySelector('.cursor--dot');
+  const solarCursor = document.querySelector('.cursor--solar');
+  function handleMove(e){
+    const x = e.clientX + 'px', y = e.clientY + 'px';
+    dotCursor.style.left = x; dotCursor.style.top = y;
+    solarCursor.style.left = x; solarCursor.style.top = y;
+  }
+  document.addEventListener('mousemove', handleMove);
+  const interactive = document.querySelectorAll('a,button,[data-lightbox],.tab,.tri-switch');
+  function onEnter(){ dotCursor.classList.add('cursor--hover'); solarCursor.classList.add('cursor--hover'); }
+  function onLeave(){ dotCursor.classList.remove('cursor--hover'); solarCursor.classList.remove('cursor--hover'); }
+  interactive.forEach(el=>{ el.addEventListener('mouseenter', onEnter); el.addEventListener('mouseleave', onLeave); });
+  document.addEventListener('mousedown', ()=>{ dotCursor.classList.add('cursor--down'); solarCursor.classList.add('cursor--down'); });
+  document.addEventListener('mouseup',   ()=>{ dotCursor.classList.remove('cursor--down'); solarCursor.classList.remove('cursor--down'); });
+
+  // LIGHTBOX
+  (function(){
+    const lb = document.getElementById('lightbox');
+    const frame = lb.querySelector('.lightbox__frame');
+    const closeBtn = lb.querySelector('.lightbox__close');
+    const slot = document.getElementById('lightboxMediaSlot');
+
+    function openWithMedia(mediaEl){
+      slot.innerHTML = '';
+      const isVideo = mediaEl.tagName.toLowerCase() === 'video';
+      const clone = mediaEl.cloneNode(true);
+      clone.classList.add('lightbox__media');
+
+      if (isVideo){
+        clone.loop = true; clone.controls = true; clone.autoplay = true; clone.setAttribute('playsinline','');
+        const startAndPlay = () => {
+          try { clone.currentTime = 0; } catch {}
+          const p = clone.play(); if (p && typeof p.then === 'function') p.catch(()=>{});
+        };
+        clone.addEventListener('loadedmetadata', startAndPlay, { once:true });
+        requestAnimationFrame(startAndPlay);
+      }
+
+      slot.appendChild(clone);
+      lb.classList.add('open');
+      lb.setAttribute('aria-hidden', 'false');
+      closeBtn.focus();
+    }
+
+    function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden', 'true'); slot.innerHTML = ''; }
+
+    document.querySelectorAll('.thumb[data-lightbox]').forEach(thumb=>{
+      const media = thumb.querySelector('video, img') || thumb;
+      const handleOpen = (e)=>{ openWithMedia(media); e.stopPropagation(); e.preventDefault(); };
+      thumb.addEventListener('click', handleOpen);
+      const btn = thumb.querySelector('.fs-btn'); if (btn){ btn.addEventListener('click', handleOpen); }
+      media.addEventListener('dblclick', handleOpen);
+    });
+
+    closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+    lb.addEventListener('click', (e)=>{ if(!frame.contains(e.target)) close(); });
+  })();
+
+  // Liquify + PRISM (unchanged)
+  (function(){
+    const svg  = document.getElementById('heroSVG');
+    const nmEl = document.getElementById('nm');
+    const offR = document.getElementById('offR');
+    const offG = document.getElementById('offG');
+    const offB = document.getElementById('offB');
+
+    const vb   = svg.viewBox.baseVal;
+    const c = document.createElement('canvas');
+    const ctx = c.getContext('2d');
+    c.width = vb.width; c.height = vb.height;
+
+    const MAX_IMPRINTS = 150, LIFE = 9000, BASE = 128, BASE_RADIUS = 110, STRETCH = 3.0, TWIRL = 1.8, POWER = 1.5;
+
+    const imprints = []; let last = {x: vb.width/2, y: vb.height/2}; let vX = 0, vY = 0;
+    let lastDirX = 1, lastDirY = 0;
+
+    function toVB(e){
+      const r = svg.getBoundingClientRect();
+      return { x: (e.clientX - r.left) / r.width  * vb.width, y: (e.clientY - r.top)  / r.height * vb.height };
+    }
+
+    svg.addEventListener('mousemove', (e)=>{
+      const p = toVB(e); vX = p.x - last.x; vY = p.y - last.y; last = p;
+      const vlen = Math.hypot(vX, vY);
+      if (vlen > 0.001) { lastDirX = vX / vlen; lastDirY = vY / vlen; }
+      imprints.unshift({x:p.x, y:p.y, vx:vX, vy:vY, t: performance.now()});
+      if (imprints.length > MAX_IMPRINTS) imprints.pop();
+    });
+
+    function clamp(v){ return Math.max(0, Math.min(255, v)); }
+    function mix(a,b,t){ return a*(1-t)+b*t; }
+
+    function drawNormalMap(){
+      ctx.clearRect(0,0,c.width,c.height);
+      ctx.fillStyle = 'rgb(128,128,0)'; ctx.fillRect(0,0,c.width,c.height);
+      const now = performance.now();
+
+      for (let i=imprints.length-1;i>=0;i--){
+        const it = imprints[i], age = now - it.t;
+        if (age > LIFE){ imprints.splice(i,1); continue; }
+        const t = age / LIFE, ease = Math.pow(1 - t, 1.6), grow = 1 + 0.9*t;
+        const vlen = Math.hypot(it.vx, it.vy) || 1, ux = it.vx / vlen, uy = it.vy / vlen;
+        const disp = POWER * Math.min(1.2, vlen/14) * ease * 110;
+        const cx = it.x, cy = it.y, rx = BASE_RADIUS * STRETCH * grow, ry = BASE_RADIUS * 0.85 * grow;
+
+        ctx.save(); ctx.translate(cx,cy); ctx.rotate(Math.atan2(uy,ux)); ctx.scale(rx, ry);
+
+        const pushX = BASE + (ux * disp * 0.6), pushY = BASE + (uy * disp * 0.6);
+        const spinX = BASE + ((-uy) * disp * TWIRL * 0.6), spinY = BASE + (( ux) * disp * TWIRL * 0.6);
+
+        const g = ctx.createRadialGradient(0,0,0, 0,0,1);
+        g.addColorStop(0.00, `rgb(${clamp(pushX)},${clamp(pushY)},0)`);
+        g.addColorStop(0.45, `rgb(${clamp(mix(pushX,spinX,0.5))},${clamp(mix(pushY,spinY,0.5))},0)`);
+        g.addColorStop(0.85, `rgb(128,128,0)`);
+        g.addColorStop(1.00, `rgb(128,128,0)`);
+
+        ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fillStyle = g; ctx.fill();
+        ctx.restore();
+      }
+
+      const url = c.toDataURL('image/png');
+      nmEl.setAttribute('href', url);
+      nmEl.setAttributeNS('http://www.w3.org/1999/xlink','href', url);
+    }
+
+    let smoothAmt = 0, lastTime  = performance.now(), prevTarget = 0;
+    const ATTACK_MS  = 700, RELEASE_MS = 500;
+
+    function animate(){
+      drawNormalMap();
+      const active = Math.min(1, imprints.length / MAX_IMPRINTS), target = 4 * active;
+      const now = performance.now(), dt  = now - lastTime; lastTime  = now;
+      const rising = target > prevTarget, tauMs  = rising ? ATTACK_MS : RELEASE_MS;
+      const alpha  = 1 - Math.exp(-dt / Math.max(1, tauMs));
+      smoothAmt += (target - smoothAmt) * alpha; prevTarget = target;
+      const amt = smoothAmt, dirX = lastDirX, dirY = lastDirY;
+      offR.setAttribute('dx', (-amt * 1.30 * dirX).toFixed(2)); offR.setAttribute('dy', (-amt * 1.30 * dirY).toFixed(2));
+      offG.setAttribute('dx', ( amt * 0.95 * dirX).toFixed(2)); offG.setAttribute('dy', ( amt * 0.95 * dirY).toFixed(2));
+      offB.setAttribute('dx', ( amt * 1.45 * (-dirY)).toFixed(2)); offB.setAttribute('dy', ( amt * 1.45 * ( dirX)).toFixed(2));
+      requestAnimationFrame(animate);
+    }
+    animate();
+  })();
+
+  // ===== Cursor Mode Switch (tri-position) =====
+  (function(){
+    const MODES = ['dot','solar','native']; // left/middle/right
+    const body = document.body;
+    const switchEl = document.getElementById('cursorSwitch');
+
+    function apply(mode){
+      // Clear
+      body.classList.remove('cursor-hide','cursor-mode-dot','cursor-mode-solar');
+      if(mode === 'dot'){
+        body.classList.add('cursor-hide','cursor-mode-dot');
+        switchEl.dataset.state = 'dot';
+        switchEl.setAttribute('aria-checked','true');
+        switchEl.title = 'Cursor: Simple';
+      }else if(mode === 'solar'){
+        body.classList.add('cursor-hide','cursor-mode-solar');
+        switchEl.dataset.state = 'solar';
+        switchEl.setAttribute('aria-checked','true');
+        switchEl.title = 'Cursor: Solar';
+      }else{
+        switchEl.dataset.state = 'native';
+        switchEl.setAttribute('aria-checked','false');
+        switchEl.title = 'Cursor: Native';
+      }
+      localStorage.setItem('cursorMode', mode);
+    }
+
+    // Init (default to dot)
+    const saved = localStorage.getItem('cursorMode') || 'dot';
+    apply(saved);
+
+    // Click cycles
+    switchEl.addEventListener('click', ()=>{
+      const current = localStorage.getItem('cursorMode') || 'dot';
+      const idx = MODES.indexOf(current);
+      const next = MODES[(idx+1)%MODES.length];
+      apply(next);
+    });
+
+    // Keyboard arrows to move left/right
+    switchEl.addEventListener('keydown', (e)=>{
+      const current = localStorage.getItem('cursorMode') || 'dot';
+      const idx = MODES.indexOf(current);
+      if(e.key === 'ArrowRight'){
+        e.preventDefault(); apply(MODES[(idx+1)%MODES.length]);
+      }else if(e.key === 'ArrowLeft'){
+        e.preventDefault(); apply(MODES[(idx+MODES.length-1)%MODES.length]);
+      }else if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault(); const next = MODES[(idx+1)%MODES.length]; apply(next);
+      }
+    });
+  })();
+</script>
+</body>
+</html>
