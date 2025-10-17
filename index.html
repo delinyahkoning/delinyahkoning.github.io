@@ -1,197 +1,94 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Delinyah Koning — Home</title>
-  <meta name="description" content="Portfolio — 3D, 2D, Design, Photos." />
+/* === Lightbox Overlay === */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&display=swap" rel="stylesheet">
-  
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/hero.css">
-  <link rel="stylesheet" href="css/lightbox.css">
-  <link rel="stylesheet" href="css/cursor.css">
-  <link rel="stylesheet" href="css/switch.css">
+.lightbox.open {
+  display: flex;
+}
 
-  <!-- Pills: white, text in bg color -->
-  <style>
-    .pill-title.pill--white{
-      background:#ffffff !important;
-      color:var(--bg) !important;
-      border-color:#ffffff !important;
-    }
-    /* About paragraph: typewriter vibe */
-    .about-text{
-      font-family: "Courier New", Courier, monospace;
-      font-size: 15px;
-      line-height: 1.65;
-      letter-spacing: 0.15px;
-      -webkit-font-smoothing: none;
-      -moz-osx-font-smoothing: auto;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="wrap nav">
-      <div class="brand">Delinyah Koning • portfolio</div><div class="spacer"></div>
-      <nav class="tabs">
-        <a class="tab active" href="/">home</a>
-        <a class="tab" href="/tabs/3d/">3D</a>
-        <a class="tab" href="/tabs/2d/">2D</a>
-        <a class="tab" href="/tabs/design/">design</a>
-        <a class="tab" href="/tabs/photos/">photos</a>
+.lightbox::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 8, 12, 0.32);
+  backdrop-filter: blur(8px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(130%);
+  pointer-events: none;
+  z-index: 0;
+}
 
-        <!-- Tri-position cursor switch -->
-        <div class="tri-switch-wrap">
-          <button id="cursorSwitch"
-                  class="tri-switch"
-                  type="button"
-                  role="switch"
-                  aria-label="Cursor mode"
-                  aria-live="polite"
-                  data-state="dot"
-                  title="Click or press ←/→ to change">
-            <div class="tri-switch__knob" aria-hidden="true"></div>
-            <div class="tri-switch__labels" aria-hidden="true">
-              <span>●</span>
-              <span>🪐</span>
-              <span>⌖</span>
-            </div>
-          </button>
-        </div>
-      </nav>
-    </div>
-  </header>
+.lightbox__frame {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 14px;
+  padding: 0;
+  background: transparent;
+  max-width: min(1000px, 84vw);
+  max-height: 84vh;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  overflow: visible;
+}
 
-  <section class="hero">
-    <div class="wrap hero-center">
-      <!-- SVG Hero -->
-      <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <filter id="liquify" x="-70%" y="-260%" width="240%" height="640%" filterUnits="objectBoundingBox">
-            <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
-            <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
-            <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68" xChannelSelector="R" yChannelSelector="G" result="disp"/>
-            <feFlood flood-color="rgb(128,128,0)" result="neutral"/>
-            <feBlend in="blur" in2="neutral" mode="difference" result="diff"/>
-            <feColorMatrix in="diff" type="saturate" values="0" result="strengthLum"/>
-            <feGaussianBlur in="strengthLum" stdDeviation="3" result="strength"/>
-            <feColorMatrix in="disp" type="matrix" result="dispR"
-              values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
-            <feColorMatrix in="disp" type="matrix" result="dispG"
-              values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
-            <feColorMatrix in="disp" type="matrix" result="dispB"
-              values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
-            <feComposite in="dispR" in2="strength" operator="in" result="maskR"/>
-            <feComposite in="dispG" in2="strength" operator="in" result="maskG"/>
-            <feComposite in="dispB" in2="strength" operator="in" result="maskB"/>
-            <feOffset in="maskR" dx="0" dy="0" result="prismR" id="offR"/>
-            <feOffset in="maskG" dx="0" dy="0" result="prismG" id="offG"/>
-            <feOffset in="maskB" dx="0" dy="0" result="prismB" id="offB"/>
-            <feMerge>
-              <feMergeNode in="prismR"/><feMergeNode in="prismG"/><feMergeNode in="prismB"/><feMergeNode in="disp"/>
-            </feMerge>
-          </filter>
-        </defs>
+.lightbox__media {
+  display: block;
+  max-width: 84vw;
+  max-height: 84vh;
+  border-radius: 12px;
+  background: #000;
+}
 
-        <g filter="url(#liquify)">
-          <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="70" font-weight="700" fill="currentColor">wow... are u...</text>
-          <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="70" font-weight="700" fill="currentColor">looking at my lil test...???</text>
-        </g>
-      </svg>
+.lightbox__close {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1;
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.25);
+  cursor: pointer;
+  z-index: 3;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+}
 
-      <p class="hero-sub poetic-note">
-        <span class="line1">just leaving traces</span>
-        <span class="line2">of progress</span>
-        <span class="line3">riiight here.</span>
-      </p>
-    </div>
-  </section>
+.lightbox__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
-  <section style="padding-top:28px">
-    <div class="wrap" style="display:grid;gap:20px;grid-template-columns:1.2fr .8fr">
-      <div class="panel">
-        <h2 class="pill-title pill--white">stuff i made</h2>
-        <div class="grid cards" style="margin-top:12px">
-          <article class="card">
-            <div class="thumb" data-lightbox>
-              <button class="fs-btn" type="button" aria-label="Open">⤢</button>
-              <video src="assets/greenplanet.mp4" autoplay muted loop playsinline></video>
-            </div>
-            <strong>Imaginary planet</strong>
-            <div class="sub" style="font-size:13px">Procedurally made in Blender</div>
-          </article>
+/* === Fix sub-pixel seam on media thumbnails === */
+.thumb {
+  position: relative;
+  overflow: hidden;
+}
 
-          <article class="card">
-            <div class="thumb" data-lightbox>
-              <button class="fs-btn" type="button" aria-label="Open">⤢</button>
-              <video src="assets/spiderwaving.mp4" autoplay muted loop playsinline></video>
-            </div>
-            <strong>Spider</strong>
-            <div class="sub" style="font-size:13px">Procedurally made in Blender</div>
-          </article>
-
-          <article class="card">
-            <div class="thumb" data-lightbox>
-              <button class="fs-btn" type="button" aria-label="Open">⤢</button>
-              <video src="assets/md.mp4" autoplay muted loop playsinline></video>
-            </div>
-            <strong>Protein Visualization</strong>
-            <div class="sub" style="font-size:13px">MD trajectory in Blender</div>
-          </article>
-        </div>
-      </div>
-      <aside class="panel">
-        <h2 class="pill-title pill--white pill--flush">about</h2>
-        <p class="sub about-text" style="margin-top:18px">Hey! I'm Delinyah, a scientist - a creative one. This is my little portfolio. Just for fun and progress. Currently obsessed with space-themed cinematics. I'm planning to delve more into animation and graphic design, both for fun sidequests and scientific purposes.</p>
-        <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:16px 0">
-        <p><a class="tab" href="mailto:koningdelinyah@gmail.com" style="font-size:13px">koningdelinyah@gmail.com</a></p>
-        <p style="margin-top:10px">
-          <a class="tab" href="assets/resume.pdf" target="_blank" style="display:inline-block; font-size:13px">resume</a>
-        </p>
-      </aside>
-    </div>
-  </section>
-
-  <footer>© <span id="y"></span> Delinyah Koning</footer>
-
-  <!-- Lightbox -->
-  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="lightbox__frame" role="document">
-      <button class="lightbox__close" type="button" aria-label="Close">
-        <span aria-hidden="true">✕</span><span class="lightbox__sr">Close</span>
-      </button>
-      <div id="lightboxMediaSlot"></div>
-    </div>
-  </div>
-
-  <!-- Cursors -->
-  <div class="cursor cursor--dot" aria-hidden="true"><span class="dot"></span></div>
-  <div class="cursor cursor--solar" aria-hidden="true">
-    <span class="cursor__sun"></span>
-    <span class="orbit orbit--mercury"><span class="track"><span class="planet"></span></span></span>
-    <span class="orbit orbit--venus"><span class="track"><span class="planet"></span></span></span>
-    <span class="orbit orbit--earth"><span class="track"><span class="planet"><span class="moon-track"><span class="moon"></span></span></span></span></span>
-    <span class="orbit orbit--mars"><span class="track"><span class="planet"></span></span></span>
-    <span class="orbit orbit--jupiter"><span class="track"><span class="planet"></span></span></span>
-    <span class="orbit orbit--saturn"><span class="track"><span class="planet"></span></span></span>
-    <span class="orbit orbit--uranus"><span class="track"><span class="planet"></span></span></span>
-    <span class="orbit orbit--neptune"><span class="track"><span class="planet"></span></span></span>
-  </div>
-
-  <!-- Scripts (ES modules; load order matters where noted!) -->
-  <script type="module" src="js/config.js"></script>      <!-- defines window.APP -->
-  <script type="module" src="js/lightbox.js"></script>
-  <script type="module" src="js/cursor.js"></script>
-  <script type="module" src="js/switch.js"></script>
-  <script type="module" src="js/hero-liquify.js"></script>
-  <script type="module" src="js/main.js"></script>        <!-- runs last -->
-</body>
-</html>
+.thumb > img,
+.thumb > video {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  object-fit: cover;
+  display: block;
+  transform: translateZ(0);
+}
