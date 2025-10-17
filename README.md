@@ -138,11 +138,13 @@ Each orbit and planet is defined in HTML like:
 
 The visual behavior is controlled using these CSS variables:
 
---r        = Orbit radius (distance from center)
---duration = Rotation speed (lower = faster spin)
---theta    = Starting rotation angle
---size     = Planet size
---color    = Planet color (can be a solid or gradient)
+```md
+- --r        = Orbit radius (distance from center)
+- --duration = Rotation speed (lower = faster spin)
+- --theta    = Starting rotation angle
+- --size     = Planet size
+- --color    = Planet color (can be a solid or gradient)
+```
 
 Example from cursor.css:
 
