@@ -55,13 +55,9 @@
   .hero-center{text-align:left}
   .hero-svg{display:block;width:min(92vw,1100px);height:auto}
 
-  /* Poetic line: lowercase, airy spacing, deep indents — Century/Times */
+  /* Poetic line */
   .hero-sub.poetic-note{
-    font-size:0.9em;
-    line-height:2.2;
-    margin-left:60px;
-    margin-top:-10px;
-    color:var(--ink);
+    font-size:0.9em; line-height:2.2; margin-left:60px; margin-top:-10px; color:var(--ink);
     font-family: "Century Schoolbook", Century, "Times New Roman", Times, Georgia, serif;
   }
   .poetic-note span{ display:block; }
@@ -70,187 +66,136 @@
 
   .panel .sub{ margin:6px 0; line-height:1.4 }
 
-  /* --- Pill section headers (mint / peach), aligned to card inner edge --- */
+  /* --- Pill section headers --- */
   .pill-title{
     --pill-px: 15px; --pill-py: 5px; --pill-font: 15px;
-    display:inline-block;
-    margin:0 0 12px 14px;
-    padding:var(--pill-py) var(--pill-px);
-    border-radius:999px;
-    border:1.5px solid currentColor;
-    background:transparent;
-    color:#fff;
-    text-transform:lowercase;
-    font-weight:600;
-    letter-spacing:.02em;
-    line-height:1;
-    font-size:var(--pill-font);
+    display:inline-block; margin:0 0 12px 14px; padding:var(--pill-py) var(--pill-px);
+    border-radius:999px; border:1.5px solid currentColor; background:transparent; color:#fff;
+    text-transform:lowercase; font-weight:600; letter-spacing:.02em; line-height:1; font-size:var(--pill-font);
   }
   .pill--mint{ color:var(--mint); }
   .pill--peach{ color:var(--peach); }
   .pill--flush{ margin-left:0 !important; }
 
   /* ===== LIGHTBOX ===== */
-  .lightbox{
-    position:fixed; inset:0; z-index:9998;
-    display:none; align-items:center; justify-content:center;
-    background:transparent;
-  }
+  .lightbox{ position:fixed; inset:0; z-index:9998; display:none; align-items:center; justify-content:center; background:transparent; }
   .lightbox.open{ display:flex; }
   .lightbox::before{
-    content:""; position:fixed; inset:0;
-    background: rgba(7,8,12,.32);
-    backdrop-filter: blur(8px) saturate(130%);
-    -webkit-backdrop-filter: blur(8px) saturate(130%);
+    content:""; position:fixed; inset:0; background: rgba(7,8,12,.32);
+    backdrop-filter: blur(8px) saturate(130%); -webkit-backdrop-filter: blur(8px) saturate(130%);
     pointer-events:none; z-index:0;
   }
   .lightbox__frame{
-    position:relative; z-index:1;
-    display:flex; align-items:center; justify-content:center;
+    position:relative; z-index:1; display:flex; align-items:center; justify-content:center;
     border:none; border-radius:14px; padding:0; background:transparent;
-    max-width:min(1000px,84vw); max-height:84vh;
-    box-shadow:0 12px 40px rgba(0,0,0,.45);
-    overflow:visible;
+    max-width:min(1000px,84vw); max-height:84vh; box-shadow:0 12px 40px rgba(0,0,0,.45); overflow:visible;
   }
-  .lightbox__media{
-    display:block; max-width:84vw; max-height:84vh;
-    border-radius:12px; background:#000;
-  }
+  .lightbox__media{ display:block; max-width:84vw; max-height:84vh; border-radius:12px; background:#000; }
   .lightbox__close{
-    position:absolute; top:-10px; right:-10px;
-    padding:6px 10px; border-radius:8px; font-size:14px; line-height:1;
-    background:rgba(0,0,0,.55); color:#fff; border:1px solid rgba(255,255,255,.25);
-    cursor:pointer; z-index:3; pointer-events:auto;
+    position:absolute; top:-10px; right:-10px; padding:6px 10px; border-radius:8px; font-size:14px; line-height:1;
+    background:rgba(0,0,0,.55); color:#fff; border:1px solid rgba(255,255,255,.25); cursor:pointer; z-index:3;
     box-shadow:0 4px 14px rgba(0,0,0,.35);
   }
   .lightbox__sr{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 
-  /* Hide native cursor so only the custom one shows */
-  * { cursor:none !important; }
+  /* ===== Cursor visibility control =====
+     We only hide the native cursor when a custom cursor is active.
+  */
+  body.cursor-hide * { cursor:none !important; }
+
+  /* ===== Cursor base ===== */
+  .cursor{
+    position:fixed; top:0; left:0; width:30px; height:30px; transform:translate(-50%,-50%);
+    pointer-events:none; z-index:9999; display:none;
+  }
+  /* Show the right cursor for each mode */
+  body.cursor-mode-dot   .cursor--dot{display:block;}
+  body.cursor-mode-solar .cursor--solar{display:block;}
+
+  /* ===== Simple white dot cursor ===== */
+  .cursor--dot .dot{
+    position:absolute; left:50%; top:50%; width:10px; height:10px; border-radius:50%;
+    transform:translate(-50%,-50%);
+    background:#ffffff; box-shadow:0 0 10px rgba(255,255,255,.45), inset 0 0 8px rgba(0,0,0,.35);
+  }
+  .cursor--dot.cursor--hover .dot{ transform:translate(-50%,-50%) scale(1.08); }
+  .cursor--dot.cursor--down  .dot{ transform:translate(-50%,-50%) scale(1.0); }
 
   /* =======================
      SOLAR-SYSTEM CURSOR — smooth, slower
      ======================= */
-  .cursor{
-    position:fixed; top:0; left:0;
-    width:30px; height:30px;
-    transform:translate(-50%,-50%);
-    pointer-events:none; z-index:9999;
-  }
-
-  /* Sun (center) */
-  .cursor__sun{
-    position:absolute; left:50%; top:50%;
-    width:18px; height:18px; border-radius:50%;
+  .cursor--solar .cursor__sun{
+    position:absolute; left:50%; top:50%; width:18px; height:18px; border-radius:50%;
     transform:translate(-50%,-50%);
     background: radial-gradient(circle at 35% 35%, #fff7c7, #ffd36b 45%, #ff9f2c 70%, #ff7a00 100%);
-    box-shadow:
-      0 0 14px rgba(255,210,90,.7),
-      0 0 28px rgba(255,160,60,.5),
-      inset 0 0 10px rgba(255,255,255,.35);
+    box-shadow:0 0 14px rgba(255,210,90,.7), 0 0 28px rgba(255,160,60,.5), inset 0 0 10px rgba(255,255,255,.35);
   }
-
-  /* Orbit container stays centered on pointer */
-  .orbit{
-    position:absolute; left:50%; top:50%;
-    transform:translate(-50%,-50%);
-    pointer-events:none;
-  }
-
-  /* Rotating ring (this rotates around the sun) */
-  .track{
-    --r: 14px;          /* radius from sun */
-    --theta: 0deg;      /* starting angle */
-    --duration: 10s;    /* orbital period (visual) */
+  .cursor--solar .orbit{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); pointer-events:none; }
+  .cursor--solar .track{
+    --r: 14px; --theta: 0deg; --duration: 10s;
     position:absolute; left:50%; top:50%;
     width: calc(var(--r) * 2); height: calc(var(--r) * 2);
     margin-left: calc(var(--r) * -1); margin-top: calc(var(--r) * -1);
     transform-origin: 50% 50%;
     will-change: transform;
     animation: orbit-spin var(--duration) linear infinite;
-    border: 1px dotted rgba(255,255,255,.06);
-    border-radius:50%;
+    border: 1px dotted rgba(255,255,255,.06); border-radius:50%;
   }
-
-  /* Planet sits ON the rotating track, so it orbits with it */
-  .planet{
+  .cursor--solar .planet{
     --size:6px; --color:#fff;
-    position:absolute; left:50%; top:50%;
-    width: var(--size); height: var(--size);
+    position:absolute; left:50%; top:50%; width: var(--size); height: var(--size);
     border-radius:50%; background: var(--color);
-    transform: translate(var(--r), -50%); /* rightmost point of track */
-    box-shadow: 0 0 6px rgba(255,255,255,.25);
-    z-index:1; /* allows Saturn ring layers to sandwich the planet */
+    transform: translate(var(--r), -50%); box-shadow: 0 0 6px rgba(255,255,255,.25); z-index:1;
   }
 
-  /* —— Planet presets (rough sizes/colors/radii/speeds/start angles) —— */
-  /* Inner planets */
-  .orbit--mercury .track{ --r:12px; --theta: 10deg;  --duration: 6s;  }
-  .orbit--mercury .planet{ --size:3px;  --color:#b7b7b7; }
+  /* Orbits (same as your last working values) */
+  .cursor--solar .orbit--mercury .track{ --r:12px; --theta: 10deg;  --duration: 6s;  }
+  .cursor--solar .orbit--mercury .planet{ --size:3px;  --color:#b7b7b7; }
 
-  .orbit--venus   .track{ --r:18px; --theta: 60deg;  --duration: 9s;  }
-  .orbit--venus   .planet{ --size:5px;  --color:#e8d28b; }
+  .cursor--solar .orbit--venus   .track{ --r:18px; --theta: 60deg;  --duration: 9s;  }
+  .cursor--solar .orbit--venus   .planet{ --size:5px;  --color:#e8d28b; }
 
-  .orbit--earth   .track{ --r:24px; --theta: 130deg; --duration: 12s; }
-  .orbit--earth   .planet{ --size:5px;  --color:#6fb7ff; box-shadow:0 0 8px rgba(120,180,255,.45); }
+  .cursor--solar .orbit--earth   .track{ --r:24px; --theta: 130deg; --duration: 12s; }
+  .cursor--solar .orbit--earth   .planet{ --size:5px;  --color:#6fb7ff; box-shadow:0 0 8px rgba(120,180,255,.45); }
 
-  .orbit--mars    .track{ --r:30px; --theta: 200deg; --duration: 15s; }
-  .orbit--mars    .planet{ --size:4px;  --color:#ff7b6b; }
+  .cursor--solar .orbit--mars    .track{ --r:30px; --theta: 200deg; --duration: 15s; }
+  .cursor--solar .orbit--mars    .planet{ --size:4px;  --color:#ff7b6b; }
 
-  /* Gas/ice giants */
-  .orbit--jupiter .track{ --r:40px; --theta: 15deg;  --duration: 20s; }
-  .orbit--jupiter .planet{
+  .cursor--solar .orbit--jupiter .track{ --r:40px; --theta: 15deg;  --duration: 20s; }
+  .cursor--solar .orbit--jupiter .planet{
     --size:9px; --color:#e8cf9b;
     background: radial-gradient(circle at 40% 35%, #f6e8c4, #e8cf9b 60%, #c6a677 100%);
     box-shadow:0 0 10px rgba(240,210,150,.35);
   }
 
-  .orbit--saturn  .track{ --r:52px; --theta: 80deg;  --duration: 25s; }
-  .orbit--saturn  .planet{
+  .cursor--solar .orbit--saturn  .track{ --r:52px; --theta: 80deg;  --duration: 25s; }
+  .cursor--solar .orbit--saturn  .planet{
     --size:8px; --color:#f1df9a;
     background: radial-gradient(circle at 40% 40%, #fff3c2, #f1df9a 60%, #cdbd86 100%);
     position:absolute;
   }
-
-  /* === Improved Saturn Rings: dual layer with texture & tilt === */
-  .orbit--saturn .planet::before,
-  .orbit--saturn .planet::after{
-    content:"";
-    position:absolute; left:50%; top:50%;
-    width: 26px;                 /* overall ring width */
-    height: 9px;                 /* ring thickness */
-    transform: translate(-50%,-50%) rotate(24deg);
-    border-radius:50%;
-    /* soft ring bands using layered gradients */
+  /* Upgraded Saturn rings (front/back halves) */
+  .cursor--solar .orbit--saturn .planet::before,
+  .cursor--solar .orbit--saturn .planet::after{
+    content:""; position:absolute; left:50%; top:50%;
+    width: 26px; height: 9px; transform: translate(-50%,-50%) rotate(24deg); border-radius:50%;
     background:
       radial-gradient(closest-side, transparent 58%, rgba(255,255,255,.35) 59% 63%, rgba(255,230,190,.25) 64% 68%, rgba(255,255,255,.18) 69% 74%, transparent 75%),
       radial-gradient(closest-side, transparent 60%, rgba(255,255,255,.15) 61% 72%, transparent 73%);
     filter: drop-shadow(0 0 2px rgba(255,255,255,.25)) drop-shadow(0 0 4px rgba(255,210,130,.15));
     pointer-events:none;
   }
-  /* Back half of the ring (behind the planet) */
-  .orbit--saturn .planet::before{
-    z-index:0;
-    /* show lower half after rotation, gives a sense of depth */
-    clip-path: inset(50% 0 0 0);
-    opacity:.9;
-  }
-  /* Front half of the ring (in front of the planet) */
-  .orbit--saturn .planet::after{
-    z-index:2;
-    /* show upper half */
-    clip-path: inset(0 0 50% 0);
-    opacity:.95;
-  }
+  .cursor--solar .orbit--saturn .planet::before{ z-index:0; clip-path: inset(50% 0 0 0); opacity:.9; }
+  .cursor--solar .orbit--saturn .planet::after { z-index:2; clip-path: inset(0 0 50% 0); opacity:.95; }
 
-  .orbit--uranus  .track{ --r:64px; --theta: 140deg; --duration: 32s; }
-  .orbit--uranus  .planet{ --size:7px; --color:#a8f1ff; }
+  .cursor--solar .orbit--uranus  .track{ --r:64px; --theta: 140deg; --duration: 32s; }
+  .cursor--solar .orbit--uranus  .planet{ --size:7px; --color:#a8f1ff; }
 
-  .orbit--neptune .track{ --r:76px; --theta: 300deg; --duration: 40s; }
-  .orbit--neptune .planet{ --size:7px; --color:#7aa8ff; }
+  .cursor--solar .orbit--neptune .track{ --r:76px; --theta: 300deg; --duration: 40s; }
+  .cursor--solar .orbit--neptune .planet{ --size:7px; --color:#7aa8ff; }
 
-  /* Earth’s Moon — nested orbit inside the (orbiting) Earth */
-  .orbit--earth .planet .moon-track{
+  /* Earth’s Moon (nested) */
+  .cursor--solar .orbit--earth .planet .moon-track{
     --r:7px; --duration:2.5s; --theta: 200deg;
     position:absolute; left:50%; top:50%;
     width: calc(var(--r) * 2); height: calc(var(--r) * 2);
@@ -258,29 +203,28 @@
     transform-origin: 50% 50%;
     will-change: transform;
     animation: orbit-spin var(--duration) linear infinite;
-    border: 1px dotted rgba(255,255,255,.05);
-    border-radius:50%;
+    border: 1px dotted rgba(255,255,255,.05); border-radius:50%;
   }
-  .orbit--earth .planet .moon{
+  .cursor--solar .orbit--earth .planet .moon{
     position:absolute; left:50%; top:50%;
     width:2.5px; height:2.5px; border-radius:50%;
     background:#dfe7ff; transform: translate(var(--r), -50%);
     box-shadow:0 0 4px rgba(220,230,255,.35);
   }
 
-  /* Cursor states */
-  .cursor--hover .track{ animation-duration: calc(var(--duration) * .85); }
-  .cursor--hover .cursor__sun{ transform:translate(-50%,-50%) scale(1.05); }
-  .cursor--down  .cursor__sun{ transform:translate(-50%,-50%) scale(1.0); }
+  /* Hover/Down states for solar */
+  .cursor--solar.cursor--hover .track{ animation-duration: calc(var(--duration) * .85); }
+  .cursor--solar.cursor--hover .cursor__sun{ transform:translate(-50%,-50%) scale(1.05); }
+  .cursor--solar.cursor--down  .cursor__sun{ transform:translate(-50%,-50%) scale(1.0); }
 
-  /* Smooth, angle-aware orbit */
+  /* Angle-aware orbit (no jumps) */
   @keyframes orbit-spin{
     from { transform: rotate(var(--theta)); }
     to   { transform: rotate(calc(var(--theta) + 360deg)); }
   }
 
   @media (prefers-reduced-motion: reduce){
-    .track{ animation: none; }
+    .cursor--solar .track{ animation: none; }
   }
 </style>
 </head>
@@ -294,6 +238,8 @@
       <a class="tab" href="/2d/">2D</a>
       <a class="tab" href="/design/">Design</a>
       <a class="tab" href="/photos/">Photos</a>
+      <!-- Cursor mode toggle button -->
+      <button id="cursorToggle" class="tab" type="button" aria-label="Toggle cursor mode">Cursor: simple</button>
     </nav>
   </div>
 </header>
@@ -302,11 +248,10 @@
   <div class="wrap hero-center">
     <svg id="heroSVG" class="hero-svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <filter id="liquify" x="-70%" y="-260%" width="240%" height="640%" filterUnits="objectBoundingBox">
+        <filter id="liquify" x="-70% y="-260%" width="240%" height="640%" filterUnits="objectBoundingBox">
           <feImage id="nm" x="0" y="0" width="1200" height="360" preserveAspectRatio="none" result="map"/>
           <feGaussianBlur in="map" stdDeviation="12" result="blur"/>
-          <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68"
-                             xChannelSelector="R" yChannelSelector="G" result="disp"/>
+          <feDisplacementMap id="dm" in="SourceGraphic" in2="blur" scale="68" xChannelSelector="R" yChannelSelector="G" result="disp"/>
           <feFlood flood-color="rgb(128,128,0)" result="neutral"/>
           <feBlend in="blur" in2="neutral" mode="difference" result="diff"/>
           <feColorMatrix in="diff" type="saturate" values="0" result="strengthLum"/>
@@ -324,10 +269,7 @@
           <feOffset in="maskG" dx="0" dy="0" result="prismG" id="offG"/>
           <feOffset in="maskB" dx="0" dy="0" result="prismB" id="offB"/>
           <feMerge>
-            <feMergeNode in="prismR"/>
-            <feMergeNode in="prismG"/>
-            <feMergeNode in="prismB"/>
-            <feMergeNode in="disp"/>
+            <feMergeNode in="prismR"/><feMergeNode in="prismG"/><feMergeNode in="prismB"/><feMergeNode in="disp"/>
           </feMerge>
         </filter>
       </defs>
@@ -403,21 +345,16 @@
   </div>
 </div>
 
-<!-- Solar System Cursor -->
-<div class="cursor" aria-hidden="true">
+<!-- Cursors -->
+<div class="cursor cursor--dot" aria-hidden="true">
+  <span class="dot"></span>
+</div>
+
+<div class="cursor cursor--solar" aria-hidden="true">
   <span class="cursor__sun"></span>
 
-  <span class="orbit orbit--mercury">
-    <span class="track">
-      <span class="planet"></span>
-    </span>
-  </span>
-
-  <span class="orbit orbit--venus">
-    <span class="track">
-      <span class="planet"></span>
-    </span>
-  </span>
+  <span class="orbit orbit--mercury"><span class="track"><span class="planet"></span></span></span>
+  <span class="orbit orbit--venus"><span class="track"><span class="planet"></span></span></span>
 
   <span class="orbit orbit--earth">
     <span class="track">
@@ -427,56 +364,34 @@
     </span>
   </span>
 
-  <span class="orbit orbit--mars">
-    <span class="track">
-      <span class="planet"></span>
-    </span>
-  </span>
-
-  <span class="orbit orbit--jupiter">
-    <span class="track">
-      <span class="planet"></span>
-    </span>
-  </span>
-
-  <span class="orbit orbit--saturn">
-    <span class="track">
-      <span class="planet"></span>
-    </span>
-  </span>
-
-  <span class="orbit orbit--uranus">
-    <span class="track">
-      <span class="planet"></span>
-    </span>
-  </span>
-
-  <span class="orbit orbit--neptune">
-    <span class="track">
-      <span class="planet"></span>
-    </span>
-  </span>
+  <span class="orbit orbit--mars"><span class="track"><span class="planet"></span></span></span>
+  <span class="orbit orbit--jupiter"><span class="track"><span class="planet"></span></span></span>
+  <span class="orbit orbit--saturn"><span class="track"><span class="planet"></span></span></span>
+  <span class="orbit orbit--uranus"><span class="track"><span class="planet"></span></span></span>
+  <span class="orbit orbit--neptune"><span class="track"><span class="planet"></span></span></span>
 </div>
 
 <script>
   // Year
   document.getElementById('y').textContent = new Date().getFullYear();
 
-  // Cursor follow + simple states
-  const cursorEl = document.querySelector('.cursor');
-  document.addEventListener('mousemove', (e)=>{
-    cursorEl.style.top  = e.clientY + 'px';
-    cursorEl.style.left = e.clientX + 'px';
-  });
+  // Cursor follow + states (applies to both cursor DOMs)
+  const dotCursor   = document.querySelector('.cursor--dot');
+  const solarCursor = document.querySelector('.cursor--solar');
+  function handleMove(e){
+    const x = e.clientX + 'px', y = e.clientY + 'px';
+    dotCursor.style.left = x; dotCursor.style.top = y;
+    solarCursor.style.left = x; solarCursor.style.top = y;
+  }
+  document.addEventListener('mousemove', handleMove);
   const interactive = document.querySelectorAll('a,button,[data-lightbox],.tab');
-  interactive.forEach(el=>{
-    el.addEventListener('mouseenter', ()=> cursorEl.classList.add('cursor--hover'));
-    el.addEventListener('mouseleave', ()=> cursorEl.classList.remove('cursor--hover'));
-  });
-  document.addEventListener('mousedown', ()=> cursorEl.classList.add('cursor--down'));
-  document.addEventListener('mouseup',   ()=> cursorEl.classList.remove('cursor--down'));
+  function onEnter(){ dotCursor.classList.add('cursor--hover'); solarCursor.classList.add('cursor--hover'); }
+  function onLeave(){ dotCursor.classList.remove('cursor--hover'); solarCursor.classList.remove('cursor--hover'); }
+  interactive.forEach(el=>{ el.addEventListener('mouseenter', onEnter); el.addEventListener('mouseleave', onLeave); });
+  document.addEventListener('mousedown', ()=>{ dotCursor.classList.add('cursor--down'); solarCursor.classList.add('cursor--down'); });
+  document.addEventListener('mouseup',   ()=>{ dotCursor.classList.remove('cursor--down'); solarCursor.classList.remove('cursor--down'); });
 
-  // LIGHTBOX (centered + autoplay from start)
+  // LIGHTBOX
   (function(){
     const lb = document.getElementById('lightbox');
     const frame = lb.querySelector('.lightbox__frame');
@@ -490,10 +405,7 @@
       clone.classList.add('lightbox__media');
 
       if (isVideo){
-        clone.loop = true;
-        clone.controls = true;
-        clone.autoplay = true;
-        clone.setAttribute('playsinline','');
+        clone.loop = true; clone.controls = true; clone.autoplay = true; clone.setAttribute('playsinline','');
         const startAndPlay = () => {
           try { clone.currentTime = 0; } catch {}
           const p = clone.play(); if (p && typeof p.then === 'function') p.catch(()=>{});
@@ -508,22 +420,16 @@
       closeBtn.focus();
     }
 
-    function close(){
-      lb.classList.remove('open');
-      lb.setAttribute('aria-hidden', 'true');
-      slot.innerHTML = '';
-    }
+    function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden', 'true'); slot.innerHTML = ''; }
 
     document.querySelectorAll('.thumb[data-lightbox]').forEach(thumb=>{
       const media = thumb.querySelector('video, img') || thumb;
       const handleOpen = (e)=>{ openWithMedia(media); e.stopPropagation(); e.preventDefault(); };
       thumb.addEventListener('click', handleOpen);
-      const btn = thumb.querySelector('.fs-btn');
-      if (btn){ btn.addEventListener('click', handleOpen); }
+      const btn = thumb.querySelector('.fs-btn'); if (btn){ btn.addEventListener('click', handleOpen); }
       media.addEventListener('dblclick', handleOpen);
     });
 
-    /* Close interactions (button, esc, backdrop) */
     closeBtn.addEventListener('click', close);
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
     lb.addEventListener('click', (e)=>{ if(!frame.contains(e.target)) close(); });
@@ -537,89 +443,53 @@
     const offG = document.getElementById('offG');
     const offB = document.getElementById('offB');
 
-    const vb   = svg.viewBox.baseVal; // 1200x360
+    const vb   = svg.viewBox.baseVal;
     const c = document.createElement('canvas');
     const ctx = c.getContext('2d');
     c.width = vb.width; c.height = vb.height;
 
-    const MAX_IMPRINTS = 150;
-    const LIFE = 9000;
-    const BASE = 128;
-    const BASE_RADIUS = 110;
-    const STRETCH = 3.0;
-    const TWIRL = 1.8;
-    const POWER = 1.5;
+    const MAX_IMPRINTS = 150, LIFE = 9000, BASE = 128, BASE_RADIUS = 110, STRETCH = 3.0, TWIRL = 1.8, POWER = 1.5;
 
-    const imprints = []; // {x,y,vx,vy,t}
-    let last = {x: vb.width/2, y: vb.height/2};
-    let vX = 0, vY = 0;
-
+    const imprints = []; let last = {x: vb.width/2, y: vb.height/2}; let vX = 0, vY = 0;
     let lastDirX = 1, lastDirY = 0;
 
     function toVB(e){
       const r = svg.getBoundingClientRect();
-      return {
-        x: (e.clientX - r.left) / r.width  * vb.width,
-        y: (e.clientY - r.top)  / r.height * vb.height
-      };
+      return { x: (e.clientX - r.left) / r.width  * vb.width, y: (e.clientY - r.top)  / r.height * vb.height };
     }
 
     svg.addEventListener('mousemove', (e)=>{
-      const p = toVB(e);
-      vX = p.x - last.x; vY = p.y - last.y;
-      last = p;
-
+      const p = toVB(e); vX = p.x - last.x; vY = p.y - last.y; last = p;
       const vlen = Math.hypot(vX, vY);
-      if (vlen > 0.001) {
-        lastDirX = vX / vlen;
-        lastDirY = vY / vlen;
-      }
-
+      if (vlen > 0.001) { lastDirX = vX / vlen; lastDirY = vY / vlen; }
       imprints.unshift({x:p.x, y:p.y, vx:vX, vy:vY, t: performance.now()});
       if (imprints.length > MAX_IMPRINTS) imprints.pop();
     });
 
-    svg.addEventListener('mouseleave', ()=>{ /* let it fade */ });
-
-    function clamp(v){ return Math.max(0, Math.min(255, v)); }
-    function mix(a,b,t){ return a*(1-t)+b*t; }
-
     function drawNormalMap(){
       ctx.clearRect(0,0,c.width,c.height);
       ctx.fillStyle = 'rgb(128,128,0)'; ctx.fillRect(0,0,c.width,c.height);
-
       const now = performance.now();
 
       for (let i=imprints.length-1;i>=0;i--){
-        const it = imprints[i];
-        const age = now - it.t;
+        const it = imprints[i], age = now - it.t;
         if (age > LIFE){ imprints.splice(i,1); continue; }
-
-        const t = age / LIFE;
-        const ease = Math.pow(1 - t, 1.6);
-        const grow = 1 + 0.9*t;
-
-        const vlen = Math.hypot(it.vx, it.vy) || 1;
-        const ux = it.vx / vlen, uy = it.vy / vlen;
+        const t = age / LIFE, ease = Math.pow(1 - t, 1.6), grow = 1 + 0.9*t;
+        const vlen = Math.hypot(it.vx, it.vy) || 1, ux = it.vx / vlen, uy = it.vy / vlen;
         const disp = POWER * Math.min(1.2, vlen/14) * ease * 110;
+        const cx = it.x, cy = it.y, rx = BASE_RADIUS * STRETCH * grow, ry = BASE_RADIUS * 0.85 * grow;
 
-        const cx = it.x, cy = it.y;
-        const rx = BASE_RADIUS * STRETCH * grow;
-        const ry = BASE_RADIUS * 0.85   * grow;
+        ctx.save(); ctx.translate(cx,cy); ctx.rotate(Math.atan2(uy,ux)); ctx.scale(rx, ry);
 
-        ctx.save();
-        ctx.translate(cx,cy);
-        ctx.rotate(Math.atan2(uy,ux));
-        ctx.scale(rx, ry);
+        const pushX = BASE + (ux * disp * 0.6), pushY = BASE + (uy * disp * 0.6);
+        const spinX = BASE + ((-uy) * disp * TWIRL * 0.6), spinY = BASE + (( ux) * disp * TWIRL * 0.6);
 
-        const pushX = BASE + (ux * disp * 0.6);
-        const pushY = BASE + (uy * disp * 0.6);
-        const spinX = BASE + ((-uy) * disp * TWIRL * 0.6);
-        const spinY = BASE + (( ux) * disp * TWIRL * 0.6);
+        const clamp = v => Math.max(0, Math.min(255, v));
+        const mix = (a,b,t) => a*(1-t)+b*t;
 
         const g = ctx.createRadialGradient(0,0,0, 0,0,1);
-        g.addColorStop(0.00, `rgb(${Math.max(0, Math.min(255, pushX))},${Math.max(0, Math.min(255, pushY))},0)`);
-        g.addColorStop(0.45, `rgb(${Math.max(0, Math.min(255, (pushX+spinX)/2))},${Math.max(0, Math.min(255, (pushY+spinY)/2))},0)`);
+        g.addColorStop(0.00, `rgb(${clamp(pushX)},${clamp(pushY)},0)`);
+        g.addColorStop(0.45, `rgb(${clamp(mix(pushX,spinX,0.5))},${clamp(mix(pushY,spinY,0.5))},0)`);
         g.addColorStop(0.85, `rgb(128,128,0)`);
         g.addColorStop(1.00, `rgb(128,128,0)`);
 
@@ -632,44 +502,60 @@
       nmEl.setAttributeNS('http://www.w3.org/1999/xlink','href', url);
     }
 
-    // Animate + RGB prism offsets
-    let smoothAmt = 0;
-    let lastTime  = performance.now();
-    let prevTarget = 0;
-
-    const ATTACK_MS  = 700;
-    const RELEASE_MS = 500;
+    let smoothAmt = 0, lastTime  = performance.now(), prevTarget = 0;
+    const ATTACK_MS  = 700, RELEASE_MS = 500;
 
     function animate(){
       drawNormalMap();
-
-      const active = Math.min(1, imprints.length / MAX_IMPRINTS);
-      const target = 4 * active;
-
-      const now = performance.now();
-      const dt  = now - lastTime;
-      lastTime  = now;
-
-      const rising = target > prevTarget;
-      const tauMs  = rising ? ATTACK_MS : RELEASE_MS;
+      const active = Math.min(1, imprints.length / MAX_IMPRINTS), target = 4 * active;
+      const now = performance.now(), dt  = now - lastTime; lastTime  = now;
+      const rising = target > prevTarget, tauMs  = rising ? ATTACK_MS : RELEASE_MS;
       const alpha  = 1 - Math.exp(-dt / Math.max(1, tauMs));
-
-      smoothAmt += (target - smoothAmt) * alpha;
-      prevTarget = target;
-
-      const dirX = lastDirX, dirY = lastDirY;
-
-      const amt = smoothAmt;
-      offR.setAttribute('dx', (-amt * 1.30 * dirX).toFixed(2));
-      offR.setAttribute('dy', (-amt * 1.30 * dirY).toFixed(2));
-      offG.setAttribute('dx', ( amt * 0.95 * dirX).toFixed(2));
-      offG.setAttribute('dy', ( amt * 0.95 * dirY).toFixed(2));
-      offB.setAttribute('dx', ( amt * 1.45 * (-dirY)).toFixed(2));
-      offB.setAttribute('dy', ( amt * 1.45 * ( dirX)).toFixed(2));
-
+      smoothAmt += (target - smoothAmt) * alpha; prevTarget = target;
+      const amt = smoothAmt, dirX = lastDirX, dirY = lastDirY;
+      offR.setAttribute('dx', (-amt * 1.30 * dirX).toFixed(2)); offR.setAttribute('dy', (-amt * 1.30 * dirY).toFixed(2));
+      offG.setAttribute('dx', ( amt * 0.95 * dirX).toFixed(2)); offG.setAttribute('dy', ( amt * 0.95 * dirY).toFixed(2));
+      offB.setAttribute('dx', ( amt * 1.45 * (-dirY)).toFixed(2)); offB.setAttribute('dy', ( amt * 1.45 * ( dirX)).toFixed(2));
       requestAnimationFrame(animate);
     }
     animate();
+  })();
+
+  // ===== Cursor Mode Toggle =====
+  (function(){
+    const MODES = ['dot','solar','native']; // cycle order
+    const body = document.body;
+    const btn = document.getElementById('cursorToggle');
+
+    function apply(mode){
+      // clear previous
+      body.classList.remove('cursor-hide','cursor-mode-dot','cursor-mode-solar');
+      if(mode === 'dot'){
+        body.classList.add('cursor-hide','cursor-mode-dot');
+        btn.textContent = 'Cursor: simple';
+        btn.setAttribute('aria-label','Cursor: simple (click to change)');
+      }else if(mode === 'solar'){
+        body.classList.add('cursor-hide','cursor-mode-solar');
+        btn.textContent = 'Cursor: solar';
+        btn.setAttribute('aria-label','Cursor: solar (click to change)');
+      }else{ // native
+        btn.textContent = 'Cursor: native';
+        btn.setAttribute('aria-label','Cursor: native (click to change)');
+      }
+      localStorage.setItem('cursorMode', mode);
+    }
+
+    // Load saved or default to 'dot'
+    const saved = localStorage.getItem('cursorMode') || 'dot';
+    apply(saved);
+
+    // Cycle on click
+    btn.addEventListener('click', ()=>{
+      const current = localStorage.getItem('cursorMode') || 'dot';
+      const idx = MODES.indexOf(current);
+      const next = MODES[(idx+1) % MODES.length];
+      apply(next);
+    });
   })();
 </script>
 </body>
