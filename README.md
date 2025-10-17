@@ -16,7 +16,7 @@ Key features:
 
 ```
 / 
-├─ index.html              # Main homepage
+├─ index.html             # Main homepage
 ├─ assets/                # Media & files
 │  ├─ greenplanet.mp4
 │  ├─ spiderwaving.mp4
