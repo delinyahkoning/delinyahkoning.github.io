@@ -5,7 +5,7 @@
   z-index: 9998;
   display: none;
   align-items: center;
-  justify-content: center; /* Center the frame container */
+  justify-content: center;
   background: transparent;
 }
 
@@ -24,10 +24,12 @@
   z-index: 0;
 }
 
-/* Shrink-wrap frame around media instead of full flex container */
 .lightbox__frame {
   position: relative;
-  display: inline-block; /* WAS flex — now it fits tightly */
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: 14px;
   padding: 0;
@@ -38,7 +40,6 @@
   overflow: visible;
 }
 
-/* Media inside popup */
 .lightbox__media {
   display: block;
   max-width: 84vw;
@@ -47,11 +48,10 @@
   background: #000;
 }
 
-/* ✅ Perfectly pinned close button */
 .lightbox__close {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: -10px;
+  right: -10px;
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 14px;
@@ -79,16 +79,16 @@
 /* === Fix sub-pixel seam on media thumbnails === */
 .thumb {
   position: relative;
-  overflow: hidden; /* ensure bleed is clipped cleanly */
+  overflow: hidden;
 }
 
 .thumb > img,
 .thumb > video {
   position: absolute;
-  inset: -1px;                  /* bleed 1px past edges */
+  inset: -1px;
   width: calc(100% + 2px);
   height: calc(100% + 2px);
   object-fit: cover;
   display: block;
-  transform: translateZ(0);     /* avoids anti-aliasing glitches */
+  transform: translateZ(0);
 }
