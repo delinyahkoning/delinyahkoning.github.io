@@ -8,7 +8,7 @@ body.cursor-mode-solar .cursor--solar{display:block}
 
 /* white dot */
 .cursor--dot .dot{
-  position:absolute; left:50%; top:50%; width:18px; height:18px; border-radius:50%;
+  position:absolute; left:50%; top:50%; width:20px; height:20px; border-radius:50%;
   transform:translate(-50%,-50%); background:#fff;
 }
 .cursor--dot.cursor--hover .dot{transform:translate(-50%,-50%) scale(1.06)}
