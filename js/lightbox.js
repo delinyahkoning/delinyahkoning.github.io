@@ -24,7 +24,27 @@ function openWithMedia(mediaEl){
   lb.classList.add('open');
   lb.setAttribute('aria-hidden', 'false');
   closeBtn.focus();
+
+  // precise placement after open (layout may still settle)
+  requestAnimationFrame(() => {
+    placeClose();
+    setTimeout(placeClose, 50);
+    setTimeout(placeClose, 250);
+    setTimeout(placeClose, 500);
+  });
+
+  // watch the specific media for size changes (images/videos)
+  if (window.ResizeObserver){
+    try {
+      // Disconnect previous observer if we had one
+      if (openWithMedia._ro) openWithMedia._ro.disconnect();
+      const ro = new ResizeObserver(placeClose);
+      ro.observe(clone);
+      openWithMedia._ro = ro;
+    } catch {}
+  }
 }
+
 function close(){
   lb.classList.remove('open');
   lb.setAttribute('aria-hidden', 'true');
@@ -43,3 +63,30 @@ document.querySelectorAll('.thumb[data-lightbox]').forEach(thumb=>{
 closeBtn.addEventListener('click', close);
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
 lb.addEventListener('click', (e)=>{ if(!frame.contains(e.target)) close(); });
+
+/* ===== Precise close-button placement (top-right of the MEDIA) ===== */
+
+const PADDING = 8; // positive = inside corner; negative = float outside
+
+function currentMedia(){
+  // Prefer explicit class, otherwise first element in the slot
+  return lb.querySelector('.lightbox__media') || slot.firstElementChild || null;
+}
+
+function placeClose(){
+  if (!lb.classList.contains('open')) return;
+  const m = currentMedia();
+  if (!m) return;
+
+  const r = m.getBoundingClientRect();
+  const top  = Math.round(r.top + PADDING);
+  const left = Math.round(r.right - closeBtn.offsetWidth - PADDING);
+
+  closeBtn.style.top  = top + 'px';
+  closeBtn.style.left = left + 'px';
+}
+
+// keep position correct on resize/rotate and when media loads
+window.addEventListener('resize', placeClose);
+slot.addEventListener('load', placeClose, true);
+slot.addEventListener('loadedmetadata', placeClose, true);
