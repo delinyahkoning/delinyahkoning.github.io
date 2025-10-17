@@ -1,115 +1,93 @@
-/* === 3-way "wall light switch" look — works with data-state: dot | solar | native === */
+/* === 3-way switch (no plate) — dot | solar | native === */
 
-.tri-switch-wrap{ display:inline-flex; align-items:center; }
+.tri-switch-wrap{
+  display:inline-flex;
+  align-items:center;
+}
 
-/* Plate */
+/* Track */
 .tri-switch{
   /* sizing */
-  --plate-w: 150px;
-  --plate-h: 40px;
-  --pad: 8px;              /* inner padding from plate edge */
-  --slot-h: 16px;
-  --lever-w: 20px;
-  --lever-h: 22px;
+  --h: 34px;
+  --pad: 6px;            /* inner padding */
+  --lever-w: 28px;       /* handle width */
+  --lever-h: 22px;       /* handle height (a bit smaller than track) */
 
   position: relative;
-  width: var(--plate-w);
-  height: var(--plate-h);
-  border-radius: 10px;
+  height: var(--h);
+  min-width: 150px;
+  padding: var(--pad);
+  border-radius: 999px;
 
-  /* plastic plate finish */
+  /* subtle dark frosted pill */
   background:
-    linear-gradient(to bottom, rgba(255,255,255,.12), rgba(255,255,255,.06));
+    linear-gradient(to bottom, rgba(255,255,255,.10), rgba(255,255,255,.04));
   border: 1px solid rgba(255,255,255,.14);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.12),
-    inset 0 -1px 0 rgba(0,0,0,.25),
-    0 6px 18px rgba(0,0,0,.35);
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 -1px 0 rgba(0,0,0,.35),
+    0 8px 18px rgba(0,0,0,.30);
 
-  display: block;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* positions */
+  align-items: center;
+  gap: 0;
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   color: #cfd6ec;
 }
 
-/* Screws on the plate */
-.tri-switch::before,
-.tri-switch::after{
-  content:"";
-  position:absolute;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.6), rgba(0,0,0,.2));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.4), inset 0 -1px 0 rgba(0,0,0,.45);
-  opacity: .9;
-}
-.tri-switch::before{ left: 10px; top: 8px; }
-.tri-switch::after { right:10px; bottom:8px; }
-
-/* Slot (track) the lever rides in */
+/* Icons (● 🪐 ⌖) overlayed on top of the track */
 .tri-switch__labels{
-  /* we’ll reuse this element as the slot container background and keep the icons on top */
   position:absolute;
-  left: var(--pad); right: var(--pad);
-  top: 50%; transform: translateY(-50%);
-  height: var(--slot-h);
-  border-radius: 999px;
-  background:
-    linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.45));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.08),
-    inset 0 -1px 0 rgba(0,0,0,.55);
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  inset: var(--pad);
+  display:grid;
+  grid-template-columns: inherit;
   align-items:center;
-  pointer-events: none;
-  overflow: visible;
-}
-
-/* Etched position icons */
-.tri-switch__labels span{
-  position: relative;
-  text-align:center;
+  pointer-events:none;
   font-size: 12px;
-  line-height:1;
-  color: rgba(255,255,255,.55);
-  text-shadow: 0 1px 0 rgba(0,0,0,.6);
+  letter-spacing: .02em;
+  color: rgba(255,255,255,.60);
+}
+.tri-switch__labels span{
+  text-align:center;
+  text-shadow: 0 1px 0 rgba(0,0,0,.5);
 }
 
-/* Highlight the active label a bit brighter */
+/* Highlight current icon slightly */
 .tri-switch[data-state="dot"]    .tri-switch__labels span:nth-child(1),
 .tri-switch[data-state="solar"]  .tri-switch__labels span:nth-child(2),
 .tri-switch[data-state="native"] .tri-switch__labels span:nth-child(3){
-  color: rgba(255,255,255,.9);
+  color: rgba(255,255,255,.95);
 }
 
-/* Lever (little 3D toggle that sits in the slot) */
+/* Lever — slightly rounded, small bevel */
 .tri-switch__knob{
-  position: absolute;
+  position:absolute;
   top: 50%;
   left: var(--pad);
   transform: translateY(-50%);
   width: var(--lever-w);
   height: var(--lever-h);
-  border-radius: 4px;
+  border-radius: 6px; /* <— slightly rounded */
   background:
-    linear-gradient(to bottom, rgba(255,255,255,.85), rgba(230,235,245,.85) 45%, rgba(200,205,215,.9)),
-    linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,0));
+    linear-gradient(to bottom, rgba(255,255,255,.85), rgba(230,235,245,.88) 45%, rgba(205,210,220,.9)),
+    linear-gradient(to bottom, rgba(0,0,0,.14), rgba(0,0,0,0));
   border: 1px solid rgba(0,0,0,.45);
   box-shadow:
-    0 2px 8px rgba(0,0,0,.55),
-    inset 0 1px 0 rgba(255,255,255,.6),
+    0 2px 10px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.55),
     inset 0 -1px 0 rgba(0,0,0,.35);
   will-change: left;
   transition: left .22s cubic-bezier(.2,.8,.2,1);
 }
 
-/* Little ridge on the lever for realism */
+/* Tiny ridge to feel tactile */
 .tri-switch__knob::after{
   content:"";
   position:absolute;
-  left: 4px; right: 4px; top: 50%;
+  left: 5px; right: 5px; top: 50%;
   height: 2px; transform: translateY(-50%);
   border-radius: 2px;
   background: rgba(0,0,0,.35);
@@ -117,27 +95,33 @@
   opacity: .65;
 }
 
-/* === Position logic ===
-   We compute an exact left value: pad + (free travel) * step
-   step = 0 (left), 0.5 (middle), 1 (right) */
+/* Compute travel and snap positions */
 .tri-switch{
-  --travel: calc(100% - (var(--pad) * 2) - var(--lever-w));
-  --step: 0; /* default */
+  --travel: calc(100% - var(--pad)*2 - var(--lever-w));
+  --step: 0;
 }
-.tri-switch[data-state="dot"]    { --step: 0;   }
-.tri-switch[data-state="solar"]  { --step: .5;  }
-.tri-switch[data-state="native"] { --step: 1;   }
+.tri-switch[data-state="dot"]    { --step: 0; }
+.tri-switch[data-state="solar"]  { --step: .5; }
+.tri-switch[data-state="native"] { --step: 1; }
 .tri-switch__knob{
   left: calc(var(--pad) + var(--travel) * var(--step));
 }
 
-/* Focus ring on the plate */
+/* Focus ring (keyboard) */
 .tri-switch:focus-visible{
   outline: 2px solid rgba(255,245,180,.45);
   outline-offset: 3px;
 }
 
-/* Reduced motion users: skip animation */
+/* Pressed feel */
+.tri-switch:active .tri-switch__knob{
+  box-shadow:
+    0 1px 8px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.45),
+    inset 0 -1px 0 rgba(0,0,0,.45);
+}
+
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce){
   .tri-switch__knob{ transition: none; }
 }
