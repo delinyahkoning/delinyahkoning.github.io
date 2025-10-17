@@ -1,58 +1,47 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Delinyah Koning — Photos</title>
   <meta name="description" content="Photography and video work." />
 
-  <!-- Shared Styles (same as homepage/tabs) -->
+  <!-- Shared Styles (match other tabs) -->
   <link rel="stylesheet" href="/css/base.css" />
   <link rel="stylesheet" href="/css/layout.css" />
   <link rel="stylesheet" href="/css/lightbox.css" />
   <link rel="stylesheet" href="/css/cursor.css" />
   <link rel="stylesheet" href="/css/switch.css" />
 
-  <!-- Masonry-only styles (keep your original layout) -->
+  <!-- Masonry-only styles: keep your original look -->
   <style>
-    /* Masonry columns (variable image heights, same as your original) */
-    .gallery { column-gap: 16px; }
-    @media (min-width:480px)  { .gallery { column-count: 2; } }
-    @media (min-width:860px)  { .gallery { column-count: 3; } }
-    @media (min-width:1180px) { .gallery { column-count: 4; } }
+    .gallery{ column-gap:16px; }
+    @media (min-width:480px){ .gallery{ column-count:2; } }
+    @media (min-width:860px){ .gallery{ column-count:3; } }
+    @media (min-width:1180px){ .gallery{ column-count:4; } }
 
-    /* Each tile (rounded container; overflow hidden so images clip cleanly) */
-    .item {
-      break-inside: avoid;
-      -webkit-column-break-inside: avoid;
-      margin: 0 0 16px;
-      background: #0d0f16;
-      border: 1px solid #232634;
-      border-radius: 14px;
-      overflow: hidden;
+    .item{
+      break-inside:avoid; -webkit-column-break-inside:avoid; margin:0 0 16px;
+      background:#0d0f16; border:1px solid #232634; border-radius:14px; overflow:hidden;
     }
+    .thumb{ position:relative; cursor:pointer; background:transparent; }
 
-    .thumb { position: relative; cursor: pointer; background: transparent; }
-
-    /* IMPORTANT: keep full image (no crop), but remove the thin strip by zeroing image radius */
-    .thumb img {
-      display: block;
-      width: 100%;
-      height: auto;
-      object-fit: contain;          /* show the whole picture (original behavior) */
-      border-radius: 0 !important;  /* prevents the dark ring/strip inside rounded tiles */
-      transition: transform .25s ease, box-shadow .25s ease;
+    /* Keep whole image (contain), remove inner gap, keep your hover scale */
+    .thumb img{
+      display:block; width:100%; height:auto;
+      object-fit:contain;
+      border-radius:0 !important;           /* prevents thin inner strip */
+      transition:transform .25s ease, box-shadow .25s ease;
     }
-    .thumb:hover img { transform: scale(1.03); }
+    .thumb:hover img{ transform:scale(1.03); }
 
-    /* ⤢ overlay button (only visible on hover) */
-    .fs-btn {
-      position: absolute; top: 8px; right: 8px; z-index: 2;
-      padding: 6px 8px; font-size: 14px; line-height: 1; border-radius: 8px;
-      background: rgba(0,0,0,.45); color: #fff; border: 1px solid rgba(255,255,255,.25);
-      opacity: 0; transition: opacity .2s ease; user-select: none;
+    /* Hover button (kept for consistency; opens lightbox too) */
+    .fs-btn{
+      position:absolute; top:8px; right:8px; z-index:2;
+      padding:6px 8px; font-size:14px; line-height:1; border-radius:8px;
+      background:rgba(0,0,0,.45); color:#fff; border:1px solid rgba(255,255,255,.25);
+      opacity:0; transition:opacity .2s ease; user-select:none;
     }
-    .thumb:hover .fs-btn { opacity: 1; }
+    .thumb:hover .fs-btn{ opacity:1; }
   </style>
 </head>
 <body>
@@ -91,7 +80,7 @@
   <section class="hero" style="padding:60px 0 30px; text-align:center;">
     <div class="wrap">
       <h1 style="font-size:clamp(32px,5vw,54px);margin:0;">Photos</h1>
-      <p class="sub" style="color:var(--muted);">Fragments, stories, reflections.</p>
+      <p class="sub" style="color:var(--muted);">Photography</p>
     </div>
   </section>
 
@@ -101,7 +90,7 @@
     </div>
   </section>
 
-  <!-- Lightbox (same as homepage) -->
+  <!-- Lightbox (same component as homepage) -->
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="lightbox__frame" role="document">
       <button class="lightbox__close" type="button" aria-label="Close">
@@ -111,7 +100,7 @@
     </div>
   </div>
 
-  <!-- Cursor DOM scaffolding (same as other pages) -->
+  <!-- Cursor DOM scaffolding (required by cursor.js) -->
   <div class="cursor cursor--dot" aria-hidden="true"><span class="dot"></span></div>
   <div class="cursor cursor--solar" aria-hidden="true">
     <span class="cursor__sun"></span>
@@ -125,7 +114,7 @@
     <span class="orbit orbit--neptune"><span class="track"><span class="planet"></span></span></span>
   </div>
 
-  <!-- Shared Scripts -->
+  <!-- Shared Scripts (order matches other tabs) -->
   <script type="module" src="/js/config.js"></script>
   <script type="module" src="/js/lightbox.js"></script>
   <script type="module" src="/js/cursor.js"></script>
@@ -134,7 +123,7 @@
 
   <!-- Build the randomized masonry gallery; thumbs open in lightbox -->
   <script>
-    // List of image filenames in /assets (case-sensitive)
+    // Image list (case-sensitive)
     const files = [
       "IMG_0243.JPG","IMG_7454.jpg","IMG_7453.jpg","IMG_7624.jpg","IMG_7640.jpg",
       "IMG_8062.jpg","IMG_8098.jpg","IMG_8074.jpg","IMG_6604.jpg","IMG_6595.jpg",
@@ -142,7 +131,7 @@
       "IMG_2179.JPG","IMG_1963.png","melkweg.png"
     ];
 
-    // Shuffle order on each load (Fisher–Yates)
+    // Shuffle (Fisher–Yates)
     for (let i = files.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [files[i], files[j]] = [files[j], files[i]];
@@ -156,15 +145,15 @@
 
       const thumb = document.createElement('div');
       thumb.className = 'thumb';
-      thumb.setAttribute('data-lightbox', '');
+      thumb.setAttribute('data-lightbox', ''); // enable homepage lightbox
 
       const btn = document.createElement('button');
       btn.className = 'fs-btn';
-      btn.type = 'button';
-      btn.textContent = '⤢';
+      btn.type='button';
+      btn.textContent='⤢';
 
       const img = document.createElement('img');
-      img.loading = 'lazy';
+      img.loading='lazy';
       img.src = `/assets/${name}`;
       img.alt = name;
 
