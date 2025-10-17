@@ -25,7 +25,7 @@ header{
 /* Pin the switch to the right page gutter (matches .wrap side padding ≈ 24px) */
 .tri-switch-wrap{
   position:absolute;
-  right:-10px;            /* keep this equal to your .wrap horizontal padding */
+  right:-20px;            /* keep this equal to your .wrap horizontal padding */
   top:50%;
   transform:translateY(-50%);
 }
