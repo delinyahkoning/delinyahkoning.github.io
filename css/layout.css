@@ -10,11 +10,13 @@ header{
 
 .tabs{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
 
-.tab{
-  padding:8px 12px; border:1px solid rgba(255,255,255,.08);
-  border-radius:999px; text-decoration:none; color:var(--ink);
+.tab {
+  padding:8px 12px; 
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:999px; 
+  text-decoration:none; 
+  color:var(--ink);
   outline: none;
-  -webkit-tap-highlight-color: rgba(255, 245, 180, 0.35); /* iOS tap splash */
 }
 
 .tab:hover{
