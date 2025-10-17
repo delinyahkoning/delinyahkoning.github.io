@@ -48,9 +48,10 @@
 }
 
 .lightbox__close {
-  position: absolute; /* <-- now positioned relative to frame */
-  top: -12px;
-  right: -12px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%); /* sits slightly above & right of the frame edge */
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 14px;
