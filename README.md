@@ -12,7 +12,7 @@ Key features:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 / 
@@ -40,11 +40,11 @@ Key features:
 
 ---
 
-## ⚙️ Editable Parameters
+## Editable Parameters
 
 These are the main tuning spots.
 
-### 🎨 Colors & Theme (`css/base.css`)
+### Colors & Theme (`css/base.css`)
 
 ```css
 :root{
@@ -60,7 +60,7 @@ These are the main tuning spots.
 
 ---
 
-### 🪐 Cursor Modes (`js/config.js`)
+### Cursor Modes (`js/config.js`)
 
 ```js
 window.APP = {
@@ -76,6 +76,7 @@ window.APP = {
 
 The hero effect is configured in `js/config.js` under the `hero` object:
 
+```js
 hero: {
   MAX_IMPRINTS: 150,
   LIFE: 9000,
@@ -85,16 +86,17 @@ hero: {
   TWIRL: 1.8,
   POWER: 1.5
 }
+```
 
 Parameter meanings:
 
-- MAX_IMPRINTS → How many mouse trail “ripples” are stored. Higher = longer motion memory.
-- LIFE → Time (in ms) before each ripple fades out. Lower = fades fast / more “fresh”, Higher = long echo trail.
-- BASE → Base lightness value of the normal map (RGB). Lower = darker center, Higher = brighter.
-- BASE_RADIUS → The circular radius of each ripple before distortion. Controls how large each pulse starts.
-- STRETCH → Horizontal scaling of the ripple. 1.0 = round, 3.0 = wide streaks.
-- TWIRL → Rotational force applied to the ripples. 0.0 = straight motion, 3.0+ = spirals.
-- POWER → How strong the displacement is overall. Master intensity control.
+- `MAX_IMPRINTS` → How many mouse trail “ripples” are stored. Higher = longer motion memory.
+- `LIFE` → Time (in ms) before each ripple fades out. Lower = fades fast / more “fresh”, Higher = long echo trail.
+- `BASE` → Base lightness value of the normal map (RGB). Lower = darker center, Higher = brighter.
+- `BASE_RADIUS` → The circular radius of each ripple before distortion. Controls how large each pulse starts.
+- `STRETCH` → Horizontal scaling of the ripple. 1.0 = round, 3.0 = wide streaks.
+- `TWIRL` → Rotational force applied to the ripples. 0.0 = straight motion, 3.0+ = spirals.
+- `POWER` → How strong the displacement is overall. Master intensity control.
 
 ---
 
@@ -102,6 +104,7 @@ Parameter meanings:
 
 The RGB split happens inside `js/hero-liquify.js` when offsets are applied:
 
+```js
 offR.setAttribute('dx', valueX);
 offR.setAttribute('dy', valueY);
 
@@ -110,6 +113,7 @@ offG.setAttribute('dy', valueY);
 
 offB.setAttribute('dx', valueX);
 offB.setAttribute('dy', valueY);
+```
 
 To INCREASE color separation:
 - Multiply offsets by a larger number (e.g. change 1.30 to 2.00).
@@ -124,11 +128,13 @@ To DISABLE prism effect entirely:
 
 Each orbit and planet is defined in HTML like:
 
+```html
 <span class="orbit orbit--mars">
   <span class="track">
     <span class="planet"></span>
   </span>
 </span>
+```
 
 The visual behavior is controlled using these CSS variables:
 
@@ -140,6 +146,7 @@ The visual behavior is controlled using these CSS variables:
 
 Example from cursor.css:
 
+```css
 .cursor--solar .orbit--mars .track{
   --r: 30px;
   --theta: 200deg;
@@ -150,6 +157,7 @@ Example from cursor.css:
   --size: 4px;
   --color: #ff7b6b;
 }
+```
 
 To ADD a planet:
 
@@ -173,10 +181,12 @@ The lightbox is initialized in `js/lightbox.js`. It activates when elements have
 
 To make something open in the lightbox:
 
+```js
 <div class="thumb" data-lightbox>
   <button class="fs-btn">⤢</button>
   <video src="assets/example.mp4" autoplay muted loop playsinline></video>
 </div>
+```
 
 Key behaviors:
 
@@ -194,10 +204,12 @@ To change popup size:
 
 Adjust in `css/lightbox.css`:
 
+```css
 .lightbox__frame{
   max-width: min(1000px, 84vw);
   max-height: 84vh;
 }
+```
 
 Change the 84vw / 84vh values to control how large it opens. 
 
@@ -205,6 +217,7 @@ Change the 84vw / 84vh values to control how large it opens.
 
 Each card follows this pattern:
 
+```html
 <article class="card">
   <div class="thumb" data-lightbox>
     <button class="fs-btn" type="button">⤢</button>
@@ -213,17 +226,22 @@ Each card follows this pattern:
   <strong>Title Here</strong>
   <div class="sub">Description here</div>
 </article>
+```
 
 To add an image instead of a video:
 
+```html
 <div class="thumb" data-lightbox>
   <button class="fs-btn">⤢</button>
   <img src="assets/example.jpg" alt="Something">
 </div>
+```
 
 Place as many cards as needed inside:
 
+```html
 <div class="grid cards"> ... </div>
+```
 
 Optional: If you want cards to be clickable without the ⤢ button, remove the button entirely and rely on the click listener already attached to the `.thumb`.
 
