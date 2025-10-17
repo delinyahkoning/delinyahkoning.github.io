@@ -1,0 +1,97 @@
+/* === Base + layout + components (moved from <style>) === */
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Arial,Helvetica,sans-serif}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--wrap-px)}
+header{position:sticky;top:0;z-index:50;background:rgba(7,8,12,.5);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
+.nav{display:flex;align-items:center;gap:16px;padding:14px 0}.brand{font-weight:700}.spacer{flex:1}
+main section{padding:60px 0}
+.hero{min-height:46vh;display:grid;place-items:start;padding:20px 0 16px;background:radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),var(--bg)}
+.hero-center{text-align:left}.hero-svg{display:block;width:min(92vw,1100px);height:auto}
+.grid{display:grid;gap:var(--gap)}.grid-split{grid-template-columns:1.2fr .8fr}
+
+/* Tabs */
+.tabs{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tab{padding:8px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;text-decoration:none;color:var(--ink)}
+.tab:hover{background:#131623}.tab.active{background:#131623;border-color:#4e6ca0;box-shadow:0 0 0 3px rgba(155,212,255,.25)}
+
+/* Panels / Cards */
+.panel{background:none;border:none;padding:24px}
+.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:none;border:none;padding:14px}
+.sub{font-size:13px;line-height:1.4}
+
+/* Thumbs */
+.thumb{aspect-ratio:16/9;background:#151826;border-radius:12px;margin-bottom:10px;display:grid;place-items:center;color:#9aa0b3;font-size:14px;letter-spacing:.3px;position:relative;overflow:hidden;cursor:pointer;transition:transform .25s ease, box-shadow .25s ease}
+.thumb img,.thumb video{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
+.thumb:hover{transform:scale(1.03);box-shadow:var(--shadow-lg)}
+.fs-btn{position:absolute;top:8px;right:8px;z-index:2;padding:6px 8px;font-size:14px;line-height:1;border-radius:8px;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.25);opacity:0;transition:opacity .2s ease;user-select:none}
+.thumb:hover .fs-btn{opacity:1}
+
+/* Poem */
+.hero-sub.poetic-note{font-size:.9em;line-height:2.2;margin-left:60px;margin-top:-10px;color:var(--ink);font-family:"Century Schoolbook", Century, "Times New Roman", Times, Georgia, serif}
+.poetic-note span{display:block}.poetic-note .line2{margin-left:12ch}.poetic-note .line3{margin-left:19ch}
+
+/* Pill titles */
+.pill-title{--pill-px:15px;--pill-py:5px;--pill-font:15px;display:inline-block;margin:0 0 12px 14px;padding:var(--pill-py) var(--pill-px);border-radius:999px;border:1.5px solid currentColor;background:transparent;color:#fff;text-transform:lowercase;font-weight:600;letter-spacing:.02em;line-height:1;font-size:var(--pill-font)}
+.pill--mint{color:var(--mint)}.pill--peach{color:var(--peach)}.pill--flush{margin-left:0!important}
+.divider{border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:16px 0}
+
+/* Lightbox */
+.lightbox{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;background:transparent}
+.lightbox.open{display:flex}
+.lightbox::before{content:"";position:fixed;inset:0;background:rgba(7,8,12,.32);backdrop-filter:blur(8px) saturate(130%);-webkit-backdrop-filter:blur(8px) saturate(130%);pointer-events:none;z-index:0}
+.lightbox__frame{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;border:none;border-radius:14px;padding:0;background:transparent;max-width:min(1000px,84vw);max-height:84vh;box-shadow:var(--shadow-xl);overflow:visible}
+.lightbox__media{display:block;max-width:84vw;max-height:84vh;border-radius:12px;background:#000}
+.lightbox__close{position:absolute;top:-10px;right:-10px;padding:6px 10px;border-radius:8px;font-size:14px;line-height:1;background:rgba(0,0,0,.55);color:#fff;border:1px solid rgba(255,255,255,.25);cursor:pointer;z-index:3;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.lightbox__sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* Cursor visibility */
+body.cursor-hide *{cursor:none!important}
+
+/* Cursors */
+.cursor{position:fixed;top:0;left:0;width:30px;height:30px;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;display:none}
+body.cursor-mode-dot .cursor--dot{display:block}
+body.cursor-mode-solar .cursor--solar{display:block}
+.cursor--dot .dot{position:absolute;left:50%;top:50%;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);background:#fff}
+.cursor--dot.cursor--hover .dot{transform:translate(-50%,-50%) scale(1.06)}
+.cursor--dot.cursor--down .dot{transform:translate(-50%,-50%) scale(1.00)}
+.cursor--solar .cursor__sun{position:absolute;left:50%;top:50%;width:18px;height:18px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 35% 35%,#fff7c7,#ffd36b 45%,#ff9f2c 70%,#ff7a00 100%);box-shadow:0 0 14px rgba(255,210,90,.7),0 0 28px rgba(255,160,60,.5),inset 0 0 10px rgba(255,255,255,.35)}
+.cursor--solar .orbit{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
+.cursor--solar .track{--r:14px;--theta:0deg;--duration:10s;position:absolute;left:50%;top:50%;width:calc(var(--r)*2);height:calc(var(--r)*2);margin-left:calc(var(--r)*-1);margin-top:calc(var(--r)*-1);transform-origin:50% 50%;will-change:transform;animation:orbit-spin var(--duration) linear infinite;border:1px dotted rgba(255,255,255,.06);border-radius:50%}
+.cursor--solar .planet{--size:6px;--color:#fff;position:absolute;left:50%;top:50%;width:var(--size);height:var(--size);border-radius:50%;background:var(--color);transform:translate(var(--r),-50%);box-shadow:0 0 6px rgba(255,255,255,.25);z-index:1}
+.cursor--solar .orbit--mercury .track{--r:12px;--theta:10deg;--duration:6s}.cursor--solar .orbit--mercury .planet{--size:3px;--color:#b7b7b7}
+.cursor--solar .orbit--venus .track{--r:18px;--theta:60deg;--duration:9s}.cursor--solar .orbit--venus .planet{--size:5px;--color:#e8d28b}
+.cursor--solar .orbit--earth .track{--r:24px;--theta:130deg;--duration:12s}.cursor--solar .orbit--earth .planet{--size:5px;--color:#6fb7ff;box-shadow:0 0 8px rgba(120,180,255,.45)}
+.cursor--solar .orbit--mars .track{--r:30px;--theta:200deg;--duration:15s}.cursor--solar .orbit--mars .planet{--size:4px;--color:#ff7b6b}
+.cursor--solar .orbit--jupiter .track{--r:40px;--theta:15deg;--duration:20s}.cursor--solar .orbit--jupiter .planet{--size:9px;--color:#e8cf9b;background:radial-gradient(circle at 40% 35%,#f6e8c4,#e8cf9b 60%,#c6a677 100%);box-shadow:0 0 10px rgba(240,210,150,.35)}
+.cursor--solar .orbit--saturn .track{--r:52px;--theta:80deg;--duration:25s}.cursor--solar .orbit--saturn .planet{--size:8px;--color:#f1df9a;background:radial-gradient(circle at 40% 40%,#fff3c2,#f1df9a 60%,#cdbd86 100%)}
+.cursor--solar .orbit--saturn .planet::before,.cursor--solar .orbit--saturn .planet::after{content:"";position:absolute;left:50%;top:50%;width:26px;height:9px;transform:translate(-50%,-50%) rotate(24deg);border-radius:50%;background:radial-gradient(closest-side,transparent 58%,rgba(255,255,255,.35) 59% 63%,rgba(255,230,190,.25) 64% 68%,rgba(255,255,255,.18) 69% 74%,transparent 75%),radial-gradient(closest-side,transparent 60%,rgba(255,255,255,.15) 61% 72%,transparent 73%);filter:drop-shadow(0 0 2px rgba(255,255,255,.25)) drop-shadow(0 0 4px rgba(255,210,130,.15));pointer-events:none}
+.cursor--solar .orbit--saturn .planet::before{z-index:0;clip-path:inset(50% 0 0 0);opacity:.9}.cursor--solar .orbit--saturn .planet::after{z-index:2;clip-path:inset(0 0 50% 0);opacity:.95}
+.cursor--solar .orbit--uranus .track{--r:64px;--theta:140deg;--duration:32s}.cursor--solar .orbit--uranus .planet{--size:7px;--color:#a8f1ff}
+.cursor--solar .orbit--neptune .track{--r:76px;--theta:300deg;--duration:40s}.cursor--solar .orbit--neptune .planet{--size:7px;--color:#7aa8ff}
+.cursor--solar .orbit--earth .planet .moon-track{--r:7px;--duration:2.5s;--theta:200deg;position:absolute;left:50%;top:50%;width:calc(var(--r)*2);height:calc(var(--r)*2);margin-left:calc(var(--r)*-1);margin-top:calc(var(--r)*-1);transform-origin:50% 50%;will-change:transform;animation:orbit-spin var(--duration) linear infinite;border:1px dotted rgba(255,255,255,.05);border-radius:50%}
+.cursor--solar .orbit--earth .planet .moon{position:absolute;left:50%;top:50%;width:2.5px;height:2.5px;border-radius:50%;background:#dfe7ff;transform:translate(var(--r),-50%);box-shadow:0 0 4px rgba(220,230,255,.35)}
+.cursor--solar.cursor--hover .track{animation-duration:calc(var(--duration)*.85)}
+.cursor--solar.cursor--hover .cursor__sun{transform:translate(-50%,-50%) scale(1.05)}
+.cursor--solar.cursor--down .cursor__sun{transform:translate(-50%,-50%) scale(1.0)}
+
+@keyframes orbit-spin{from{transform:rotate(var(--theta))}to{transform:rotate(calc(var(--theta) + 360deg))}}
+@media (prefers-reduced-motion:reduce){.cursor--solar .track{animation:none}}
+
+/* Tri-switch */
+.tri-switch{--w:132px;--h:34px;--pad:4px;--knob:38px;position:relative;width:var(--w);height:var(--h);border-radius:999px;background:radial-gradient(120px 60px at 30% -40%,rgba(155,212,255,.18),transparent 60%),rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:inline-flex;align-items:center;justify-content:space-between;padding:var(--pad);gap:0;color:#cfd6ec}
+.tri-switch:focus-visible{outline:2px solid rgba(155,212,255,.6);outline-offset:2px}
+.tri-switch__labels{position:absolute;inset:var(--pad);display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;pointer-events:none;font-size:12px;letter-spacing:.02em;color:#9aa0b3}
+.tri-switch__labels span{text-align:center;opacity:.6}
+.tri-switch__knob{position:absolute;left:var(--pad);top:50%;transform:translateY(-50%);width:var(--knob);height:calc(var(--h) - var(--pad)*2);box-sizing:border-box;border-radius:999px;background:#10131d;border:1px solid rgba(255,255,255,.14);box-shadow:0 6px 16px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.06);transition:left .28s cubic-bezier(.22,.61,.36,1)}
+.tri-switch[data-state="dot"] .tri-switch__knob{left:var(--pad)}
+.tri-switch[data-state="solar"] .tri-switch__knob{left:calc(50% - var(--knob)/2)}
+.tri-switch[data-state="native"] .tri-switch__knob{left:calc(100% - var(--pad) - var(--knob))}
+.tri-switch[data-state="dot"] .tri-switch__labels span:nth-child(1),
+.tri-switch[data-state="solar"] .tri-switch__labels span:nth-child(2),
+.tri-switch[data-state="native"] .tri-switch__labels span:nth-child(3){color:#fff;opacity:1;font-weight:600}
+.tri-switch-wrap{display:flex;align-items:center}
+
+/* Utilities + footer */
+.mt-12{margin-top:12px}.pt-28{padding-top:28px}.text-sm{font-size:13px}.no-underline{text-decoration:none}
+footer{padding:24px;text-align:center;color:var(--muted)}
