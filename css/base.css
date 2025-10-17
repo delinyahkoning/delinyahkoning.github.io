@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&display=swap');
+
 :root{
   --bg:#0a0b0f; --ink:#ffffff; --muted:#9aa0b3; --panel:#10121a; --accent:#9bd4ff;
   --radius:18px; --max:1200px; --mint:#a8ffd3; --peach:#ffd6a5;
