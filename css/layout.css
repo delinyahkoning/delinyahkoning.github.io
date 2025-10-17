@@ -5,15 +5,29 @@ header{
   border-bottom:1px solid rgba(255,255,255,.06);
 }
 
-.nav{display:flex; align-items:center; gap:16px; padding:14px 0}
+.nav{
+  display:flex; align-items:center; gap:16px; padding:14px 0;
+  position:relative; /* anchor for absolute-positioned switch */
+}
+
 .brand{font-weight:700}
 
+/* Tabs: pull left a bit, and reserve room on the right for the switch */
 .tabs{
   display:flex; 
   align-items:center; 
   gap:10px; 
   flex-wrap:wrap;
-  margin-left:-30px;
+  margin-left:-30px;     /* your left pull */
+  padding-right:180px;   /* space so tabs don't slide under the switch */
+}
+
+/* Pin the switch to the right page gutter (matches .wrap side padding ≈ 24px) */
+.tri-switch-wrap{
+  position:absolute;
+  right:24px;            /* keep this equal to your .wrap horizontal padding */
+  top:50%;
+  transform:translateY(-50%);
 }
 
 .tab {
