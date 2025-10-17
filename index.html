@@ -72,13 +72,9 @@
 
   /* --- Pill section headers (mint / peach), aligned to card inner edge --- */
   .pill-title{
-    /* smaller by default */
-    --pill-px: 15px;   /* horizontal padding */
-    --pill-py: 5px;    /* vertical padding */
-    --pill-font: 15px; /* text size */
-
+    --pill-px: 15px; --pill-py: 5px; --pill-font: 15px;
     display:inline-block;
-    margin:0 0 12px 14px;          /* aligns with .card padding (14px) */
+    margin:0 0 12px 14px;
     padding:var(--pill-py) var(--pill-px);
     border-radius:999px;
     border:1.5px solid currentColor;
@@ -92,60 +88,39 @@
   }
   .pill--mint{ color:var(--mint); }
   .pill--peach{ color:var(--peach); }
-
-  /* make the second column pill flush with its text edge */
   .pill--flush{ margin-left:0 !important; }
 
-  /* ===== LIGHTBOX (centered, smaller) with UNIFORM BLURRED/DIMMED overlay ===== */
+  /* ===== LIGHTBOX ===== */
   .lightbox{
     position:fixed; inset:0; z-index:9998;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    background:transparent; /* all blur/dim handled by ::before */
+    display:none; align-items:center; justify-content:center;
+    background:transparent;
   }
   .lightbox.open{ display:flex; }
-
-  /* Full-screen overlay to avoid any unblurred halo */
   .lightbox::before{
-    content:"";
-    position:fixed; inset:0;
+    content:""; position:fixed; inset:0;
     background: rgba(7,8,12,.32);
     backdrop-filter: blur(8px) saturate(130%);
     -webkit-backdrop-filter: blur(8px) saturate(130%);
-    pointer-events:none;
-    z-index:0;
+    pointer-events:none; z-index:0;
   }
-
   .lightbox__frame{
     position:relative; z-index:1;
     display:flex; align-items:center; justify-content:center;
-    border:none; border-radius:14px;
-    padding:0;
-    background:transparent;
-    max-width:min(1000px,84vw);
-    max-height:84vh;
+    border:none; border-radius:14px; padding:0; background:transparent;
+    max-width:min(1000px,84vw); max-height:84vh;
     box-shadow:0 12px 40px rgba(0,0,0,.45);
-    overflow:visible; /* allow close button to sit over the corner neatly */
+    overflow:visible;
   }
   .lightbox__media{
-    display:block;
-    max-width:84vw;
-    max-height:84vh;
-    border-radius:12px;
-    background:#000;
+    display:block; max-width:84vw; max-height:84vh;
+    border-radius:12px; background:#000;
   }
-
-  /* CLOSE BUTTON — perfectly aligned over the panel's top-right corner */
   .lightbox__close{
-    position:absolute;
-    top:-10px;               /* sit slightly outside so it hugs the corner */
-    right:-10px;
+    position:absolute; top:-10px; right:-10px;
     padding:6px 10px; border-radius:8px; font-size:14px; line-height:1;
     background:rgba(0,0,0,.55); color:#fff; border:1px solid rgba(255,255,255,.25);
-    cursor:pointer;
-    z-index:3;               /* ensure it sits above the video */
-    pointer-events:auto;
+    cursor:pointer; z-index:3; pointer-events:auto;
     box-shadow:0 4px 14px rgba(0,0,0,.35);
   }
   .lightbox__sr{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
@@ -154,9 +129,7 @@
   * { cursor:none !important; }
 
   /* =======================
-     MULTI-ORBIT COSMIC CURSOR
-     Three satellites: white, pastel yellow, pastel purple
-     Each: unique radius, start angle, and size
+     MULTI-ORBIT COSMIC CURSOR (smooth)
      ======================= */
   .cursor{
     position:fixed; top:0; left:0;
@@ -164,8 +137,6 @@
     transform:translate(-50%,-50%);
     pointer-events:none; z-index:9999;
   }
-
-  /* Core planet */
   .cursor__planet{
     position:absolute; left:50%; top:50%;
     width:16px; height:16px; border-radius:50%;
@@ -173,55 +144,51 @@
     background: var(--accent);
     box-shadow:0 0 10px rgba(155,212,255,.45), inset 0 0 10px rgba(0,0,0,.35);
   }
-
-  /* Orbit container (centers tracks at pointer) */
   .cursor__orbit{
     position:absolute; left:50%; top:50%;
-    transform:translate(-50%,-50%);
-    pointer-events:none;
+    transform:translate(-50%,-50%); pointer-events:none;
   }
-
-  /* Spinning track — we rotate this; satellite rides at distance --r */
   .cursor__track{
-    --r: 14px;             /* radius to satellite from center */
-    --theta: 0deg;         /* initial angle offset */
-    --duration: 2.4s;      /* spin speed */
+    --r: 14px;            /* radius */
+    --theta: 0deg;        /* start angle */
+    --duration: 2.4s;     /* speed */
     position:absolute; left:50%; top:50%;
     width: calc(var(--r) * 2); height: calc(var(--r) * 2);
     margin-left: calc(var(--r) * -1); margin-top: calc(var(--r) * -1);
     transform-origin: 50% 50%;
-    transform: rotate(var(--theta));
-    animation: cursor-spin var(--duration) linear infinite;
+    /* IMPORTANT: animate from theta to theta+360 to avoid jumps */
+    animation: orbit-spin var(--duration) linear infinite;
     opacity:.95;
   }
-
   .cursor__satellite{
-    --size:6px;  /* diameter */
-    --color:#fff;
+    --size:6px; --color:#fff;
     position:absolute; left:50%; top:50%;
     width: var(--size); height: var(--size);
-    border-radius:50%;
-    background: var(--color);
+    border-radius:50%; background: var(--color);
     box-shadow: 0 0 6px rgba(255,255,255,.35);
-    transform: translate(var(--r), -50%); /* sit on the right edge of the track */
+    transform: translate(var(--r), -50%); /* sits on track edge */
   }
 
-  /* Variant orbits with unique radius/size/color and starting angle */
-  .orbit--white .cursor__track  { --r: 13px; --theta: 15deg;  --duration: 2.25s; }
+  /* Unique tracks */
+  .orbit--white .cursor__track   { --r: 13px; --theta: 15deg;  --duration: 2.25s; }
   .orbit--white .cursor__satellite{ --size:5px; --color:#ffffff; }
 
-  .orbit--yellow .cursor__track { --r: 18px; --theta: 145deg; --duration: 3s; }
-  .orbit--yellow .cursor__satellite{ --size:6px; --color:#ffe8a3; /* pastel yellow */ }
+  .orbit--yellow .cursor__track  { --r: 18px; --theta: 145deg; --duration: 3s; }
+  .orbit--yellow .cursor__satellite{ --size:6px; --color:#ffe8a3; } /* pastel yellow */
 
-  .orbit--purple .cursor__track { --r: 24px; --theta: 265deg; --duration: 3.8s; }
-  .orbit--purple .cursor__satellite{ --size:7px; --color:#e6c8ff; /* pastel purple */ }
+  .orbit--purple .cursor__track  { --r: 24px; --theta: 265deg; --duration: 3.8s; }
+  .orbit--purple .cursor__satellite{ --size:7px; --color:#e6c8ff; } /* pastel purple */
 
   /* Hover/click states */
   .cursor--hover .cursor__planet{ transform:translate(-50%,-50%) scale(1.1); }
-  .cursor--hover .cursor__track{ animation-duration: calc(var(--duration) * .75); }
+  .cursor--hover .cursor__track{ animation-duration: calc(var(--duration) * .85); }
   .cursor--down  .cursor__planet{ transform:translate(-50%,-50%) scale(1.0); }
 
-  @keyframes cursor-spin{ to { transform: rotate(360deg); } }
+  /* Smooth, angle-aware orbit */
+  @keyframes orbit-spin{
+    from { transform: rotate(var(--theta)); }
+    to   { transform: rotate(calc(var(--theta) + 360deg)); }
+  }
 
   @media (prefers-reduced-motion: reduce){
     .cursor__track{ animation: none; }
@@ -278,11 +245,10 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
       </g>
     </svg>
 
-    <!-- Poetic line: big vertical space + deep indents -->
     <p class="hero-sub poetic-note">
       <span class="line1">just leaving traces</span>
       <span class="line2">of progress</span>
@@ -405,9 +371,7 @@
       clone.classList.add('lightbox__media');
 
       if (isVideo){
-        // keep/force looping in the popup
         clone.loop = true;
-        // show controls & autoplay from start
         clone.controls = true;
         clone.autoplay = true;
         clone.setAttribute('playsinline','');
@@ -542,8 +506,7 @@
         g.addColorStop(0.85, `rgb(128,128,0)`);
         g.addColorStop(1.00, `rgb(128,128,0)`);
 
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(0,0,1,0,Math.PI*2); ctx.fillStyle = g; ctx.fill();
         ctx.restore();
       }
 
