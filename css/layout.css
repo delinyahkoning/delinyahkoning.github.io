@@ -14,7 +14,7 @@ header{
   align-items:center; 
   gap:10px; 
   flex-wrap:wrap;
-  margin-right:35px;  /* ⬅ added */
+  margin-right:60px;  /* ⬅ added */
 }
 
 .tab {
