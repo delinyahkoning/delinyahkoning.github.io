@@ -31,3 +31,34 @@ h1, h2, h3, h4, h5, h6 {
 .hero-svg text {
   font-family: Arial, Helvetica, sans-serif !important;
 }
+
+/* Pills (section labels) */
+.pill-title {
+  font-family: "Courier New", Courier, monospace !important;
+  font-style: normal !important;
+}
+
+/* Tabs + brand (in case they set their own font) */
+.tabs .tab,
+.brand {
+  font-family: inherit !important;
+}
+
+/* Poetic lines under the hero — switch to Courier, not italic */
+.poetic-note,
+.poetic-note .line1,
+.poetic-note .line2,
+.poetic-note .line3 {
+  font-family: "Courier New", Courier, monospace !important;
+  font-style: normal !important;
+}
+
+/* Card titles/subtitles, buttons, footer, lightbox close — normalize too */
+.card strong,
+.sub,
+.fs-btn,
+footer,
+.lightbox__close {
+  font-family: inherit !important;
+}
+
