@@ -1,0 +1,19 @@
+.hero{
+  min-height:46vh; display:grid; place-items:start;
+  background:
+    radial-gradient(1200px 600px at 80% -10%,rgba(155,212,255,.05),transparent 60%),
+    radial-gradient(900px 700px at -10% 20%,rgba(155,212,255,.04),transparent 50%),
+    var(--bg);
+  padding:20px 0 16px;
+}
+.hero-center{text-align:left}
+.hero-svg{display:block; width:min(92vw,1100px); height:auto}
+
+/* Poetic line */
+.hero-sub.poetic-note{
+  font-size:0.9em; line-height:2.2; margin-left:60px; margin-top:-10px; color:var(--ink);
+  font-family:"Century Schoolbook", Century, "Times New Roman", Times, Georgia, serif;
+}
+.poetic-note span{display:block}
+.poetic-note .line2{margin-left:12ch}
+.poetic-note .line3{margin-left:19ch}
