@@ -1,21 +1,21 @@
-/* === 3-way segmented switch — matches nav pill styling === */
-/* Works with: data-state="dot" | "solar" | "native" */
+/* === 3-way segmented switch — matches nav pills & actually toggles === */
+/* Works if the button has one of these attributes:
+   data-state="dot|solar|native|orbit|planet|system|crosshair|aim|target"
+*/
 
 .tri-switch-wrap{
   display:inline-flex;
   align-items:center;
-  margin-left: 6px;           /* small gap from tabs */
-  vertical-align: middle;     /* align with tab pills */
+  margin-left:6px;
+  vertical-align:middle;
 }
 
-/* Track matches .tab chip look */
+/* Track (same vibe/height as your tabs) */
 .tri-switch{
-  /* Size tuned to your .tab (padding: 8px 12px on 16px text ≈ 32px tall) */
-  --h: 32px;                  /* pill height to match menu items */
-  --pad: 3px;                 /* inner padding for knob/labels */
+  --h: 32px;                /* match tab chip height feel */
+  --pad: 3px;
   --radius: 999px;
   --border: 1px solid rgba(255,255,255,.08);
-  --seg-gap: 2px;             /* tiny breathing room inside */
 
   position: relative;
   display: grid;
@@ -32,69 +32,67 @@
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+
+  /* position math defaults */
+  --knob-w: calc((100% - 2px) / 3);           /* three equal segments */
+  --knob-h: calc(var(--h) - var(--pad)*2);
+  --travel: calc(100% - var(--pad)*2 - var(--knob-w));
+  --step: 0;                                   /* left by default */
 }
 
 /* Labels (● 🪐 ⌖) */
 .tri-switch__labels{
-  position: absolute;
+  position:absolute;
   inset: var(--pad);
-  display: grid;
-  grid-template-columns: inherit;
-  align-items: center;
-  pointer-events: none;
-  font-size: 13px;
-  letter-spacing: .02em;
+  display:grid; grid-template-columns:inherit;
+  align-items:center; pointer-events:none;
+  font-size:13px; letter-spacing:.02em;
   color: rgba(255,255,255,.75);
 }
-.tri-switch__labels span{
-  text-align: center;
-  line-height: 1;
-}
+.tri-switch__labels span{ text-align:center; line-height:1; }
 
-/* Selected label brightens slightly */
+/* Brighten active label */
 .tri-switch[data-state="dot"]    .tri-switch__labels span:nth-child(1),
 .tri-switch[data-state="solar"]  .tri-switch__labels span:nth-child(2),
-.tri-switch[data-state="native"] .tri-switch__labels span:nth-child(3){
+.tri-switch[data-state="orbit"]  .tri-switch__labels span:nth-child(2),
+.tri-switch[data-state="planet"] .tri-switch__labels span:nth-child(2),
+.tri-switch[data-state="system"] .tri-switch__labels span:nth-child(2),
+.tri-switch[data-state="native"] .tri-switch__labels span:nth-child(3),
+.tri-switch[data-state="crosshair"] .tri-switch__labels span:nth-child(3),
+.tri-switch[data-state="aim"]    .tri-switch__labels span:nth-child(3),
+.tri-switch[data-state="target"] .tri-switch__labels span:nth-child(3){
   color: rgba(255,255,255,.95);
 }
 
-/* Knob = pastel yellow pill (same family as your active tab) */
+/* Knob — pastel yellow pill to match active tab */
 .tri-switch__knob{
-  --knob-h: calc(var(--h) - var(--pad)*2);
-  --knob-w: calc((100% - var(--seg-gap)*2) / 3); /* 3 segments with tiny inner gap */
-
-  position: absolute;
+  position:absolute;
   top: var(--pad);
-  left: var(--pad);
+  left: calc(var(--pad) + var(--travel) * var(--step));
   width: var(--knob-w);
   height: var(--knob-h);
   border-radius: var(--radius);
-  background: rgba(255, 245, 180, 0.25);             /* pastel yellow */
-  border: 1px solid rgba(255, 245, 180, 0.55);       /* match active tab border */
-  box-shadow: 0 0 0 3px rgba(255, 245, 180, 0.18);   /* soft glow like tabs */
+  background: rgba(255,245,180,.25);
+  border: 1px solid rgba(255,245,180,.55);
+  box-shadow: 0 0 0 3px rgba(255,245,180,.18);
   transition: left .20s cubic-bezier(.2,.8,.2,1);
   will-change: left;
 }
 
-/* Position logic (left / middle / right) */
-.tri-switch{
-  --travel: calc(100% - var(--pad)*2 - var(--knob-w));
-  --step: 0;
-}
-.tri-switch[data-state="dot"]    { --step: 0; }
-.tri-switch[data-state="solar"]  { --step: .5; }
-.tri-switch[data-state="native"] { --step: 1; }
-.tri-switch__knob{
-  left: calc(var(--pad) + var(--travel) * var(--step));
-}
+/* Map lots of possible state names to the 3 positions */
+.tri-switch[data-state="dot"]         { --step: 0; }
+.tri-switch[data-state="solar"],
+.tri-switch[data-state="orbit"],
+.tri-switch[data-state="planet"],
+.tri-switch[data-state="system"]      { --step: .5; }
+.tri-switch[data-state="native"],
+.tri-switch[data-state="crosshair"],
+.tri-switch[data-state="aim"],
+.tri-switch[data-state="target"]      { --step: 1; }
 
-/* Focus ring — same tone as your keyboard focus on tabs */
+/* Focus/hover (keep subtle, like tabs) */
 .tri-switch:focus-visible{
-  outline: 2px solid rgba(255, 245, 180, 0.45);
-  outline-offset: 2px;
+  outline:2px solid rgba(255,245,180,.45);
+  outline-offset:2px;
 }
-
-/* Hover (subtle, to match your tabs hover) */
-.tri-switch:hover{
-  border-color: rgba(255,255,255,.12);
-}
+.tri-switch:hover{ border-color: rgba(255,255,255,.12); }
