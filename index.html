@@ -129,10 +129,7 @@
   * { cursor:none !important; }
 
   /* =======================
-     SOLAR-SYSTEM CURSOR — FIXED
-     - Planets are children of the rotating track (so they actually orbit)
-     - Slower, readable orbital periods
-     - Angle-aware keyframes (no jumps)
+     SOLAR-SYSTEM CURSOR — smooth, slower
      ======================= */
   .cursor{
     position:fixed; top:0; left:0;
@@ -183,6 +180,7 @@
     border-radius:50%; background: var(--color);
     transform: translate(var(--r), -50%); /* rightmost point of track */
     box-shadow: 0 0 6px rgba(255,255,255,.25);
+    z-index:1; /* allows Saturn ring layers to sandwich the planet */
   }
 
   /* —— Planet presets (rough sizes/colors/radii/speeds/start angles) —— */
@@ -211,15 +209,38 @@
   .orbit--saturn  .planet{
     --size:8px; --color:#f1df9a;
     background: radial-gradient(circle at 40% 40%, #fff3c2, #f1df9a 60%, #cdbd86 100%);
+    position:absolute;
   }
-  .orbit--saturn  .planet::after{
-    content:""; position:absolute; left:50%; top:50%;
-    width: 14px; height: 6px; border-radius: 50%;
-    transform: translate(-50%,-50%) rotate(18deg);
-    border: 1px solid rgba(255,255,255,.25);
-    border-left-color: transparent; border-right-color: transparent;
-    opacity:.85; pointer-events:none;
-    filter: drop-shadow(0 0 3px rgba(255,255,255,.2));
+
+  /* === Improved Saturn Rings: dual layer with texture & tilt === */
+  .orbit--saturn .planet::before,
+  .orbit--saturn .planet::after{
+    content:"";
+    position:absolute; left:50%; top:50%;
+    width: 26px;                 /* overall ring width */
+    height: 9px;                 /* ring thickness */
+    transform: translate(-50%,-50%) rotate(24deg);
+    border-radius:50%;
+    /* soft ring bands using layered gradients */
+    background:
+      radial-gradient(closest-side, transparent 58%, rgba(255,255,255,.35) 59% 63%, rgba(255,230,190,.25) 64% 68%, rgba(255,255,255,.18) 69% 74%, transparent 75%),
+      radial-gradient(closest-side, transparent 60%, rgba(255,255,255,.15) 61% 72%, transparent 73%);
+    filter: drop-shadow(0 0 2px rgba(255,255,255,.25)) drop-shadow(0 0 4px rgba(255,210,130,.15));
+    pointer-events:none;
+  }
+  /* Back half of the ring (behind the planet) */
+  .orbit--saturn .planet::before{
+    z-index:0;
+    /* show lower half after rotation, gives a sense of depth */
+    clip-path: inset(50% 0 0 0);
+    opacity:.9;
+  }
+  /* Front half of the ring (in front of the planet) */
+  .orbit--saturn .planet::after{
+    z-index:2;
+    /* show upper half */
+    clip-path: inset(0 0 50% 0);
+    opacity:.95;
   }
 
   .orbit--uranus  .track{ --r:64px; --theta: 140deg; --duration: 32s; }
@@ -313,7 +334,7 @@
 
       <g filter="url(#liquify)">
         <text x="40" y="150" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">wow... are u...</text>
-        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...?</text>
+        <text x="40" y="250" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="700" fill="var(--ink)">looking at my lil test...???</text>
       </g>
     </svg>
 
@@ -382,7 +403,7 @@
   </div>
 </div>
 
-<!-- Solar System Cursor (fixed) -->
+<!-- Solar System Cursor -->
 <div class="cursor" aria-hidden="true">
   <span class="cursor__sun"></span>
 
