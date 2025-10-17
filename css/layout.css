@@ -8,7 +8,14 @@ header{
 .nav{display:flex; align-items:center; gap:16px; padding:14px 0}
 .brand{font-weight:700}
 
-.tabs{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+/* Add spacing between tabs and the cursor switch */
+.tabs{
+  display:flex; 
+  align-items:center; 
+  gap:10px; 
+  flex-wrap:wrap;
+  margin-right:35px;  /* ⬅ added */
+}
 
 .tab {
   padding:8px 12px; 
