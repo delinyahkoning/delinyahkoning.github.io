@@ -63,7 +63,7 @@
     .proj-gallery .thumb{
       border-radius: 12px;
       overflow: hidden;
-      background: #000;             /* keep for letterboxing only (gallery) */
+      background: #000;             /* only for letterboxing in gallery */
     }
     .proj-gallery .g-photo{ aspect-ratio: 4 / 3; }
     .proj-gallery .g-video{ grid-column: 1 / -1; aspect-ratio: 16 / 9; }
@@ -76,36 +76,40 @@
     }
     .proj-gallery .thumb:hover .fs-btn{ opacity:1; }
 
-    /* SHADING — header left; images left, no background box */
+    /* SHADING — header left; image directly under header; tiny gap to text; small break to next block; no backgrounds */
     .proj-method{ margin-top: 24px; }
     .proj-method h2{
       font-family: "Courier New", Courier, monospace;
       font-weight: 700; /* bold courier */
       font-size: 18px; margin: 0 0 10px;
     }
-    .method{ margin: 16px 0 20px; }
+    .method{
+      margin: 0 0 28px; /* small space before next header */
+    }
     .method h3{
       font-family: "Courier New", Courier, monospace;
       font-weight: 700;
-      font-size: 14px;
-      margin: 0 0 6px;
+      font-size: 18px;
+      margin: 0 0 8px;  /* header close to image */
       letter-spacing: .2px;
     }
     .method .thumb{
       width: min(var(--methodImgMax), 100%);
       border-radius: 0;
       overflow: visible;
-      background: none;             /* remove black box */
-      margin: 0;                    /* left-align image */
+      background: none;  /* remove black box */
+      margin: 0;         /* left-align image */
     }
     .method .thumb img{ width:100%; height:auto; display:block; }
     .method p{
-      margin: 8px 0 0;
+      margin: 6px 0 0;  /* tiny gap under image before text */
       max-width: var(--narrow);
-      margin-left: 0;               /* align text left */
+      margin-left: 0;
       margin-right: auto;
       font-family: "Courier New", Courier, monospace;
-      font-weight: 400; line-height: 1.7; letter-spacing: .15px;
+      font-weight: 400;
+      line-height: 1.6;
+      letter-spacing: .15px;
     }
 
     .hero h1{ margin: 8px 0 6px; }
@@ -196,11 +200,7 @@
               <img src="/assets/imaginary-planet/planet.png" alt="Planet shader nodes">
             </div>
           </div>
-          <p>
-            Notes about the base albedo and breakup. (Replace this text) — e.g., layered noise feeding a color
-            ramp for continents, secondary high-frequency mask for rocky detail, and a shallow subsurface mix to
-            bump the lit edge without going waxy.
-          </p>
+          <p>[ … ]</p>
         </div>
 
         <div class="method">
@@ -211,10 +211,7 @@
               <img src="/assets/imaginary-planet/atmosphere.png" alt="Atmosphere shader nodes">
             </div>
           </div>
-          <p>
-            How the rim glow is faked. (Replace this text) — e.g., Fresnel-driven falloff + slight color shift on
-            grazing angles, blended additively in comp; density map keeps the day side thicker than the night.
-          </p>
+          <p>[ … ]</p>
         </div>
 
         <div class="method">
@@ -225,10 +222,7 @@
               <img src="/assets/imaginary-planet/clouds.png" alt="Clouds shader nodes">
             </div>
           </div>
-          <p>
-            Motion + breakup. (Replace this text) — e.g., animated noise offset for slow drift, soft light blend on
-            the day side, and a touch of shadowing around the terminator to suggest height.
-          </p>
+          <p>[ … ]</p>
         </div>
       </section>
 
