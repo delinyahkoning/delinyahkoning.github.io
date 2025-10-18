@@ -32,11 +32,33 @@
   box-shadow: 0 12px 40px rgba(0,0,0,0.45);
 }
 
+/* === Minimal change: allow the media to size itself to viewport while preserving aspect === */
 .lightbox__media {
+  /* previously:
+     max-width: 100%;
+     max-height: 100%;
+     display: block;
+     background: #000;
+  */
+  width: auto;
+  height: auto;
   max-width: 100%;
   max-height: 100%;
+  object-fit: contain;
+  aspect-ratio: auto;
   display: block;
   background: #000;
+}
+
+/* Extra safety: if the slot ever gets a non-IMG/VIDEO child, these keep scaling sane */
+#lightboxMediaSlot img.lightbox__media,
+#lightboxMediaSlot video.lightbox__media {
+  width: auto !important;
+  height: auto !important;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  aspect-ratio: auto;
 }
 
 #lightboxMediaSlot {
