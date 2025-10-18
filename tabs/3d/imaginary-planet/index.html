@@ -13,7 +13,7 @@
 
   <!-- Page-local styles -->
   <style>
-    :root { --narrow: 62ch; --mediaMax: 900px; --methodImgMax: 450px; }
+    :root { --narrow: 62ch; --mediaMax: 900px; --methodImgMax: 300px; }
 
     /* MAIN VIDEO — centered, a bit smaller */
     .proj-hero figure { margin: 0; }
@@ -50,23 +50,34 @@
     .proj-desc p{ font-weight: 700; }   /* bold courier for main description */
     .proj-notes p{ font-weight: 400; }  /* normal courier for closing text */
 
-    /* MINI GALLERY — centered block, no boxes */
+    /* ============== MINI GALLERY ============== */
     .proj-gallery{
       margin-top: 20px;
       display: grid;
       grid-template-columns: repeat(2, minmax(260px, 1fr));
-      gap: 12px;
+      column-gap: 12px;             /* keep horizontal rhythm */
+      row-gap: 8px;                  /* tighter vertical rhythm */
       max-width: min(var(--mediaMax), 100%);
-      margin-left: auto;            /* center gallery block */
+      margin-left: auto;             /* center gallery block */
       margin-right: auto;
     }
+    /* Kill any stray whitespace/margins on items */
+    .proj-gallery .g-photo,
+    .proj-gallery .g-video{ margin:0; line-height:0; }
+
+    /* Use aspect-ratio on the INNER thumb (not the grid item) */
+    .proj-gallery .g-photo .thumb{ aspect-ratio: 4 / 3; }
+    .proj-gallery .g-video{
+      grid-column: 1 / -1;          /* full width for the video item */
+    }
+    .proj-gallery .g-video .thumb{ aspect-ratio: 16 / 9; }
+
     .proj-gallery .thumb{
       border-radius: 12px;
       overflow: hidden;
       background: #000;             /* only for letterboxing in gallery */
+      margin: 0;                    /* no extra gaps */
     }
-    .proj-gallery .g-photo{ aspect-ratio: 4 / 3; }
-    .proj-gallery .g-video{ grid-column: 1 / -1; aspect-ratio: 16 / 9; }
     .proj-gallery .thumb img,
     .proj-gallery .thumb video{ width:100%; height:100%; object-fit:cover; display:block; }
     .proj-gallery .fs-btn{
@@ -76,7 +87,8 @@
     }
     .proj-gallery .thumb:hover .fs-btn{ opacity:1; }
 
-    /* SHADING — header left; image directly under header; tiny gap to text; small break to next block; no backgrounds */
+    /* ============== SHADING ============== */
+    /* header left; image directly under header; tiny gap to text; small break to next block; no backgrounds */
     .proj-method{ margin-top: 24px; }
     .proj-method h2{
       font-family: "Courier New", Courier, monospace;
@@ -117,6 +129,7 @@
       height: auto;              /* keep aspect ratio */
       object-fit: contain;       /* never crop */
     }
+
     /* Tight rhythm: image -> text small gap */
     .method p{
       margin: 6px 0 0;  /* tiny gap under image before text */
