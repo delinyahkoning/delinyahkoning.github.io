@@ -93,14 +93,31 @@
       margin: 0 0 8px;  /* header close to image */
       letter-spacing: .2px;
     }
-    .method .thumb{
-      width: min(var(--methodImgMax), 100%);
+
+    /* --- Fix: shader screenshots must NOT be on a forced tile/aspect --- */
+    /* Neutralize any global .thumb rules ONLY inside the Shading section */
+    .proj-method .thumb{
+      display: inline-block;     /* let image define the box */
+      position: static;
+      width: auto;               /* natural width by default */
+      max-width: 100%;           /* responsive on small screens */
+      height: auto;
+      background: none;
       border-radius: 0;
       overflow: visible;
-      background: none;  /* remove black box */
-      margin: 0;         /* left-align image */
+      margin: 0;                 /* left-aligned */
+      aspect-ratio: auto;
     }
-    .method .thumb img{ width:100%; height:auto; display:block; }
+    .proj-method .thumb > img{
+      position: static;          /* override any absolute/inset from global */
+      inset: auto;
+      display: block;
+      width: auto;               /* natural size */
+      max-width: 100%;           /* but don’t overflow */
+      height: auto;              /* keep aspect ratio */
+      object-fit: contain;       /* never crop */
+    }
+    /* Tight rhythm: image -> text small gap */
     .method p{
       margin: 6px 0 0;  /* tiny gap under image before text */
       max-width: var(--narrow);
@@ -188,7 +205,7 @@
         </div>
       </section>
 
-      <!-- Shading (header left; images left; text left; no backgrounds) -->
+      <!-- Shading (header left; images left; text left; no backgrounds; natural aspect) -->
       <section class="proj-method">
         <h2>Shading</h2>
 
