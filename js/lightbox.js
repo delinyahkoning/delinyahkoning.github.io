@@ -138,7 +138,7 @@ closeBtn.addEventListener('click', close);
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
 lb.addEventListener('click', (e)=>{ if(!frame.contains(e.target)) close(); });
 
-/* ===== Precise button placements relative to MEDIA ===== */
+/* ===== Precise placements (viewport coords -> fixed elements) ===== */
 const PADDING = 8; // positive = inside corner; negative = float outside
 
 function currentMedia(){
@@ -154,6 +154,7 @@ function placeClose(){
   const top  = Math.round(r.top + PADDING);
   const left = Math.round(r.right - closeBtn.offsetWidth - PADDING);
 
+  // closeBtn is position: fixed; these are viewport coords
   closeBtn.style.top  = top + 'px';
   closeBtn.style.left = left + 'px';
 }
@@ -164,7 +165,7 @@ function placeMore(){
   if (!m) return;
 
   const r = m.getBoundingClientRect();
-  // Place JUST BELOW the media, right-aligned to the media edge
+  // position fixed at media bottom-right, slightly below
   const top  = Math.round(r.bottom + 8);
   const left = Math.round(r.right - lbMoreWrap.offsetWidth - 8);
 
