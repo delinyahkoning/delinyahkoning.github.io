@@ -18,13 +18,19 @@ function openWithMedia(mediaEl, meta = {}){
   const clone = mediaEl.cloneNode(true);
   clone.classList.add('lightbox__media');
 
-  /* === Minimal addition: clear fixed attributes so CSS can size naturally === */
+  /* Minimal: clear fixed attributes/styles that can force landscape sizing */
   try {
     if (clone.removeAttribute) {
       clone.removeAttribute('width');
       clone.removeAttribute('height');
     }
-    // Do NOT force inline styles; let CSS (lightbox.css) control sizing entirely.
+    if (clone.style) {
+      clone.style.width = '';
+      clone.style.height = '';
+      clone.style.maxWidth = '';
+      clone.style.maxHeight = '';
+      clone.style.objectFit = '';
+    }
   } catch {}
 
   if (isVideo){
@@ -32,6 +38,7 @@ function openWithMedia(mediaEl, meta = {}){
     clone.controls = true;
     clone.autoplay = true;
     clone.setAttribute('playsinline','');
+
     const startAndPlay = () => {
       try { clone.currentTime = 0; } catch {}
       const p = clone.play();
