@@ -42,8 +42,9 @@
   <main>
     <div class="wrap">
       <figure class="panel" style="overflow:hidden">
-        <video src="/assets/greenplanet.mp4" controls loop playsinline style="width:100%;display:block;border-radius:16px;"></video>
-        <figcaption class="sub" style="margin-top:8px;color:var(--muted)">Early pass — ring brightness & volumetric falloff tests.</figcaption>
+        <!-- AUTOPLAY FIX: added autoplay muted loop playsinline (kept controls) -->
+        <video src="/assets/greenplanet.mp4" autoplay muted loop playsinline controls style="width:100%;display:block;border-radius:16px;"></video>
+        <figcaption class="sub" style="margin-top:8px;color:var(--muted)">Early pass — ring brightness &amp; volumetric falloff tests.</figcaption>
       </figure>
 
       <section class="grid cards" style="margin-top:16px">
@@ -109,5 +110,23 @@
   <script type="module" src="/js/cursor.js"></script>
   <script type="module" src="/js/switch.js"></script>
   <script type="module" src="/js/main.js"></script>
+
+  <!-- Autoplay enforcer (safe no-op if autoplay already works) -->
+  <script>
+    (function(){
+      document.querySelectorAll('video[autoplay]').forEach(v => {
+        const tryPlay = () => {
+          const p = v.play();
+          if (p && typeof p.then === 'function') {
+            p.catch(() => setTimeout(tryPlay, 400));
+          }
+        };
+        // ensure muted + playsinline in case markup was altered
+        v.muted = true;
+        v.setAttribute('playsinline','');
+        tryPlay();
+      });
+    })();
+  </script>
 </body>
 </html>
