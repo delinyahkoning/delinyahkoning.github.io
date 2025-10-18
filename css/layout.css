@@ -79,26 +79,44 @@ section{padding:60px 0}
 
 .thumb:hover{transform:scale(1.03); box-shadow:0 10px 24px rgba(0,0,0,.35)}
 
+/* FS button (kept subtle but a touch larger to match lightbox.css) */
 .fs-btn{
   position:absolute; top:8px; right:8px; z-index:2;
-  padding:6px 8px; font-size:14px; line-height:1; border-radius:8px;
+  padding:8px 14px;                 /* was 6px 8px */
+  font-size:16px;                   /* was 14px */
+  line-height:1; border-radius:8px;
   background:rgba(0,0,0,.45); color:#fff; border:1px solid rgba(255,255,255,.25);
   opacity:0; transition:opacity .2s ease; user-select:none;
 }
 
 .thumb:hover .fs-btn{opacity:1}
 
+/* Home pills (titles) */
 .pill-title{
   --pill-px: 15px; --pill-py: 5px; --pill-font: 15px;
   display:inline-block; margin:0 0 12px 14px; padding:var(--pill-py) var(--pill-px);
   border-radius:999px; border:1.5px solid currentColor; background:transparent; color:#fff;
   text-transform:lowercase; font-weight:600; letter-spacing:.02em; line-height:1; font-size:var(--pill-font);
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
 }
 
+/* Cute yellow fill on hover (clean & readable) */
+.pill-title:hover{
+  background:#ffd96b;               /* cute yellow */
+  color:#000;                       /* readable on yellow */
+  border-color:#ffd96b;
+}
+
+/* Optional color variants (harmless if unused) */
 .pill--mint{color:var(--mint)}
 .pill--peach{color:var(--peach)}
 .pill--flush{margin-left:0!important}
 
 .panel .sub{margin:6px 0; line-height:1.4}
 
-footer{padding:24px 0; text-align:center; color:var(--muted)}
+/* Footer smaller & quieter */
+footer{
+  padding:24px 0; text-align:center; color:var(--muted);
+  font-size:12px;                   /* smaller copyright line */
+  opacity:.8;                       /* slightly quieter */
+}
