@@ -12,6 +12,27 @@
   <link rel="stylesheet" href="/css/lightbox.css">
   <link rel="stylesheet" href="/css/cursor.css">
   <link rel="stylesheet" href="/css/switch.css">
+
+  <!-- ADDED: small style so the See more btn sits in the thumb -->
+  <style>
+    .see-more-btn{
+      position:absolute; right:8px; bottom:8px;
+      padding:6px 10px; font-size:12px; font-weight:600;
+      color:#fff; text-decoration:none;
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:999px;
+      background:rgba(0,0,0,.35);
+      backdrop-filter:saturate(140%) blur(6px);
+      opacity:0; transform:translateY(3px);
+      transition:opacity .18s ease, transform .18s ease, background .18s ease;
+      pointer-events:none;
+    }
+    .thumb:hover .see-more-btn{ opacity:1; transform:translateY(0); pointer-events:auto; }
+    .see-more-btn:hover{ background:rgba(255,255,255,.12); }
+    .lightbox__more{ position:absolute; right:14px; bottom:14px; z-index:5; }
+    .lightbox__more[hidden]{ display:none; }
+    .lightbox__more a{ display:inline-block; padding:8px 12px; font-size:12px; font-weight:600; color:#fff; text-decoration:none; border:1px solid rgba(255,255,255,.25); border-radius:999px; background:rgba(0,0,0,.35); backdrop-filter:saturate(140%) blur(6px); }
+  </style>
 </head>
 <body>
   <header>
@@ -55,6 +76,17 @@
 
   <section>
     <div class="wrap grid cards">
+      <!-- ADDED: Imaginary Planet card -->
+      <article class="card" data-more="/tabs/3d/imaginary-planet/">
+        <div class="thumb" data-lightbox style="position:relative">
+          <button class="fs-btn" type="button">⤢</button>
+          <video src="/assets/greenplanet.mp4" autoplay muted loop playsinline></video>
+          <a class="see-more-btn" href="/tabs/3d/imaginary-planet/">See more →</a>
+        </div>
+        <strong>Imaginary planet</strong>
+        <div class="sub" style="font-size:13px">Procedurally made in Blender</div>
+      </article>
+
       <!-- Card 1 -->
       <article class="card">
         <div class="thumb" data-lightbox>
@@ -89,11 +121,15 @@
 
   <!-- Lightbox -->
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="lightbox__frame" role="document">
+    <div class="lightbox__frame" role="document" style="position:relative"><!-- position to anchor btn -->
       <button class="lightbox__close" type="button" aria-label="Close">
         <span aria-hidden="true">✕</span><span class="lightbox__sr">Close</span>
       </button>
       <div id="lightboxMediaSlot"></div>
+      <!-- ADDED -->
+      <div class="lightbox__more" id="lightboxMore" hidden>
+        <a id="lightboxSeeMore" href="#">See more →</a>
+      </div>
     </div>
   </div>
 
