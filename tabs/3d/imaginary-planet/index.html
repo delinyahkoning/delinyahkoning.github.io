@@ -15,6 +15,18 @@
   <style>
     :root { --narrow: 62ch; --mediaMax: 1000px; --methodImgMax: 550px; }
 
+    /* Pill style same as home page buttons */
+    .pill {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
     /* MAIN VIDEO — centered, a bit bigger now */
     .proj-hero figure { margin: 0; }
     .proj-hero .hero-media{
@@ -37,7 +49,7 @@
     .proj-notes{
       margin-top:18px;
       max-width: var(--narrow);
-      margin-left: 0;               /* align to left */
+      margin-left: 0;
       margin-right: auto;
     }
     .proj-desc p,
@@ -46,7 +58,7 @@
       line-height: 1.7;
       letter-spacing: .15px;
       margin: 0;
-      font-weight: 400;             /* main explainer normal Courier */
+      font-weight: 400;
     }
 
     /* ============== MINI GALLERY ============== */
@@ -54,28 +66,22 @@
       margin-top: 20px;
       display: grid;
       grid-template-columns: repeat(2, minmax(260px, 1fr));
-      column-gap: 12px;             /* keep horizontal rhythm */
-      row-gap: 8px;                  /* tighter vertical rhythm */
+      column-gap: 12px;
+      row-gap: 8px;
       max-width: min(var(--mediaMax), 100%);
-      margin-left: auto;             /* center gallery block */
+      margin-left: auto;
       margin-right: auto;
     }
-    /* Kill any stray whitespace/margins on items */
     .proj-gallery .g-photo,
     .proj-gallery .g-video{ margin:0; line-height:0; }
-
-    /* Use aspect-ratio on the INNER thumb (not the grid item) */
     .proj-gallery .g-photo .thumb{ aspect-ratio: 4 / 3; }
-    .proj-gallery .g-video{
-      grid-column: 1 / -1;          /* full width for the video item */
-    }
+    .proj-gallery .g-video{ grid-column: 1 / -1; }
     .proj-gallery .g-video .thumb{ aspect-ratio: 16 / 9; }
-
     .proj-gallery .thumb{
       border-radius: 12px;
       overflow: hidden;
-      background: #000;             /* only for letterboxing in gallery */
-      margin: 0;                    /* no extra gaps */
+      background: #000;
+      margin: 0;
       position: relative;
     }
     .proj-gallery .thumb img,
@@ -91,30 +97,26 @@
     .proj-method{
       margin-top: 24px;
       display: grid;
-      grid-template-columns: repeat(2, minmax(300px, 1fr)); /* Option A: natural wrap */
+      grid-template-columns: repeat(2, minmax(300px, 1fr));
       gap: 32px;
     }
     .proj-method h2{
-      grid-column: 1 / -1; /* Shading header spans full width */
+      grid-column: 1 / -1;
       font-family: "Courier New", Courier, monospace;
-      font-weight: 700; /* bold courier */
-      font-size: 20px;  /* a little bigger */
+      font-weight: 700;
+      font-size: 20px;
       margin: 0 0 10px;
     }
-    .method{
-      margin: 0; /* spacing handled by grid gap */
-    }
+    .method{ margin: 0; }
     .method h3{
       font-family: "Courier New", Courier, monospace;
       font-weight: 700;
       font-size: 18px;
-      margin: 0 0 8px;  /* header close to image */
+      margin: 0 0 8px;
       letter-spacing: .2px;
     }
-
-    /* Shader screenshots: natural aspect, capped by --methodImgMax */
     .proj-method .method-thumb .thumb{
-      display: inline-block;     /* let image define the box */
+      display: inline-block;
       position: static;
       width: auto;
       max-width: var(--methodImgMax);
@@ -122,7 +124,7 @@
       background: none;
       border-radius: 0;
       overflow: visible;
-      margin: 0;                 /* left-aligned */
+      margin: 0;
       aspect-ratio: auto;
     }
     .proj-method .method-thumb .thumb > img{
@@ -134,8 +136,6 @@
       height: auto;
       object-fit: contain;
     }
-
-    /* Tight rhythm: image -> text small gap */
     .method p{
       margin: 6px 0 0;
       max-width: var(--narrow);
@@ -175,7 +175,7 @@
     <div class="wrap">
       <a class="tab" href="/tabs/3d/" style="font-size:13px">← Back to 3D</a>
       <h1 style="font-size:clamp(28px,4.5vw,48px);">Imaginary Planet</h1>
-      <p class="sub" style="color:var(--muted);">Looping mood piece. Goals: fake atmosphere, subtle ring glow, and an orbital parallax that feels alive.</p>
+      <p class="sub pill">Looping mood piece. Goals: fake atmosphere, subtle ring glow, and an orbital parallax that feels alive.</p>
     </div>
   </section>
 
