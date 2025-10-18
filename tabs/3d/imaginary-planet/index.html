@@ -13,9 +13,9 @@
 
   <!-- Page-local styles -->
   <style>
-    :root { --narrow: 62ch; --mediaMax: 900px; --methodImgMax: 300px; }
+    :root { --narrow: 62ch; --mediaMax: 1000px; --methodImgMax: 300px; }
 
-    /* MAIN VIDEO — centered, a bit smaller */
+    /* MAIN VIDEO — centered, a bit bigger now */
     .proj-hero figure { margin: 0; }
     .proj-hero .hero-media{
       width: min(var(--mediaMax), 100%);
@@ -46,9 +46,8 @@
       line-height: 1.7;
       letter-spacing: .15px;
       margin: 0;
+      font-weight: 400;             /* main explainer now normal Courier (not bold) */
     }
-    .proj-desc p{ font-weight: 700; }   /* bold courier for main description */
-    .proj-notes p{ font-weight: 400; }  /* normal courier for closing text */
 
     /* ============== MINI GALLERY ============== */
     .proj-gallery{
@@ -93,7 +92,8 @@
     .proj-method h2{
       font-family: "Courier New", Courier, monospace;
       font-weight: 700; /* bold courier */
-      font-size: 18px; margin: 0 0 10px;
+      font-size: 20px;  /* a little bigger */
+      margin: 0 0 10px;
     }
     .method{
       margin: 0 0 28px; /* small space before next header */
@@ -108,11 +108,11 @@
 
     /* --- Fix: shader screenshots must NOT be on a forced tile/aspect --- */
     /* Neutralize any global .thumb rules ONLY inside the Shading section */
-    .proj-method .thumb{
+    .proj-method .method-thumb .thumb{
       display: inline-block;     /* let image define the box */
       position: static;
       width: auto;               /* natural width by default */
-      max-width: 100%;           /* responsive on small screens */
+      max-width: var(--methodImgMax);  /* ↓ cap size (downscaled a little) */
       height: auto;
       background: none;
       border-radius: 0;
@@ -120,7 +120,7 @@
       margin: 0;                 /* left-aligned */
       aspect-ratio: auto;
     }
-    .proj-method .thumb > img{
+    .proj-method .method-thumb .thumb > img{
       position: static;          /* override any absolute/inset from global */
       inset: auto;
       display: block;
