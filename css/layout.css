@@ -98,19 +98,7 @@ section{padding:60px 0}
   border-radius:999px; border:1.5px solid currentColor; 
   text-transform:lowercase; font-weight:600; letter-spacing:.02em; line-height:1; font-size:var(--pill-font);
   transition: background .2s ease, color .2s ease, border-color .2s ease;
-  cursor:pointer;
-
-  /* Default: white pill with black text */
-  background:#fff; 
-  color:#000; 
-  border-color:#fff;
-}
-
-/* Cute yellow fill on hover (clean & readable) */
-.pill-title:hover{
-  background:#ffd96b;               /* cute yellow */
-  color:#000;                       /* readable on yellow */
-  border-color:#ffd96b;
+  /* default appearance is set later by the page's inline <style> */
 }
 
 /* Optional color variants (harmless if unused) */
@@ -125,4 +113,16 @@ footer{
   padding:24px 0; text-align:center; color:var(--muted);
   font-size:12px;                   /* smaller copyright line */
   opacity:.8;                       /* slightly quieter */
+}
+
+/* -----------------------------------------------------
+   HOME pills hover override
+   Beats the page-local .pill-title.pill--white { ... !important }
+   by using higher specificity + !important on hover.
+   Targets your exact markup: <h2 class="pill-title pill--white">...</h2>
+------------------------------------------------------ */
+.panel h2.pill-title.pill--white:hover{
+  background:#ffd96b !important;    /* cute yellow fill */
+  border-color:#ffd96b !important;
+  color:#000 !important;            /* readable on yellow */
 }
