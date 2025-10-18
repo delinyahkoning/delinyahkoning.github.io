@@ -1,95 +1,145 @@
-/* === Lightbox Overlay === */
+/* Base lightbox styles */
 .lightbox {
   position: fixed;
   inset: 0;
-  z-index: 9998;
-  display: none;
+  z-index: 2000;
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  transition: opacity 0.25s ease;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .lightbox.open {
-  display: flex;
-}
-
-.lightbox::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: rgba(7, 8, 12, 0.32);
-  backdrop-filter: blur(8px) saturate(130%);
-  -webkit-backdrop-filter: blur(8px) saturate(130%);
-  pointer-events: none;
-  z-index: 0;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .lightbox__frame {
+  max-width: 90vw;
+  max-height: 90vh;
   position: relative;
-  z-index: 1;
+  background: var(--panel, #10121a);
+  border-radius: var(--radius, 12px);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.lightbox__close {
+  position: absolute;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
   border: none;
-  border-radius: 14px;
-  padding: 0;
-  background: transparent;
-  max-width: min(1000px, 84vw);
-  max-height: 84vh;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-  overflow: visible;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.lightbox__close:hover {
+  background: rgba(255,255,255,0.2);
 }
 
 .lightbox__media {
+  max-width: 100%;
+  max-height: 100%;
   display: block;
-  max-width: 84vw;
-  max-height: 84vh;
-  border-radius: 12px;
-  background: #000;
 }
 
-/* Close button: JS positions it precisely (top/left) each time */
-.lightbox__close {
-  position: fixed;
-  top: 0;       /* JS will override */
-  left: 0;      /* JS will override */
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1;
-  background: rgba(0,0,0,.55);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,.25);
-  cursor: pointer;
-  z-index: 10000;
-  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+#lightboxMediaSlot {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.lightbox__sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* === Fix sub-pixel seam on media thumbnails === */
+/* --- Inline fullscreen button inside card thumbs --- */
 .thumb {
   position: relative;
+  cursor: pointer;
   overflow: hidden;
+  border-radius: var(--radius, 12px);
 }
 
-.thumb > img,
-.thumb > video {
+.thumb .fs-btn {
   position: absolute;
-  inset: -1px;
-  width: calc(100% + 2px);
-  height: calc(100% + 2px);
-  object-fit: cover;
-  display: block;
-  transform: translateZ(0);
+  right: 6px;
+  top: 6px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.thumb:hover .fs-btn {
+  opacity: 1;
+}
+
+/* ================================ */
+/* NEW PARTS — See more overlays   */
+/* ================================ */
+
+/* Hover “See more” on any tile with data-more */
+.see-more-btn {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 999px;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: saturate(140%) blur(6px);
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity 0.18s ease, transform 0.18s ease, background 0.18s ease;
+  pointer-events: none;
+}
+
+.thumb:hover .see-more-btn {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.see-more-btn:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* Popup "See more" (positioned via JS — do not hardcode bottom/right here) */
+.lightbox__more {
+  position: absolute; /* JS sets top/left to media bottom-right */
+  z-index: 5;
+}
+
+.lightbox__more[hidden] {
+  display: none;
+}
+
+.lightbox__more a {
+  display: inline-block;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 999px;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: saturate(140%) blur(6px);
 }
