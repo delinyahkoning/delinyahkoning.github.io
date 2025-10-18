@@ -11,29 +11,23 @@
   <link rel="stylesheet" href="/css/cursor.css">
   <link rel="stylesheet" href="/css/switch.css">
 
-  <!-- Page-local styles for this project layout -->
+  <!-- Page-local styles: no boxes, left-aligned, simple spacing -->
   <style>
-    :root { --proj-max: 980px; --proj-narrow: 62ch; }
-    .proj-wrap { max-width: var(--proj-max); margin: 0 auto; }
-    .proj-narrow { max-width: var(--proj-narrow); margin: 0 auto; }
+    :root { --narrow: 62ch; }
 
-    /* Main hero media a bit smaller */
+    /* Headings/subtitle already align via .wrap; keep content left */
     .proj-hero figure { margin: 0; }
-    .proj-hero .hero-media {
-      width: 100%;
+    .proj-hero .hero-media{
+      width: min(900px, 100%);   /* a bit smaller than full width */
+      display:block;
       border-radius: 16px;
-      display: block;
-      box-shadow: 0 12px 30px rgba(0,0,0,.28);
     }
-    .proj-hero figcaption { margin-top: 8px; color: var(--muted); }
+    .proj-hero figcaption{ margin-top:8px; color:var(--muted); }
 
-    /* Main description (bold Courier) */
-    .proj-desc {
-      margin-top: 18px;
-      padding: 18px;
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.00));
-      border: 1px solid rgba(255,255,255,.06);
+    /* Main description: bold Courier, left-aligned */
+    .proj-desc{
+      margin-top:18px;
+      max-width: var(--narrow);
     }
     .proj-desc p{
       font-family: "Courier New", Courier, monospace;
@@ -43,25 +37,23 @@
       margin: 0;
     }
 
-    /* Creative mini-gallery */
-    .proj-gallery {
+    /* Mini gallery: simple, left-aligned, no shadows/boxes */
+    .proj-gallery{
       margin-top: 20px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      gap: 12px;
+      max-width: min(900px, 100%);
     }
-    .proj-gallery .thumb {
-      border-radius: 14px;
+    .proj-gallery .thumb{
+      border-radius: 12px;
       overflow: hidden;
-      background: #000;
-      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      background: #000; /* so letterboxing is dark; not a box UI */
     }
-    .proj-gallery .g-photo { aspect-ratio: 4 / 3; }
-    .proj-gallery .g-video { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
-    .proj-gallery .g-photo:nth-child(1) .thumb { transform: rotate(-0.6deg); }
-    .proj-gallery .g-photo:nth-child(2) .thumb { transform: rotate(0.7deg); }
+    .proj-gallery .g-photo{ aspect-ratio: 4 / 3; }
+    .proj-gallery .g-video{ grid-column: 1 / -1; aspect-ratio: 16 / 9; }
     .proj-gallery .thumb img,
-    .proj-gallery .thumb video { width:100%; height:100%; object-fit:cover; display:block; }
+    .proj-gallery .thumb video{ width:100%; height:100%; object-fit:cover; display:block; }
     .proj-gallery .fs-btn{
       position:absolute; right:6px; top:6px;
       background:rgba(0,0,0,.6); color:#fff; border:none; border-radius:6px;
@@ -69,65 +61,46 @@
     }
     .proj-gallery .thumb:hover .fs-btn{ opacity:1; }
 
-    /* Methodology / Shading */
-    .proj-method { margin-top: 22px; }
+    /* Shading methodology — plain flow, left-aligned */
+    .proj-method{ margin-top: 24px; }
     .proj-method h2{
       font-family: "Courier New", Courier, monospace;
       font-weight: 700; /* bold courier */
-      font-size: 18px;
-      margin: 0 0 10px;
+      font-size: 18px; margin: 0 0 10px;
     }
-    .method-item{
-      display: grid;
-      grid-template-columns: minmax(260px, 460px) 1fr;
-      gap: 16px;
-      padding: 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.06);
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
-      margin-bottom: 14px;
-      align-items: start;
+    .method{
+      margin: 14px 0 18px;
+      max-width: min(900px, 100%);
     }
-    .method-thumb .thumb{
-      border-radius: 12px;
-      overflow: hidden;
-      background:#000;
-      box-shadow: 0 10px 24px rgba(0,0,0,.22);
-    }
-    .method-thumb .thumb img{ width:100%; height:auto; display:block; }
-    .method-copy h3{
+    .method h3{
       font-family: "Courier New", Courier, monospace;
       font-weight: 700;
       font-size: 14px;
-      margin: 4px 0 6px;
+      margin: 0 0 6px;
       letter-spacing: .2px;
     }
-    .method-copy p{
-      font-family: "Courier New", Courier, monospace;
-      font-weight: 400; /* normal courier */
-      line-height: 1.7;
-      letter-spacing: .15px;
-      margin: 0;
-      max-width: 60ch;
+    .method .thumb{
+      width: min(560px, 100%);
+      border-radius: 10px;
+      overflow: hidden;
+      background:#000;
     }
-    @media (max-width: 820px){
-      .method-item{ grid-template-columns: 1fr; }
+    .method .thumb img{ width:100%; height:auto; display:block; }
+    .method p{
+      margin: 8px 0 0;
+      max-width: var(--narrow);
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 400; line-height: 1.7; letter-spacing: .15px;
     }
 
-    /* Extra text box (normal Courier, narrow) */
-    .proj-notes {
-      margin-top: 20px;
-      padding: 18px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.06);
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+    /* Closing notes paragraph, left and narrow */
+    .proj-notes{
+      margin-top: 22px;
+      max-width: var(--narrow);
     }
     .proj-notes p{
       font-family: "Courier New", Courier, monospace;
-      font-weight: 400;
-      line-height: 1.7;
-      letter-spacing: .15px;
-      margin: 0;
+      font-weight: 400; line-height: 1.7; letter-spacing: .15px; margin: 0;
     }
 
     .hero h1{ margin: 8px 0 6px; }
@@ -163,10 +136,10 @@
   </section>
 
   <main>
-    <div class="wrap proj-wrap">
-      <!-- Main hero media (smaller & centered) -->
+    <div class="wrap">
+      <!-- Main hero media (smaller, left-aligned) -->
       <section class="proj-hero">
-        <figure class="panel" style="overflow:visible;">
+        <figure>
           <video
             src="/assets/greenplanet.mp4"
             autoplay muted loop playsinline controls
@@ -175,8 +148,8 @@
         </figure>
       </section>
 
-      <!-- Main description (bold Courier) -->
-      <section class="proj-desc panel proj-narrow">
+      <!-- Main description (bold Courier, left) -->
+      <section class="proj-desc">
         <p>
           A study in procedural space vibes. The planet’s rim glow is layered with a soft additive pass and a
           restrained chromatic spread on highlights. The rings use thin noise breakup to avoid perfect symmetry,
@@ -184,9 +157,8 @@
         </p>
       </section>
 
-      <!-- Creative mini-gallery -->
+      <!-- Creative mini-gallery (no boxes) -->
       <section class="proj-gallery">
-        <!-- Top row: two photos side-by-side -->
         <div class="g-photo">
           <div class="thumb" data-lightbox>
             <button class="fs-btn" type="button" aria-label="Open">⤢</button>
@@ -199,7 +171,6 @@
             <img src="/assets/imaginary-planet/photo2.png" alt="Imaginary planet — still 2">
           </div>
         </div>
-        <!-- Bottom row: video full width -->
         <div class="g-video">
           <div class="thumb" data-lightbox>
             <button class="fs-btn" type="button" aria-label="Open">⤢</button>
@@ -208,65 +179,56 @@
         </div>
       </section>
 
-      <!-- ===== Methodology: Shading ===== -->
+      <!-- Shading methodology (plain flow, left) -->
       <section class="proj-method">
         <h2>Shading</h2>
 
-        <!-- Planet -->
-        <article class="method-item">
+        <div class="method">
+          <h3>Planet</h3>
           <div class="method-thumb">
             <div class="thumb" data-lightbox>
               <button class="fs-btn" type="button" aria-label="Open">⤢</button>
               <img src="/assets/imaginary-planet/planet.png" alt="Planet shader nodes">
             </div>
           </div>
-          <div class="method-copy">
-            <h3>Planet</h3>
-            <p>
-              Notes about the base albedo and breakup. (Replace this text) — e.g., layered noise feeding a color
-              ramp for continents, secondary high-frequency mask for rocky detail, and a shallow subsurface mix to
-              bump the lit edge without going waxy.
-            </p>
-          </div>
-        </article>
+          <p>
+            Notes about the base albedo and breakup. (Replace this text) — e.g., layered noise feeding a color
+            ramp for continents, secondary high-frequency mask for rocky detail, and a shallow subsurface mix to
+            bump the lit edge without going waxy.
+          </p>
+        </div>
 
-        <!-- Atmosphere -->
-        <article class="method-item">
+        <div class="method">
+          <h3>Atmosphere</h3>
           <div class="method-thumb">
             <div class="thumb" data-lightbox>
               <button class="fs-btn" type="button" aria-label="Open">⤢</button>
               <img src="/assets/imaginary-planet/atmosphere.png" alt="Atmosphere shader nodes">
             </div>
           </div>
-          <div class="method-copy">
-            <h3>Atmosphere</h3>
-            <p>
-              How the rim glow is faked. (Replace this text) — e.g., Fresnel-driven falloff + slight color shift on
-              grazing angles, blended additively in comp; density map keeps the day side thicker than the night.
-            </p>
-          </div>
-        </article>
+          <p>
+            How the rim glow is faked. (Replace this text) — e.g., Fresnel-driven falloff + slight color shift on
+            grazing angles, blended additively in comp; density map keeps the day side thicker than the night.
+          </p>
+        </div>
 
-        <!-- Clouds -->
-        <article class="method-item">
+        <div class="method">
+          <h3>Clouds</h3>
           <div class="method-thumb">
             <div class="thumb" data-lightbox>
               <button class="fs-btn" type="button" aria-label="Open">⤢</button>
               <img src="/assets/imaginary-planet/clouds.png" alt="Clouds shader nodes">
             </div>
           </div>
-          <div class="method-copy">
-            <h3>Clouds</h3>
-            <p>
-              Motion + breakup. (Replace this text) — e.g., animated noise offset for slow drift, soft light blend on
-              the day side, and a touch of shadowing around the terminator to suggest height.
-            </p>
-          </div>
-        </article>
+          <p>
+            Motion + breakup. (Replace this text) — e.g., animated noise offset for slow drift, soft light blend on
+            the day side, and a touch of shadowing around the terminator to suggest height.
+          </p>
+        </div>
       </section>
 
-      <!-- Extra text box (normal Courier, narrow) -->
-      <section class="proj-notes panel proj-narrow">
+      <!-- Closing notes (normal Courier, left) -->
+      <section class="proj-notes">
         <p>
           Rendered in Blender with lightweight compositing. I like the slight haze across the rings and the gentle
           parallax on the foreground glow. Next steps: play with a slower ring tumble and see if a super subtle
@@ -276,7 +238,7 @@
     </div>
   </main>
 
-  <!-- Lightbox (standard) -->
+  <!-- Lightbox -->
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="lightbox__frame" role="document">
       <button class="lightbox__close" type="button" aria-label="Close">
