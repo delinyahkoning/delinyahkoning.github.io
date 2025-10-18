@@ -11,44 +11,54 @@
   <link rel="stylesheet" href="/css/cursor.css">
   <link rel="stylesheet" href="/css/switch.css">
 
-  <!-- Page-local styles: no boxes, left-aligned, simple spacing -->
+  <!-- Page-local styles -->
   <style>
-    :root { --narrow: 62ch; }
+    :root { --narrow: 62ch; --mediaMax: 900px; --methodImgMax: 560px; }
 
-    /* Headings/subtitle already align via .wrap; keep content left */
+    /* Keep headings left via .wrap */
+
+    /* MAIN VIDEO — centered, a bit smaller */
     .proj-hero figure { margin: 0; }
     .proj-hero .hero-media{
-      width: min(900px, 100%);   /* a bit smaller than full width */
+      width: min(var(--mediaMax), 100%);
       display:block;
       border-radius: 16px;
+      margin: 0 auto;               /* center video (as before) */
     }
     .proj-hero figcaption{ margin-top:8px; color:var(--muted); }
 
-    /* Main description: bold Courier, left-aligned */
-    .proj-desc{
+    /* TEXT SECTIONS — left-aligned to the wrap’s left edge */
+    .proj-desc,
+    .proj-notes{
       margin-top:18px;
       max-width: var(--narrow);
+      margin-left: 0;               /* align to left */
+      margin-right: auto;
     }
-    .proj-desc p{
+    .proj-desc p,
+    .proj-notes p{
       font-family: "Courier New", Courier, monospace;
-      font-weight: 700;
-      line-height: 1.65;
+      line-height: 1.7;
       letter-spacing: .15px;
       margin: 0;
     }
+    .proj-desc p{ font-weight: 700; }   /* bold courier for main description */
+    .proj-notes p{ font-weight: 400; }  /* normal courier for closing text */
 
-    /* Mini gallery: simple, left-aligned, no shadows/boxes */
+    /* MINI GALLERY — centered as a block, no boxes */
     .proj-gallery{
       margin-top: 20px;
       display: grid;
       grid-template-columns: repeat(2, minmax(260px, 1fr));
       gap: 12px;
-      max-width: min(900px, 100%);
+      max-width: min(var(--mediaMax), 100%);
+      margin-left: auto;            /* center gallery block */
+      margin-right: auto;
     }
     .proj-gallery .thumb{
       border-radius: 12px;
       overflow: hidden;
-      background: #000; /* so letterboxing is dark; not a box UI */
+      background: #000;
     }
     .proj-gallery .g-photo{ aspect-ratio: 4 / 3; }
     .proj-gallery .g-video{ grid-column: 1 / -1; aspect-ratio: 16 / 9; }
@@ -61,17 +71,14 @@
     }
     .proj-gallery .thumb:hover .fs-btn{ opacity:1; }
 
-    /* Shading methodology — plain flow, left-aligned */
+    /* SHADING — header left; each item image centered, text left */
     .proj-method{ margin-top: 24px; }
     .proj-method h2{
       font-family: "Courier New", Courier, monospace;
       font-weight: 700; /* bold courier */
       font-size: 18px; margin: 0 0 10px;
     }
-    .method{
-      margin: 14px 0 18px;
-      max-width: min(900px, 100%);
-    }
+    .method{ margin: 16px 0 20px; }
     .method h3{
       font-family: "Courier New", Courier, monospace;
       font-weight: 700;
@@ -80,27 +87,20 @@
       letter-spacing: .2px;
     }
     .method .thumb{
-      width: min(560px, 100%);
+      width: min(var(--methodImgMax), 100%);
       border-radius: 10px;
       overflow: hidden;
       background:#000;
+      margin: 0 auto;               /* center shader image */
     }
     .method .thumb img{ width:100%; height:auto; display:block; }
     .method p{
       margin: 8px 0 0;
       max-width: var(--narrow);
+      margin-left: 0;               /* align text to left */
+      margin-right: auto;
       font-family: "Courier New", Courier, monospace;
       font-weight: 400; line-height: 1.7; letter-spacing: .15px;
-    }
-
-    /* Closing notes paragraph, left and narrow */
-    .proj-notes{
-      margin-top: 22px;
-      max-width: var(--narrow);
-    }
-    .proj-notes p{
-      font-family: "Courier New", Courier, monospace;
-      font-weight: 400; line-height: 1.7; letter-spacing: .15px; margin: 0;
     }
 
     .hero h1{ margin: 8px 0 6px; }
@@ -137,7 +137,7 @@
 
   <main>
     <div class="wrap">
-      <!-- Main hero media (smaller, left-aligned) -->
+      <!-- Main video (centered) -->
       <section class="proj-hero">
         <figure>
           <video
@@ -148,7 +148,7 @@
         </figure>
       </section>
 
-      <!-- Main description (bold Courier, left) -->
+      <!-- Main description (left) -->
       <section class="proj-desc">
         <p>
           A study in procedural space vibes. The planet’s rim glow is layered with a soft additive pass and a
@@ -157,7 +157,7 @@
         </p>
       </section>
 
-      <!-- Creative mini-gallery (no boxes) -->
+      <!-- Mini gallery (centered block) -->
       <section class="proj-gallery">
         <div class="g-photo">
           <div class="thumb" data-lightbox>
@@ -179,7 +179,7 @@
         </div>
       </section>
 
-      <!-- Shading methodology (plain flow, left) -->
+      <!-- Shading (header left; images centered; text left) -->
       <section class="proj-method">
         <h2>Shading</h2>
 
@@ -227,7 +227,7 @@
         </div>
       </section>
 
-      <!-- Closing notes (normal Courier, left) -->
+      <!-- Closing notes (left) -->
       <section class="proj-notes">
         <p>
           Rendered in Blender with lightweight compositing. I like the slight haze across the rings and the gentle
