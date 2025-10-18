@@ -35,6 +35,42 @@
       -webkit-font-smoothing: none;
       -moz-osx-font-smoothing: auto;
     }
+
+    /* === ADDED: small styles for “See more” button overlays === */
+    .see-more-btn{
+      position:absolute;
+      right:8px; bottom:8px;
+      padding:6px 10px;
+      font-size:12px; font-weight:600;
+      color:#fff; text-decoration:none;
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:999px;
+      background:rgba(0,0,0,.35);
+      backdrop-filter:saturate(140%) blur(6px);
+      opacity:0; transform:translateY(3px);
+      transition:opacity .18s ease, transform .18s ease, background .18s ease;
+      pointer-events:none; /* only show on hover */
+    }
+    .thumb:hover .see-more-btn{ opacity:1; transform:translateY(0); pointer-events:auto; }
+    .see-more-btn:hover{ background:rgba(255,255,255,.12); }
+
+    /* Lightbox “See more” button */
+    .lightbox__more{
+      position:absolute;
+      right:14px; bottom:14px;
+      z-index:5;
+    }
+    .lightbox__more a{
+      display:inline-block;
+      padding:8px 12px;
+      font-size:12px; font-weight:600;
+      color:#fff; text-decoration:none;
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:999px;
+      background:rgba(0,0,0,.35);
+      backdrop-filter:saturate(140%) blur(6px);
+    }
+    .lightbox__more[hidden]{ display:none; }
   </style>
 </head>
 <body>
@@ -120,10 +156,11 @@
       <div class="panel">
         <h2 class="pill-title pill--white">stuff i made</h2>
         <div class="grid cards" style="margin-top:12px">
-          <article class="card">
-            <div class="thumb" data-lightbox>
+          <article class="card" data-more="/tabs/3d/imaginary-planet/"><!-- ADDED data-more -->
+            <div class="thumb" data-lightbox style="position:relative"><!-- ADDED position:relative -->
               <button class="fs-btn" type="button" aria-label="Open">⤢</button>
               <video src="assets/greenplanet.mp4" autoplay muted loop playsinline></video>
+              <a class="see-more-btn" href="/tabs/3d/imaginary-planet/">See more →</a><!-- ADDED -->
             </div>
             <strong>Imaginary planet</strong>
             <div class="sub" style="font-size:13px">Procedurally made in Blender</div>
@@ -150,7 +187,7 @@
       </div>
       <aside class="panel">
         <h2 class="pill-title pill--white pill--flush">about</h2>
-        <p class="sub about-text" style="margin-top:18px">Hey! I'm Delinyah, a scientist - a creative one. This is my little portfolio. Just for fun and progress. I am currently obsessed with space-themed cinematics. I'm planning to delve more into animation and graphic design, both for fun sidequests and scientific purposes.</p>
+        <p class="sub about-text" style="margin-top:18px">Hey! I'm Delinyah, a scientist - a creative one. This is my little portfolio. Just for fun and progress. I am currently obsessed with space-themed cinematics. I'm planning to delve more into animation and graphic design, both for fun sidequests and scientific purposes. This website itself is also a creative sidequest. I hid some surprises in there. Hover over stuff and find out...</p>
         <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:16px 0">
         <p><a class="tab" href="mailto:koningdelinyah@gmail.com" style="font-size:13px">koningdelinyah@gmail.com</a></p>
         <p style="margin-top:10px">
@@ -164,11 +201,15 @@
 
   <!-- Lightbox -->
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="lightbox__frame" role="document">
+    <div class="lightbox__frame" role="document" style="position:relative"><!-- ADDED position to hold btn -->
       <button class="lightbox__close" type="button" aria-label="Close">
         <span aria-hidden="true">✕</span><span class="lightbox__sr">Close</span>
       </button>
       <div id="lightboxMediaSlot"></div>
+      <!-- ADDED: See more in popup -->
+      <div class="lightbox__more" id="lightboxMore" hidden>
+        <a id="lightboxSeeMore" href="#">See more →</a>
+      </div>
     </div>
   </div>
 
