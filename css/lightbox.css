@@ -19,8 +19,9 @@
 }
 
 .lightbox__frame {
-  max-width: 90vw;
-  max-height: 90vh;
+  /* slightly smaller than before */
+  max-width: 82vw;
+  max-height: 82vh;
   position: relative;
   background: var(--panel, #10121a);
   border-radius: var(--radius, 12px);
@@ -32,6 +33,9 @@
 
 .lightbox__close {
   position: absolute;
+  /* CSS fallback – JS will also place it */
+  top: 8px;
+  right: 8px;
   background: rgba(0,0,0,0.5);
   color: #fff;
   border: none;
@@ -88,7 +92,7 @@
 }
 
 /* ================================ */
-/* NEW PARTS — See more overlays   */
+/* See more overlays and popup btn  */
 /* ================================ */
 
 /* Hover “See more” on any tile with data-more */
@@ -121,9 +125,9 @@
   background: rgba(255,255,255,0.12);
 }
 
-/* Popup "See more" (positioned via JS — do not hardcode bottom/right here) */
+/* Popup "See more" (positioned via JS at media's bottom-right) */
 .lightbox__more {
-  position: absolute; /* JS sets top/left to media bottom-right */
+  position: absolute; /* JS sets top/left */
   z-index: 5;
 }
 
