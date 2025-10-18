@@ -4,7 +4,14 @@ const frame = lb.querySelector('.lightbox__frame');
 const closeBtn = lb.querySelector('.lightbox__close');
 const slot = document.getElementById('lightboxMediaSlot');
 
-function openWithMedia(mediaEl){
+// ADDED: refs for "See more" inside popup (if page provides them)
+const lbMoreWrap = document.getElementById('lightboxMore');
+const lbMoreLink = document.getElementById('lightboxSeeMore');
+
+// track which tile opened the lightbox
+let lastSourceThumb = null;
+
+function openWithMedia(mediaEl, meta = {}){
   slot.innerHTML = '';
   const isVideo = mediaEl.tagName.toLowerCase() === 'video';
   const clone = mediaEl.cloneNode(true);
@@ -24,6 +31,24 @@ function openWithMedia(mediaEl){
   lb.classList.add('open');
   lb.setAttribute('aria-hidden', 'false');
   closeBtn.focus();
+
+  // ADDED: compute and show "See more" based on the source card's data-more
+  lastSourceThumb = meta.sourceThumb || lastSourceThumb || null;
+  if (lbMoreWrap && lbMoreLink){
+    let moreHref = null;
+    if (lastSourceThumb){
+      const card = lastSourceThumb.closest('article.card');
+      if (card && card.hasAttribute('data-more')){
+        moreHref = card.getAttribute('data-more');
+      }
+    }
+    if (moreHref){
+      lbMoreLink.href = moreHref;
+      lbMoreWrap.hidden = false;
+    } else {
+      lbMoreWrap.hidden = true;
+    }
+  }
 
   // precise placement after open (layout may still settle)
   requestAnimationFrame(() => {
@@ -54,7 +79,10 @@ function close(){
 // bindings
 document.querySelectorAll('.thumb[data-lightbox]').forEach(thumb=>{
   const media = thumb.querySelector('video, img') || thumb;
-  const handleOpen = (e)=>{ openWithMedia(media); e.stopPropagation(); e.preventDefault(); };
+  const handleOpen = (e)=>{
+    openWithMedia(media, { sourceThumb: thumb }); // ADDED meta
+    e.stopPropagation(); e.preventDefault();
+  };
   thumb.addEventListener('click', handleOpen);
   const btn = thumb.querySelector('.fs-btn'); if (btn){ btn.addEventListener('click', handleOpen); }
   media.addEventListener('dblclick', handleOpen);
