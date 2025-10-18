@@ -32,33 +32,11 @@
   box-shadow: 0 12px 40px rgba(0,0,0,0.45);
 }
 
-/* === Minimal change: allow the media to size itself to viewport while preserving aspect === */
 .lightbox__media {
-  /* previously:
-     max-width: 100%;
-     max-height: 100%;
-     display: block;
-     background: #000;
-  */
-  width: auto;
-  height: auto;
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;
-  aspect-ratio: auto;
   display: block;
   background: #000;
-}
-
-/* Extra safety: if the slot ever gets a non-IMG/VIDEO child, these keep scaling sane */
-#lightboxMediaSlot img.lightbox__media,
-#lightboxMediaSlot video.lightbox__media {
-  width: auto !important;
-  height: auto !important;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  aspect-ratio: auto;
 }
 
 #lightboxMediaSlot {
@@ -174,4 +152,17 @@
   border-radius: 999px;
   background: rgba(0,0,0,0.35);
   backdrop-filter: saturate(140%) blur(6px);
+}
+
+/* === Minimal portrait fix (no other behavior changed) ===
+   The cloned IMG/VIDEO carries class .lightbox__media and sits inside #lightboxMediaSlot.
+   Let it size to the viewport-limited frame while keeping natural aspect ratio.
+*/
+#lightboxMediaSlot img.lightbox__media,
+#lightboxMediaSlot video.lightbox__media {
+  width: auto;
+  height: auto;
+  max-width: min(82vw, 100%);
+  max-height: min(82vh, 100%);
+  /* no object-fit: we rely on intrinsic ratio with auto sizing */
 }
