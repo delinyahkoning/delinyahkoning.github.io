@@ -95,9 +95,15 @@ section{padding:60px 0}
 .pill-title{
   --pill-px: 15px; --pill-py: 5px; --pill-font: 15px;
   display:inline-block; margin:0 0 12px 14px; padding:var(--pill-py) var(--pill-px);
-  border-radius:999px; border:1.5px solid currentColor; background:transparent; color:#fff;
+  border-radius:999px; border:1.5px solid currentColor; 
   text-transform:lowercase; font-weight:600; letter-spacing:.02em; line-height:1; font-size:var(--pill-font);
   transition: background .2s ease, color .2s ease, border-color .2s ease;
+  cursor:pointer;
+
+  /* Default: white pill with black text */
+  background:#fff; 
+  color:#000; 
+  border-color:#fff;
 }
 
 /* Cute yellow fill on hover (clean & readable) */
